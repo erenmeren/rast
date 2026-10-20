@@ -1,0 +1,195 @@
+{
+  "note": "Stock photographs for fictional prototype profiles only. The pictured people are not actual app users. Demo ages, identities, preferences, or other profile information must not be interpreted as facts about the pictured people.",
+  "license": "Unsplash License",
+  "images": [
+    {
+      "file": "portrait-1.jpg",
+      "source": "https://unsplash.com/photos/a-woman-in-a-black-top-leaning-against-a-wall-XLCP4bF8Fds",
+      "photographer": "Jane Palash",
+      "download_url": "https://images.unsplash.com/photo-1597523308574-a7459e3d3c4e?auto=format&fit=crop&crop=faces&w=700&h=950&q=83&fm=jpg",
+      "bytes": 120270,
+      "license_url": "https://unsplash.com/license",
+      "width": 700,
+      "height": 950
+    },
+    {
+      "file": "portrait-2.jpg",
+      "source": "https://unsplash.com/photos/woman-in-white-shirt-smiling-18jNa-MzWYc",
+      "photographer": "Black Linear Studios",
+      "download_url": "https://images.unsplash.com/photo-1627328543975-3f0ba8a823b0?auto=format&fit=crop&crop=faces&w=700&h=950&q=83&fm=jpg",
+      "bytes": 120179,
+      "license_url": "https://unsplash.com/license",
+      "width": 700,
+      "height": 950
+    },
+    {
+      "file": "portrait-3.jpg",
+      "source": "https://unsplash.com/photos/man-in-gray-and-white-sweater-V28kuY69FTY",
+      "photographer": "A. C. (@avecalvar)",
+      "download_url": "https://images.unsplash.com/photo-1620862291771-953515831f3b?auto=format&fit=crop&crop=faces&w=700&h=950&q=83&fm=jpg",
+      "bytes": 161790,
+      "license_url": "https://unsplash.com/license",
+      "width": 700,
+      "height": 950
+    },
+    {
+      "file": "portrait-4.jpg",
+      "source": "https://unsplash.com/photos/man-in-gray-hoodie-smiling-7ox6lWrU1rs",
+      "photographer": "Jabo Elysée",
+      "download_url": "https://images.unsplash.com/photo-1604857209516-fe60ee97246b?auto=format&fit=crop&crop=faces&w=700&h=950&q=83&fm=jpg",
+      "bytes": 102049,
+      "license_url": "https://unsplash.com/license",
+      "width": 700,
+      "height": 950
+    },
+    {
+      "file": "portrait-5.jpg",
+      "source": "https://unsplash.com/photos/a-man-with-a-beard-wearing-a-white-shirt-8ryZGXuDVf4",
+      "photographer": "Venti Views",
+      "download_url": "https://images.unsplash.com/photo-1634513837961-a7da40696a92?auto=format&fit=crop&crop=faces&w=700&h=950&q=83&fm=jpg",
+      "bytes": 119659,
+      "license_url": "https://unsplash.com/license",
+      "width": 700,
+      "height": 950
+    },
+    {
+      "file": "portrait-6.jpg",
+      "source": "https://unsplash.com/photos/a-person-with-the-hands-on-the-chest--QyzZ-sRGys",
+      "photographer": "Dmitry Ganin",
+      "download_url": "https://images.unsplash.com/photo-1666932520967-c3ea42589b98?auto=format&fit=crop&crop=faces&w=700&h=950&q=83&fm=jpg",
+      "bytes": 111016,
+      "license_url": "https://unsplash.com/license",
+      "width": 700,
+      "height": 950
+    },
+    {
+      "file": "portrait-7.jpg",
+      "source": "https://unsplash.com/photos/woman-holds-a-camera-seemingly-thoughtful-AqYlYYO3v3o",
+      "photographer": "Brooke Balentine",
+      "download_url": "https://images.unsplash.com/photo-1753019493958-713b3efa38de?auto=format&fit=crop&crop=faces&w=700&h=950&q=83&fm=jpg",
+      "bytes": 113195,
+      "license_url": "https://unsplash.com/license",
+      "width": 700,
+      "height": 950
+    },
+    {
+      "file": "portrait-8.jpg",
+      "source": "https://unsplash.com/photos/portrait-photography-of-man-JSRmthCownc",
+      "photographer": "Dominique Jordan",
+      "download_url": "https://images.unsplash.com/photo-1515095984775-726a54913d0e?auto=format&fit=crop&crop=faces&w=700&h=950&q=83&fm=jpg",
+      "bytes": 133403,
+      "license_url": "https://unsplash.com/license",
+      "width": 700,
+      "height": 950
+    },
+    {
+      "file": "city.jpg",
+      "source": "https://unsplash.com/photos/people-walking-down-a-street-UFxeZ4gG-kU",
+      "photographer": "Abdullah Al Mallah",
+      "download_url": "https://images.unsplash.com/photo-1658416438375-1fde63cf7a30?auto=format&fit=crop&crop=faces&w=700&h=950&q=83&fm=jpg",
+      "bytes": 108239,
+      "license_url": "https://unsplash.com/license",
+      "width": 700,
+      "height": 950
+    }
+  ],
+  "note_tr": "Kurgusal prototip profilleri için temsili stok fotoğraflarıdır. Fotoğraflardaki kişiler uygulamanın gerçek kullanıcıları değildir. Demo yaşları, kimlikleri veya tercihleri fotoğraflardaki kişilere ait bilgi olarak yorumlanmamalıdır.",
+  "fonts": [
+    {
+      "file": "fonts/dm-sans-400-700-normal-latin-ext.woff2",
+      "family": "DM Sans",
+      "style": "normal",
+      "weight": "400 700",
+      "subset": "latin-ext",
+      "source_url": "https://fonts.gstatic.com/s/dmsans/v17/rP2Yp2ywxg089UriI5-g4vlH9VoD8Cmcqbu6-K6h9Q.woff2",
+      "source_css_url": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400..700&family=Instrument+Serif:ital@0;1&display=swap",
+      "unicode_range": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF",
+      "license": "SIL Open Font License 1.1",
+      "bytes": 18228,
+      "license_file": "fonts/dm-sans-OFL.txt",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmsans/OFL.txt"
+    },
+    {
+      "file": "fonts/dm-sans-400-700-normal-latin.woff2",
+      "family": "DM Sans",
+      "style": "normal",
+      "weight": "400 700",
+      "subset": "latin",
+      "source_url": "https://fonts.gstatic.com/s/dmsans/v17/rP2Yp2ywxg089UriI5-g4vlH9VoD8Cmcqbu0-K4.woff2",
+      "source_css_url": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400..700&family=Instrument+Serif:ital@0;1&display=swap",
+      "unicode_range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+      "license": "SIL Open Font License 1.1",
+      "bytes": 36932,
+      "license_file": "fonts/dm-sans-OFL.txt",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmsans/OFL.txt"
+    },
+    {
+      "file": "fonts/instrument-serif-400-italic-latin-ext.woff2",
+      "family": "Instrument Serif",
+      "style": "italic",
+      "weight": "400",
+      "subset": "latin-ext",
+      "source_url": "https://fonts.gstatic.com/s/instrumentserif/v5/jizHRFtNs2ka5fXjeivQ4LroWlx-6zAjgn7MsNo.woff2",
+      "source_css_url": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400..700&family=Instrument+Serif:ital@0;1&display=swap",
+      "unicode_range": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF",
+      "license": "SIL Open Font License 1.1",
+      "bytes": 12384,
+      "license_file": "fonts/instrument-serif-OFL.txt",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/instrumentserif/OFL.txt"
+    },
+    {
+      "file": "fonts/instrument-serif-400-italic-latin.woff2",
+      "family": "Instrument Serif",
+      "style": "italic",
+      "weight": "400",
+      "subset": "latin",
+      "source_url": "https://fonts.gstatic.com/s/instrumentserif/v5/jizHRFtNs2ka5fXjeivQ4LroWlx-6zAjjH7M.woff2",
+      "source_css_url": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400..700&family=Instrument+Serif:ital@0;1&display=swap",
+      "unicode_range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+      "license": "SIL Open Font License 1.1",
+      "bytes": 22128,
+      "license_file": "fonts/instrument-serif-OFL.txt",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/instrumentserif/OFL.txt"
+    },
+    {
+      "file": "fonts/instrument-serif-400-normal-latin-ext.woff2",
+      "family": "Instrument Serif",
+      "style": "normal",
+      "weight": "400",
+      "subset": "latin-ext",
+      "source_url": "https://fonts.gstatic.com/s/instrumentserif/v5/jizBRFtNs2ka5fXjeivQ4LroWlx-6zsTjmbI.woff2",
+      "source_css_url": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400..700&family=Instrument+Serif:ital@0;1&display=swap",
+      "unicode_range": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF",
+      "license": "SIL Open Font License 1.1",
+      "bytes": 11604,
+      "license_file": "fonts/instrument-serif-OFL.txt",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/instrumentserif/OFL.txt"
+    },
+    {
+      "file": "fonts/instrument-serif-400-normal-latin.woff2",
+      "family": "Instrument Serif",
+      "style": "normal",
+      "weight": "400",
+      "subset": "latin",
+      "source_url": "https://fonts.gstatic.com/s/instrumentserif/v5/jizBRFtNs2ka5fXjeivQ4LroWlx-6zUTjg.woff2",
+      "source_css_url": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400..700&family=Instrument+Serif:ital@0;1&display=swap",
+      "unicode_range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+      "license": "SIL Open Font License 1.1",
+      "bytes": 21032,
+      "license_file": "fonts/instrument-serif-OFL.txt",
+      "license_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/instrumentserif/OFL.txt"
+    }
+  ],
+  "font_licenses": [
+    {
+      "family": "DM Sans",
+      "source_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmsans/OFL.txt",
+      "file": "fonts/dm-sans-OFL.txt"
+    },
+    {
+      "family": "Instrument Serif",
+      "source_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/instrumentserif/OFL.txt",
+      "file": "fonts/instrument-serif-OFL.txt"
+    }
+  ]
+}
