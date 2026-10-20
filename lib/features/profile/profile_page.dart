@@ -55,7 +55,7 @@ class ProfilePage extends ConsumerWidget {
                           Text.rich(
                             TextSpan(
                               text: profile.age == null ? '—' : ageLabel(profile.age!),
-                              children: [TextSpan(text: ' years old', style: rastStyle(size: 13, weight: 500, color: c.isDark ? c.body : const Color(0xFF9999A5)))],
+                              children: [TextSpan(text: '  years old', style: rastStyle(size: 13, weight: 500, letterSpacing: 0, color: c.isDark ? c.body : const Color(0xFF9999A5)))],
                             ),
                             style: rastStyle(size: 34, weight: 800, height: 1, letterSpacing: -1.3, color: c.text),
                           ),
@@ -115,7 +115,7 @@ class ProfilePage extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text.rich(
-                    TextSpan(text: 'Your photos', children: [TextSpan(text: '  $n/4', style: rastStyle(size: 9, weight: 500, color: c.isDark ? c.body : const Color(0xFFB1B1BC)))]),
+                    TextSpan(text: 'Your photos', children: [TextSpan(text: '  $n/4', style: rastStyle(size: 9, weight: 500, letterSpacing: 0, color: c.isDark ? c.body : const Color(0xFFB1B1BC)))]),
                     style: rastStyle(size: 11, weight: 700, color: c.isDark ? c.label : const Color(0xFF696974)),
                   ),
                   TextLinkButton(label: 'Edit', size: 11, color: c.accent, onPressed: () => context.push('/profile/photos')),

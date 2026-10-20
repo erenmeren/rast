@@ -4,7 +4,17 @@
 
 rast is a native, English-language dating app for iOS and Android, built with Flutter and Dart. Instead of endless browsing, rast shows you people whose paths actually crossed yours in real life: within about 20 metres, after a privacy delay, and only when you fit each other's preferences.
 
-> Status: **in development**. The first milestone is a fully navigable native app running on mock data. Real SMS verification, backend, location processing, chat delivery and purchases are added afterwards behind the same repository interfaces.
+> Status: **milestone 1 done (2026-10-20)**: a fully navigable native app on mock data, light and dark, with 85 passing tests. Real SMS verification, backend, location processing, chat delivery and purchases come next, behind the same repository interfaces.
+
+| Welcome | Discover | Likes You | Profile |
+| --- | --- | --- | --- |
+| ![Welcome](docs/screenshots/01-welcome-light.jpg) | ![Discover](docs/screenshots/03-discover-light.jpg) | ![Likes You](docs/screenshots/04-likes-light.jpg) | ![Profile](docs/screenshots/10-profile-light.jpg) |
+
+| Introduction | Match | Conversation (dark) | Location & visibility (dark) |
+| --- | --- | --- | --- |
+| ![Intro](docs/screenshots/02-intro-light.jpg) | ![Match](docs/screenshots/07-match-light.jpg) | ![Conversation](docs/screenshots/09-conversation-dark.jpg) | ![Location](docs/screenshots/11-location-dark.jpg) |
+
+More in `docs/screenshots/`. They are rendered by `test/screenshots_test.dart` with the real font and assets, not captured on a device.
 
 ## Product rules (agreed, non-negotiable)
 
@@ -42,7 +52,7 @@ rast/
 
 ## Architecture
 
-- **Flutter stable** with Dart. Versions are recorded in `pubspec.lock` and `.fvmrc`/`flutter --version` output in the docs.
+- **Flutter 3.47.7 stable, Dart 3.13.5**. Exact package versions are in `pubspec.lock` and `docs/superpowers/plans/decision-log.md`.
 - **Riverpod** for state and dependency injection. **go_router** for navigation with guards for session, setup completion and the required introduction.
 - **Repository interfaces** (`AuthRepository`, `ProfileRepository`, `DiscoveryRepository`, `MatchRepository`, `ChatRepository`, `SafetyRepository`, `IntroRepository`, `EntitlementRepository`, `LocationRepository`) with explicit **mock** implementations today and **production** adapters later. Screens never know which one they are talking to.
 - Pure domain rules (eligibility, delay, age range, shuffle) live in plain Dart and are unit-tested against the prototype's fixtures.
@@ -50,25 +60,48 @@ rast/
 ## Getting started
 
 ```sh
-flutter --version          # stable channel
+flutter --version          # 3.47.7 stable
 flutter pub get
-flutter run                # mock mode is the default
-flutter test
+flutter run                # mock mode is the only mode for now
+flutter test               # 85 tests: rules, state, widgets, flows
 flutter analyze
+flutter build apk --debug  # build/app/outputs/flutter-apk/app-debug.apk
+
+# Render every main screen to PNG for visual review:
+RAST_SHOTS=/some/dir flutter test test/screenshots_test.dart
 ```
 
-Mock mode uses fictional profiles and stock placeholder photos. The sample verification code is `246810`. No SMS is sent, no location is collected, no payment is taken.
+Mock mode uses fictional profiles and stock placeholder photos. The sample verification code is `246810`. No SMS is sent, no location is collected, no payment is taken. In debug builds the photo step has a "Use sample photos" shortcut so a reviewer can get through setup quickly.
+
+### Walkthrough
+
+1. Welcome → phone (any valid number) → code `246810` → age and gender → preferences → four photos → "Enable location" or "Not now".
+2. The one-time introduction plays (27.4 s). It can be paused, not skipped. "Start exploring" unlocks after it has been watched.
+3. Discover: tap photo edges to browse the album, drag or use the buttons to like or pass, rewind a pass, open the detail page, open the person menu.
+4. Likes You: blurred previews; "Get rast Plus" is a no-charge preview that reveals the same people.
+5. Like someone who likes you back (for example the 27-year-old) to see the match moment and open the chat.
+6. Profile: dating preferences, location & visibility (8 interval and 8 delay choices), appearance, how it works replay, notifications, safety & account (removed connections, blocked profiles, pause, log out, delete).
 
 ## Roadmap
 
 | Phase | Scope | Status |
 | --- | --- | --- |
-| 1 | Native foundation: theme, typography, components, four-tab shell | planned |
-| 2 | Onboarding (phone → code → about you → preferences → photos → location) and the one-time introduction | planned |
-| 3 | Discover deck, Likes You, person detail, eligibility rules | planned |
-| 4 | Match, Chats, conversation, remove/block/report, Safety & account | planned |
+| 1 | Native foundation: theme, typography, components, four-tab shell | done (mock) |
+| 2 | Onboarding (phone → code → about you → preferences → photos → location) and the one-time introduction | done (mock) |
+| 3 | Discover deck, Likes You, person detail, eligibility rules | done (mock) |
+| 4 | Match, Chats, conversation, remove/block/report, Safety & account | done (mock) |
 | 5 | Real backend, SMS verification, location evidence, realtime chat | later |
 | 6 | Store purchases, entitlements, release validation | later |
+
+## Known gaps in milestone 1
+
+- No real permission prompt: "Enable location" only flips a flag. The production adapter must request precise and background access and handle denial and recovery.
+- The Likes You blur is cosmetic. A free client must never receive the original image from the server.
+- No network, loading, retry or offline states yet; everything is synchronous and local.
+- Age is a typed whole number guarded to 18–130, as in the prototype. The production age model and age assurance are undecided.
+- A self-described gender matches only the "Everyone" interest. The handoff says not to guess a finer mapping.
+- Chats, likes and passes reset on relaunch (like the prototype). Profile, preferences, timing, appearance, intro status and safety state persist on the device.
+- iOS is configured but has not been built here (no Xcode on the build machine). Visual parity on physical devices is unverified; the screenshots come from the widget-test renderer.
 
 ## Reference
 
