@@ -1,0 +1,23 @@
+{
+  "family": "Plus Jakarta Sans",
+  "style": "normal",
+  "source_repository": "https://github.com/google/fonts/tree/main/ofl/plusjakartasans",
+  "files": [
+    {
+      "file": "PlusJakartaSans-Variable.ttf",
+      "source_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/plusjakartasans/PlusJakartaSans%5Bwght%5D.ttf",
+      "git_blob_sha1": "0cb13a998ed525ba226d911b10d6c4c4f923a961",
+      "sha256": "89b3fb38aa0d275d7a731d0d817a4f1622b316b4d7fbdedcf02ee9099ff68bc8",
+      "bytes": 176288,
+      "retrieved_date": "2026-10-20"
+    },
+    {
+      "file": "OFL.txt",
+      "source_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/plusjakartasans/OFL.txt",
+      "git_blob_sha1": "ea69b0ca12a02556c436680ea0a159efb7a748fa",
+      "sha256": "995c7199cab65954f545996326755daee7b63cc6b42b06c13da1f9502ab08a99",
+      "bytes": 4402,
+      "retrieved_date": "2026-10-20"
+    }
+  ]
+}

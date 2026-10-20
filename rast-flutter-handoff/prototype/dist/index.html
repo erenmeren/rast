@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Good things happen nearby. Explore rast, a modern dating app for people whose paths cross in real life.">
+  <title>rast — Good things happen nearby.</title>
+  <script>
+    (()=>{let preference='system';try{const saved=JSON.parse(localStorage.getItem('rast-design-settings')||'null');if(['system','light','dark'].includes(saved?.theme))preference=saved.theme;}catch{}const theme=preference==='system'?(window.matchMedia?.('(prefers-color-scheme: dark)').matches?'dark':'light'):preference;document.documentElement.setAttribute('data-theme',theme);document.documentElement.style.colorScheme=theme;})();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="assets/fonts/jakarta.css">
+  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="v2.css?v=2">
+  <link rel="stylesheet" href="how-it-works.css?v=2">
+  <link rel="stylesheet" href="dark-mode.css?v=1">
+</head>
+<body>
+  <div id="studio"></div>
+  <div id="live-region" class="sr-only" role="status" aria-live="polite"></div>
+  <script type="module" src="app.js?v=6"></script>
+</body>
+</html>

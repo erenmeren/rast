@@ -1,0 +1,7 @@
+{
+  "name": "rast-mobile-design",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "rast — interactive mobile product design prototype"
+}

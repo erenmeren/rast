@@ -1,0 +1,178 @@
+{
+  "source": "prototype/dist/app.js#SCREENS",
+  "source_commit": "de646b9263e4c6d31dea0c0aa76d946da775ab88",
+  "main_screens": [
+    {
+      "key": "welcome",
+      "name": "Welcome",
+      "group": "signup",
+      "title": "Good things happen nearby.",
+      "copy": "A confident first impression. Full-bleed portraits, bold type and a bright coral accent.",
+      "rule": "Real life comes first",
+      "ruleCopy": "Start with the people whose paths cross yours.",
+      "symbol": "mark"
+    },
+    {
+      "key": "phone",
+      "name": "Phone number",
+      "group": "signup",
+      "title": "A number. A new beginning.",
+      "copy": "One phone number to sign up or sign in. No email, password, name or job title.",
+      "rule": "Keep it simple",
+      "ruleCopy": "Phone number, then a six-digit verification code.",
+      "symbol": "phone"
+    },
+    {
+      "key": "otp",
+      "name": "Verification",
+      "group": "signup",
+      "title": "You are almost in.",
+      "copy": "A single code field supports typing and pasting. Change your number or request a new code.",
+      "rule": "Demo code: 246810",
+      "ruleCopy": "This prototype does not send a real SMS.",
+      "symbol": "shield"
+    },
+    {
+      "key": "basics",
+      "name": "Your age & gender",
+      "group": "signup",
+      "title": "Your age. Your identity.",
+      "copy": "Your own age and gender are explicitly required. Who you want to meet is a separate next step.",
+      "rule": "Adults only",
+      "ruleCopy": "Ages under 18 cannot continue. Ages 99 and older display as 99+.",
+      "symbol": "user"
+    },
+    {
+      "key": "preferences",
+      "name": "Dating preferences",
+      "group": "signup",
+      "title": "Your kind of connection.",
+      "copy": "Select multiple genders or Everyone. Set both age limits on one shared slider.",
+      "rule": "One range. Two handles.",
+      "ruleCopy": "Drag the ends of a single age range from 18 to 99+.",
+      "symbol": "sliders"
+    },
+    {
+      "key": "photos",
+      "name": "Your photos",
+      "group": "signup",
+      "title": "Four photos. All you.",
+      "copy": "Four photo slots, one clear next step. Add or change photos without filling out a long profile.",
+      "rule": "4 photos required",
+      "ruleCopy": "Discovery pauses if you remove a photo until all four are back.",
+      "symbol": "camera"
+    },
+    {
+      "key": "permission",
+      "name": "Location permission",
+      "group": "signup",
+      "title": "Let your paths cross.",
+      "copy": "The reason for location access is explained before asking for permission.",
+      "rule": "Your visibility, your call",
+      "ruleCopy": "Pause encounters whenever you want.",
+      "symbol": "locate"
+    },
+    {
+      "key": "discover",
+      "name": "Discover",
+      "group": "app",
+      "title": "Make the first move.",
+      "copy": "Big photos. Clear actions. People you have crossed paths with, ready for a new connection.",
+      "rule": "Close in real life",
+      "ruleCopy": "About 20 metres apart. A two-hour privacy delay by default.",
+      "symbol": "mark"
+    },
+    {
+      "key": "how",
+      "name": "How it works",
+      "group": "app",
+      "title": "Small world. Good timing.",
+      "copy": "One short introduction after setup. Replay the story anytime from Profile, or explore its five chapters at your own pace.",
+      "rule": "Watch a hello happen",
+      "ruleCopy": "A crossing, a mutual fit, a little time, and two people choosing to connect.",
+      "symbol": "route"
+    },
+    {
+      "key": "likes",
+      "name": "Likes You",
+      "group": "app",
+      "title": "Someone made a move.",
+      "copy": "Incoming likes have a dedicated place. Blurred previews for free members; clear profiles with Premium.",
+      "rule": "Your likes, unlocked",
+      "ruleCopy": "Free mutual matching and chat still work in Discover.",
+      "symbol": "heart"
+    },
+    {
+      "key": "premium",
+      "name": "Premium",
+      "group": "app",
+      "title": "Less guessing. More connecting.",
+      "copy": "A focused subscription screen explains what unlocks, with monthly and annual example plans.",
+      "rule": "Only a subscription preview",
+      "ruleCopy": "No payment is collected. Privacy delays always stay in place.",
+      "symbol": "spark"
+    },
+    {
+      "key": "match",
+      "name": "Match",
+      "group": "app",
+      "title": "The feeling is mutual.",
+      "copy": "Two likes, one clear next step. Start a conversation or keep exploring.",
+      "rule": "Two yeses. One hello.",
+      "ruleCopy": "Like a profile that likes you back to try this moment.",
+      "symbol": "heart"
+    },
+    {
+      "key": "chats",
+      "name": "Chats",
+      "group": "app",
+      "title": "Keep a good thing going.",
+      "copy": "New connections and conversations in one place. A photo and an age are enough to get started.",
+      "rule": "Messages after a match",
+      "ruleCopy": "No subscription is needed to chat after matching.",
+      "symbol": "chat"
+    },
+    {
+      "key": "conversation",
+      "name": "Conversation",
+      "group": "app",
+      "title": "Start with a hello.",
+      "copy": "High-contrast message bubbles, a clean composer and safety controls a tap away.",
+      "rule": "No location shared",
+      "ruleCopy": "Exact encounter locations and times stay out of the conversation.",
+      "symbol": "chat"
+    },
+    {
+      "key": "profile",
+      "name": "Your profile",
+      "group": "app",
+      "title": "Make it yours.",
+      "copy": "Your age, identity, four photos and preferences. Manage visibility, Premium and the How it works introduction from one place.",
+      "rule": "No profile homework",
+      "ruleCopy": "No name, job, religion or biography required.",
+      "symbol": "user"
+    },
+    {
+      "key": "settings",
+      "name": "Location & visibility",
+      "group": "app",
+      "title": "You set the pace.",
+      "copy": "Update frequency, reveal delay and a visibility switch together. Simple choices, clear defaults.",
+      "rule": "The longer delay wins",
+      "ruleCopy": "If one person chooses one hour and the other two, both wait two hours.",
+      "symbol": "clock"
+    }
+  ],
+  "additional_routes": [
+    "detail",
+    "editPhotos",
+    "safety"
+  ],
+  "bottom_navigation": [
+    "Discover",
+    "Likes You",
+    "Chats",
+    "Profile"
+  ],
+  "note": "Generated inventory of the prototype gallery. See docs/02_SCREEN_MAP.md for additional routes, modal sheets, states and Flutter mapping."
+}

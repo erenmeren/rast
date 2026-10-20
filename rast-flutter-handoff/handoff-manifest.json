@@ -1,0 +1,74 @@
+{
+  "format_version": 1,
+  "name": "rast — design and Flutter/Dart handoff",
+  "created_at_utc": "2026-10-20T16:16:09.210884+00:00",
+  "source": {
+    "saved_design_version": 6,
+    "commit_sha": "de646b9263e4c6d31dea0c0aa76d946da775ab88",
+    "hosted_reference": "https://rast-mobile-design.reynolds-9923.chatgpt.site",
+    "source_directory": "prototype",
+    "copied_source_files": 36,
+    "source_modified_for_export": false
+  },
+  "deliverable": {
+    "working_web_prototype": true,
+    "flutter_implementation_plan": true,
+    "flutter_application_implemented": false,
+    "production_backend_included": false,
+    "apk_or_ipa_included": false,
+    "app_language": "English",
+    "technical_document_language": "English",
+    "owner_quick_start_language": "Turkish",
+    "main_screen_count": 16,
+    "additional_route_count": 3,
+    "modal_case_count": 15,
+    "standalone_svg_icon_count": 36,
+    "native_font": "design/flutter-assets/fonts/PlusJakartaSans-Variable.ttf"
+  },
+  "validation": {
+    "performed_in_export": true,
+    "commands": [
+      {
+        "command": "node --check prototype/dist/app.js",
+        "exit_code": 0
+      },
+      {
+        "command": "node --test prototype/checks/rules.test.mjs",
+        "exit_code": 0,
+        "rule_scenarios_in_file": 7,
+        "runner_reported_test_files": 1
+      },
+      {
+        "command": "node prototype/checks/app-smoke.test.mjs",
+        "exit_code": 0,
+        "scenarios_passed": 37,
+        "scenarios_failed": 0
+      }
+    ],
+    "source_files_identical": 36,
+    "local_document_links_checked": 31,
+    "svg_files_parsed": 37,
+    "json_files_parsed": 6,
+    "python_tools_syntax": "passed",
+    "local_asset_references": "passed",
+    "unwanted_metadata_files": "none",
+    "native_font_metadata": "Plus Jakarta Sans Regular, wght 200/400/800, 1188 glyphs",
+    "flutter_compilation": "not applicable — planned implementation only",
+    "browser_visual_qa_this_export": "not performed",
+    "native_device_gps_testing": "not performed"
+  },
+  "integrity": {
+    "file_hash_index": "SHA256SUMS.txt",
+    "algorithm": "SHA-256",
+    "index_scope": "All payload files except SHA256SUMS.txt itself",
+    "archive_crc_check": "performed after writing ZIP"
+  },
+  "excluded": [
+    "Git history",
+    "Site hosting configuration and identity files",
+    "credentials",
+    "runtime files",
+    "node_modules",
+    "live user data"
+  ]
+}
