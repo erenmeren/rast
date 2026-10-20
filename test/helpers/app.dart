@@ -64,7 +64,7 @@ Future<void> loadRastFont() async {
 }
 
 /// Pumps the real app with [container]. Phone-sized surface.
-Future<void> pumpRast(WidgetTester tester, ProviderContainer container, {String? initialLocation}) async {
+Future<void> pumpRast(WidgetTester tester, ProviderContainer container, {String? initialLocation, bool settle = true}) async {
   tester.view.physicalSize = const Size(390 * 3, 844 * 3);
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
@@ -74,7 +74,12 @@ Future<void> pumpRast(WidgetTester tester, ProviderContainer container, {String?
     container.read(routerProvider).go(initialLocation);
   }
   await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const RastApp()));
-  await tester.pumpAndSettle();
+  if (settle) {
+    await tester.pumpAndSettle();
+  } else {
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+  }
 }
 
 /// Location of the top-most route, including imperatively pushed ones.

@@ -11,6 +11,7 @@ import '../features/onboarding/about_you_page.dart';
 import '../features/onboarding/location_permission_page.dart';
 import '../features/onboarding/photos_page.dart';
 import '../features/onboarding/preferences_page.dart';
+import '../features/intro/how_it_works_page.dart';
 import 'shell.dart';
 import 'stub_page.dart';
 
@@ -59,7 +60,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/setup/preferences', builder: (_, _) => const PreferencesPage()),
       GoRoute(path: '/setup/photos', builder: (_, _) => const PhotosPage()),
       GoRoute(path: '/setup/location', builder: (_, _) => const LocationPermissionPage()),
-      GoRoute(path: '/intro', builder: (_, _) => const StubPage('Intro')),
+      GoRoute(path: '/intro', builder: (_, _) => const HowItWorksPage(required: true)),
       GoRoute(
         path: '/matches/:personId',
         builder: (_, state) => StubPage('Match ${state.pathParameters['personId']}'),
@@ -119,7 +120,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 GoRoute(path: 'location', builder: (_, _) => const StubPage('Location & visibility')),
                 GoRoute(path: 'photos', builder: (_, _) => const PhotosPage(editing: true)),
                 GoRoute(path: 'safety', builder: (_, _) => const StubPage('Safety & account')),
-                GoRoute(path: 'how-it-works', builder: (_, _) => const StubPage('How it works')),
+                GoRoute(path: 'how-it-works', builder: (_, _) => const HowItWorksPage(required: false)),
                 GoRoute(
                   path: 'plus',
                   parentNavigatorKey: rootNavigatorKey,
