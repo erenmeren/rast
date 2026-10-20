@@ -4,6 +4,13 @@ import 'package:go_router/go_router.dart';
 
 import '../core/models/models.dart';
 import '../features/auth/session_notifier.dart';
+import '../features/auth/phone_page.dart';
+import '../features/auth/verify_page.dart';
+import '../features/auth/welcome_page.dart';
+import '../features/onboarding/about_you_page.dart';
+import '../features/onboarding/location_permission_page.dart';
+import '../features/onboarding/photos_page.dart';
+import '../features/onboarding/preferences_page.dart';
 import 'shell.dart';
 import 'stub_page.dart';
 
@@ -45,13 +52,13 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: notifier.redirect,
     routes: [
       GoRoute(path: '/', redirect: (_, _) => '/discover'),
-      GoRoute(path: '/welcome', builder: (_, _) => const StubPage('Welcome')),
-      GoRoute(path: '/auth/phone', builder: (_, _) => const StubPage('Phone')),
-      GoRoute(path: '/auth/verify', builder: (_, _) => const StubPage('Verify')),
-      GoRoute(path: '/setup/about', builder: (_, _) => const StubPage('About you')),
-      GoRoute(path: '/setup/preferences', builder: (_, _) => const StubPage('Preferences')),
-      GoRoute(path: '/setup/photos', builder: (_, _) => const StubPage('Photos')),
-      GoRoute(path: '/setup/location', builder: (_, _) => const StubPage('Location')),
+      GoRoute(path: '/welcome', builder: (_, _) => const WelcomePage()),
+      GoRoute(path: '/auth/phone', builder: (_, _) => const PhonePage()),
+      GoRoute(path: '/auth/verify', builder: (_, _) => const VerifyPage()),
+      GoRoute(path: '/setup/about', builder: (_, _) => const AboutYouPage()),
+      GoRoute(path: '/setup/preferences', builder: (_, _) => const PreferencesPage()),
+      GoRoute(path: '/setup/photos', builder: (_, _) => const PhotosPage()),
+      GoRoute(path: '/setup/location', builder: (_, _) => const LocationPermissionPage()),
       GoRoute(path: '/intro', builder: (_, _) => const StubPage('Intro')),
       GoRoute(
         path: '/matches/:personId',
@@ -110,7 +117,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               builder: (_, _) => const StubPage('Profile'),
               routes: [
                 GoRoute(path: 'location', builder: (_, _) => const StubPage('Location & visibility')),
-                GoRoute(path: 'photos', builder: (_, _) => const StubPage('Edit photos')),
+                GoRoute(path: 'photos', builder: (_, _) => const PhotosPage(editing: true)),
                 GoRoute(path: 'safety', builder: (_, _) => const StubPage('Safety & account')),
                 GoRoute(path: 'how-it-works', builder: (_, _) => const StubPage('How it works')),
                 GoRoute(
