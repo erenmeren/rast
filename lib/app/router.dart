@@ -12,6 +12,8 @@ import '../features/onboarding/location_permission_page.dart';
 import '../features/onboarding/photos_page.dart';
 import '../features/onboarding/preferences_page.dart';
 import '../features/intro/how_it_works_page.dart';
+import '../features/discovery/discover_page.dart';
+import '../features/discovery/person_detail_page.dart';
 import 'shell.dart';
 import 'stub_page.dart';
 
@@ -71,12 +73,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/discover',
-              builder: (_, _) => const StubPage('Discover'),
+              builder: (_, _) => const DiscoverPage(),
               routes: [
                 GoRoute(
                   path: 'people/:personId',
                   parentNavigatorKey: rootNavigatorKey,
-                  builder: (_, state) => StubPage('Person ${state.pathParameters['personId']}'),
+                  builder: (_, state) => PersonDetailPage(personId: state.pathParameters['personId']!, origin: 'discover'),
                 ),
               ],
             ),
@@ -89,7 +91,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 GoRoute(
                   path: 'people/:personId',
                   parentNavigatorKey: rootNavigatorKey,
-                  builder: (_, state) => StubPage('Person ${state.pathParameters['personId']}'),
+                  builder: (_, state) => PersonDetailPage(personId: state.pathParameters['personId']!, origin: 'likes'),
                 ),
                 GoRoute(
                   path: 'plus',

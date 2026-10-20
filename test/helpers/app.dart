@@ -96,3 +96,6 @@ Future<void> tapNav(WidgetTester tester, String label) async {
   await tester.tap(find.descendant(of: find.byType(RastBottomNav), matching: find.text(label)));
   await tester.pumpAndSettle();
 }
+
+/// Lets any visible toast expire so no timer is pending at teardown.
+Future<void> finishToasts(WidgetTester tester) => tester.pump(const Duration(seconds: 4));
