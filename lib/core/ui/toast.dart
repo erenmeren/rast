@@ -15,10 +15,10 @@ void showToast(BuildContext context, String message) {
   _current = null;
   final c = context.colors;
   final entry = OverlayEntry(
-    builder: (_) => Positioned(
+    builder: (overlayContext) => Positioned(
       left: 18,
       right: 18,
-      bottom: 88 + MediaQuery.paddingOf(context).bottom,
+      bottom: 88 + MediaQuery.paddingOf(overlayContext).bottom,
       child: IgnorePointer(
         child: Material(
           color: Colors.transparent,

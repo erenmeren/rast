@@ -14,6 +14,11 @@ import '../features/onboarding/preferences_page.dart';
 import '../features/intro/how_it_works_page.dart';
 import '../features/discovery/discover_page.dart';
 import '../features/discovery/person_detail_page.dart';
+import '../features/chat/chats_page.dart';
+import '../features/chat/conversation_page.dart';
+import '../features/chat/match_page.dart';
+import '../features/likes/likes_page.dart';
+import '../features/premium/premium_page.dart';
 import 'shell.dart';
 import 'stub_page.dart';
 
@@ -65,7 +70,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/intro', builder: (_, _) => const HowItWorksPage(required: true)),
       GoRoute(
         path: '/matches/:personId',
-        builder: (_, state) => StubPage('Match ${state.pathParameters['personId']}'),
+        builder: (_, state) => MatchPage(personId: state.pathParameters['personId']!),
       ),
       StatefulShellRoute.indexedStack(
         builder: (_, _, shell) => RastShell(navigationShell: shell),
@@ -86,7 +91,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/likes',
-              builder: (_, _) => const StubPage('Likes You'),
+              builder: (_, _) => const LikesPage(),
               routes: [
                 GoRoute(
                   path: 'people/:personId',
@@ -96,7 +101,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 GoRoute(
                   path: 'plus',
                   parentNavigatorKey: rootNavigatorKey,
-                  builder: (_, _) => const StubPage('Plus'),
+                  builder: (_, _) => const PremiumPage(),
                 ),
               ],
             ),
@@ -104,12 +109,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/chats',
-              builder: (_, _) => const StubPage('Chats'),
+              builder: (_, _) => const ChatsPage(),
               routes: [
                 GoRoute(
                   path: ':threadId',
                   parentNavigatorKey: rootNavigatorKey,
-                  builder: (_, state) => StubPage('Thread ${state.pathParameters['threadId']}'),
+                  builder: (_, state) => ConversationPage(threadId: state.pathParameters['threadId']!),
                 ),
               ],
             ),
@@ -126,7 +131,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 GoRoute(
                   path: 'plus',
                   parentNavigatorKey: rootNavigatorKey,
-                  builder: (_, _) => const StubPage('Plus'),
+                  builder: (_, _) => const PremiumPage(),
                 ),
               ],
             ),
