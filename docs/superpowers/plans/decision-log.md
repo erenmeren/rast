@@ -12,11 +12,11 @@ Product decisions come from the handoff. Entries here are engineering choices ma
 
 | Package | Version | Why |
 | --- | --- | --- |
-| flutter_riverpod | see pubspec.lock | app state + dependency injection, plain `Notifier` classes, no codegen |
-| go_router | see pubspec.lock | declarative routes, `StatefulShellRoute` for the four tabs, one redirect guard |
-| shared_preferences | see pubspec.lock | device-local appearance, timing, notifications, intro status, mock safety and session |
-| image_picker | see pubspec.lock | gallery picker for the four photos |
-| flutter_svg | see pubspec.lock | the 36 handoff icons, tinted with `ColorFilter` |
+| flutter_riverpod | 3.4.3 | app state + dependency injection, plain `Notifier` classes, no codegen |
+| go_router | 18.1.1 | declarative routes, `StatefulShellRoute` for the four tabs, one redirect guard |
+| shared_preferences | 2.5.6 | device-local appearance, timing, notifications, intro status, mock safety and session |
+| image_picker | 1.2.4 | gallery picker for the four photos |
+| flutter_svg | 2.3.0 | the 36 handoff icons, tinted with `ColorFilter` |
 
 ## Engineering choices
 
