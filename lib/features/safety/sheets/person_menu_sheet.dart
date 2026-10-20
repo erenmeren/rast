@@ -118,64 +118,84 @@ Future<void> showBlockConfirmSheet(BuildContext context, WidgetRef ref, String p
 
 Future<void> showReportSheet(BuildContext context, WidgetRef ref, String personId, {required String returnTo}) {
   final matched = ref.read(threadsProvider.notifier).byPerson(personId) != null;
-  String? reason;
-  var alsoBlock = true;
-  final details = TextEditingController();
   return showRastSheet<void>(
     context,
     title: 'What would you like to report?',
-    builder: (sheetContext) => StatefulBuilder(
-      builder: (sheetContext, setState) {
-        final c = sheetContext.colors;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Choose the reason that fits best.', style: rastStyle(size: 13, weight: 450, height: 1.65, color: c.body)),
-            const SizedBox(height: 8),
-            for (final r in reportReasons)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: _ReportOption(label: r, selected: reason == r, onTap: () => setState(() => reason = r)),
-              ),
-            const SizedBox(height: 10),
-            RastTextField(
-              controller: details,
-              hint: 'Anything else to add? (optional)',
-              maxLength: 1000,
-              maxLines: 3,
-              minLines: 2,
-              semanticLabel: 'Report details',
-            ),
-            const SizedBox(height: 8),
-            OptionCheck(
-              label: matched ? 'Also block and permanently remove this connection.' : 'Also block this profile.',
-              value: alsoBlock,
-              onChanged: (v) => setState(() => alsoBlock = v),
-            ),
-            const SizedBox(height: 12),
-            PrimaryButton(
-              label: 'Complete report',
-              trailingIcon: null,
-              onPressed: reason == null
-                  ? null
-                  : () {
-                      Navigator.of(sheetContext).pop();
-                      ref.read(safetyActionsProvider).report(personId, reason!, alsoBlock: alsoBlock);
-                      if (alsoBlock) _leave(context, returnTo);
-                      showToast(
-                        context,
-                        alsoBlock
-                            ? 'Report saved and profile blocked in this preview. No real report was sent.'
-                            : 'Report saved in this preview. No real report was sent.',
-                      );
-                    },
-            ),
-            const FormHelp('Design preview: no real report is sent. Optional details are not saved.'),
-          ],
+    builder: (sheetContext) => _ReportSheetBody(
+      matched: matched,
+      onSubmit: (reason, alsoBlock) {
+        Navigator.of(sheetContext).pop();
+        ref.read(safetyActionsProvider).report(personId, reason, alsoBlock: alsoBlock);
+        if (alsoBlock) _leave(context, returnTo);
+        showToast(
+          context,
+          alsoBlock
+              ? 'Report saved and profile blocked in this preview. No real report was sent.'
+              : 'Report saved in this preview. No real report was sent.',
         );
       },
     ),
-  ).whenComplete(details.dispose);
+  );
+}
+
+class _ReportSheetBody extends StatefulWidget {
+  const _ReportSheetBody({required this.matched, required this.onSubmit});
+  final bool matched;
+  final void Function(String reason, bool alsoBlock) onSubmit;
+
+  @override
+  State<_ReportSheetBody> createState() => _ReportSheetBodyState();
+}
+
+class _ReportSheetBodyState extends State<_ReportSheetBody> {
+  String? _reason;
+  bool _alsoBlock = true;
+  final _details = TextEditingController();
+
+  @override
+  void dispose() {
+    _details.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Choose the reason that fits best.', style: rastStyle(size: 13, weight: 450, height: 1.65, color: c.body)),
+        const SizedBox(height: 8),
+        for (final r in reportReasons)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: _ReportOption(label: r, selected: _reason == r, onTap: () => setState(() => _reason = r)),
+          ),
+        const SizedBox(height: 10),
+        RastTextField(
+          controller: _details,
+          hint: 'Anything else to add? (optional)',
+          maxLength: 1000,
+          maxLines: 3,
+          minLines: 2,
+          semanticLabel: 'Report details',
+        ),
+        const SizedBox(height: 8),
+        OptionCheck(
+          label: widget.matched ? 'Also block and permanently remove this connection.' : 'Also block this profile.',
+          value: _alsoBlock,
+          onChanged: (v) => setState(() => _alsoBlock = v),
+        ),
+        const SizedBox(height: 12),
+        PrimaryButton(
+          label: 'Complete report',
+          trailingIcon: null,
+          onPressed: _reason == null ? null : () => widget.onSubmit(_reason!, _alsoBlock),
+        ),
+        const FormHelp('Design preview: no real report is sent. Optional details are not saved.'),
+      ],
+    );
+  }
 }
 
 /// After a removal the current screen may no longer be valid (conversation,

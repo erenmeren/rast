@@ -19,8 +19,10 @@ import '../features/chat/conversation_page.dart';
 import '../features/chat/match_page.dart';
 import '../features/likes/likes_page.dart';
 import '../features/premium/premium_page.dart';
+import '../features/profile/location_settings_page.dart';
+import '../features/profile/profile_page.dart';
+import '../features/safety/safety_page.dart';
 import 'shell.dart';
-import 'stub_page.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
@@ -122,11 +124,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/profile',
-              builder: (_, _) => const StubPage('Profile'),
+              builder: (_, _) => const ProfilePage(),
               routes: [
-                GoRoute(path: 'location', builder: (_, _) => const StubPage('Location & visibility')),
+                GoRoute(path: 'location', builder: (_, _) => const LocationSettingsPage()),
                 GoRoute(path: 'photos', builder: (_, _) => const PhotosPage(editing: true)),
-                GoRoute(path: 'safety', builder: (_, _) => const StubPage('Safety & account')),
+                GoRoute(path: 'safety', builder: (_, _) => const SafetyPage()),
                 GoRoute(path: 'how-it-works', builder: (_, _) => const HowItWorksPage(required: false)),
                 GoRoute(
                   path: 'plus',
