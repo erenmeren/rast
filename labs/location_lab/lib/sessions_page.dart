@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'export.dart';
 import 'lab_store.dart';
 import 'models.dart';
 import 'providers.dart';
@@ -45,7 +46,7 @@ class _SessionsPageState extends ConsumerState<SessionsPage> {
   }
 }
 
-class _SessionTile extends StatelessWidget {
+class _SessionTile extends ConsumerWidget {
   const _SessionTile({required this.store, required this.session, required this.onChanged});
 
   final LabStore store;
@@ -53,7 +54,7 @@ class _SessionTile extends StatelessWidget {
   final VoidCallback onChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final start = DateTime.fromMillisecondsSinceEpoch(session.startedAtUtcMs, isUtc: true).toLocal();
     final end = session.endedAtUtcMs;
     final duration = end == null
@@ -69,7 +70,9 @@ class _SessionTile extends StatelessWidget {
         trailing: PopupMenuButton<String>(
           onSelected: (value) async {
             if (value == 'export') {
-              await exportSession(context, store, session);
+              final root = await ref.read(documentsDirProvider.future);
+              final files = await writeExport(store, session, root);
+              await shareExport(files, subject: 'rast lab ${session.deviceModel} ${session.id}');
             } else if (value == 'delete') {
               await store.deleteSession(session.id);
               onChanged();
@@ -83,10 +86,4 @@ class _SessionTile extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Replaced by the real export in the export task.
-Future<void> exportSession(BuildContext context, LabStore store, LabSession session) async {
-  ScaffoldMessenger.of(context)
-      .showSnackBar(const SnackBar(content: Text('Export not wired yet')));
 }
