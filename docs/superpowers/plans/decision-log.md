@@ -44,3 +44,16 @@ Product decisions, given by the owner in conversation. Not reversible by enginee
 - **Location storage:** PostGIS `geography(Point, 4326)` column with a GiST index on a time-partitioned `location_sample` table (sample id, account ref, point, horizontal accuracy, observed UTC, received UTC, sequence). Candidate pairs via `ST_DWithin(…, 20)` within the time window, decided by `ST_Distance` plus accuracy, eligibility and tombstone checks in a server function. Accepted encounters go to `encounter` (pair id, encounter UTC, rule version, release floor, state) with no coordinates. Row-level security hides raw samples from clients; a scheduled job deletes samples older than 24 h. what3words and vector databases were considered and rejected: neither answers a 20-metre distance question, and what3words would send raw coordinates to a third party.
 - **Device buffer:** pending samples in a small local SQLite queue (drift), uploaded in batches, deleted on acknowledgement. No location history on the device.
 - **Open until Phase 0 measures them:** max sample age / clock skew window, accuracy threshold, moving vs stationary evidence, encounter deduplication.
+
+## 2026-10-24 — Location lab dependencies (labs/location_lab, resolved by `flutter pub add`)
+
+| Package | Version | Why |
+| --- | --- | --- |
+| geolocator | 14.1.2 | position stream; Android foreground service via `ForegroundNotificationConfig`; iOS background updates via `AppleSettings` |
+| permission_handler | 13.0.2 | request background location ("Allow all the time") and notifications |
+| sqflite / sqflite_common_ffi | 2.4.5 | local rows for sessions, samples, events; ffi build runs the same store in `flutter test` |
+| battery_plus | 7.1.2 | battery percent and charging state per sample |
+| device_info_plus | 13.3.0 | model and OS version in the session row |
+| path_provider, share_plus | 2.1.6, 13.3.1 | export directory and share sheet |
+| ntp | 2.0.0 | clock offset at session start |
+| uuid, intl, flutter_riverpod | 4.6.0, 0.20.3, 3.4.3 | ids, time formatting, state |

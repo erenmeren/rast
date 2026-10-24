@@ -32,3 +32,5 @@ Thumbs.db
 *.jks
 *.keystore
 graphify-out/
+labs/*/build/
+labs/*/.dart_tool/
