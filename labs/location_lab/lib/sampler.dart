@@ -27,6 +27,8 @@ class SamplerStatus {
     this.lastAccuracyM,
     this.lifecycle = Lifecycle.resumed,
     this.batteryPct,
+    this.eventRevision = 0,
+    this.lastWriteError,
   });
 
   final bool running;
@@ -37,6 +39,12 @@ class SamplerStatus {
   final Lifecycle lifecycle;
   final int? batteryPct;
 
+  /// Increments on every stored event; the UI uses it to refresh the feed.
+  final int eventRevision;
+
+  /// Last storage failure, shown on the home screen so dropped rows are visible.
+  final String? lastWriteError;
+
   SamplerStatus copyWith({
     bool? running,
     String? sessionId,
@@ -46,6 +54,8 @@ class SamplerStatus {
     double? lastAccuracyM,
     Lifecycle? lifecycle,
     int? batteryPct,
+    int? eventRevision,
+    String? lastWriteError,
   }) =>
       SamplerStatus(
         running: running ?? this.running,
@@ -55,6 +65,8 @@ class SamplerStatus {
         lastAccuracyM: lastAccuracyM ?? this.lastAccuracyM,
         lifecycle: lifecycle ?? this.lifecycle,
         batteryPct: batteryPct ?? this.batteryPct,
+        eventRevision: eventRevision ?? this.eventRevision,
+        lastWriteError: lastWriteError ?? this.lastWriteError,
       );
 }
 
@@ -87,12 +99,12 @@ class Sampler extends ChangeNotifier {
   int _nextSeq = 0;
   (int, BatteryStateLabel)? _batteryCache;
   DateTime? _batteryReadAt;
-  Future<void> _writes = Future.value();
+  Future<void>? _writes;
 
   int get _nowMs => _now().millisecondsSinceEpoch;
 
   /// Completes when every queued sample and event write has landed.
-  Future<void> flush() => _writes;
+  Future<void> flush() => _writes ?? Future<void>.value();
 
   Future<void> start(SamplerConfig config) async {
     if (_status.running) return;
@@ -130,6 +142,7 @@ class Sampler extends ChangeNotifier {
       cancelOnError: false,
     );
     _status = _status.copyWith(running: true);
+    notifyListeners();
     await logEvent(EventKind.stream, 'started');
   }
 
@@ -137,7 +150,7 @@ class Sampler extends ChangeNotifier {
     if (!_status.running) return;
     await _sub?.cancel();
     _sub = null;
-    await _writes;
+    await flush();
     await logEvent(EventKind.stream, 'stopped');
     final id = _status.sessionId;
     if (id != null) await _store.endSession(id, _nowMs);
@@ -216,13 +229,21 @@ class Sampler extends ChangeNotifier {
   /// Returns the future of this job only, so a job may log an event without
   /// waiting on itself.
   Future<void> _enqueue(Future<void> Function() job) {
-    final next = _writes.then((_) => job());
-    _writes = next.catchError((_) {});
+    // The chain head is created on first use so it belongs to the zone the
+    // sampler runs in, not the zone it was constructed in.
+    final next = (_writes ?? Future<void>.value()).then((_) => job());
+    _writes = next.catchError((Object e, StackTrace st) {
+      debugPrint('lab store write failed: $e\n$st');
+      _status = _status.copyWith(lastWriteError: e.toString());
+      notifyListeners();
+    });
     return next;
   }
 
-  Future<void> _write(LabEvent e) =>
-      _enqueue(() => _store.insertEvent(e)).then((_) => notifyListeners());
+  Future<void> _write(LabEvent e) => _enqueue(() => _store.insertEvent(e)).then((_) {
+        _status = _status.copyWith(eventRevision: _status.eventRevision + 1);
+        notifyListeners();
+      });
 
   @override
   void dispose() {

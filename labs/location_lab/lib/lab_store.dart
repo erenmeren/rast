@@ -2,13 +2,30 @@ import 'package:sqflite/sqflite.dart';
 
 import 'models.dart';
 
-/// SQLite persistence for lab sessions, samples and events.
-class LabStore {
-  LabStore(this._db);
+/// Persistence for lab sessions, samples and events.
+abstract class LabStore {
+  /// Opens the SQLite-backed store at [path].
+  static Future<LabStore> open(String path) => SqliteLabStore.open(path);
+
+  Future<void> close();
+  Future<void> insertSession(LabSession s);
+  Future<void> endSession(String id, int endedAtUtcMs);
+  Future<LabSession?> openSession();
+  Future<List<LabSession>> sessions();
+  Future<void> insertSample(Sample s);
+  Future<void> insertEvent(LabEvent e);
+  Future<List<Sample>> samples(String sessionId);
+  Future<List<LabEvent>> events(String sessionId);
+  Future<int> sampleCount(String sessionId);
+  Future<void> deleteSession(String id);
+}
+
+class SqliteLabStore implements LabStore {
+  SqliteLabStore(this._db);
 
   final Database _db;
 
-  static Future<LabStore> open(String path) async {
+  static Future<SqliteLabStore> open(String path) async {
     final db = await openDatabase(
       path,
       version: 1,
@@ -56,14 +73,17 @@ class LabStore {
         await db.execute('CREATE INDEX event_session ON event(session_id, time_utc_ms)');
       },
     );
-    return LabStore(db);
+    return SqliteLabStore(db);
   }
 
+  @override
   Future<void> close() => _db.close();
 
+  @override
   Future<void> insertSession(LabSession s) =>
       _db.insert('session', s.toJson(), conflictAlgorithm: ConflictAlgorithm.replace);
 
+  @override
   Future<void> endSession(String id, int endedAtUtcMs) => _db.update(
         'session',
         {'ended_at_utc_ms': endedAtUtcMs},
@@ -71,6 +91,7 @@ class LabStore {
         whereArgs: [id],
       );
 
+  @override
   Future<LabSession?> openSession() async {
     final rows = await _db.query(
       'session',
@@ -81,15 +102,19 @@ class LabStore {
     return rows.isEmpty ? null : LabSession.fromJson(rows.first);
   }
 
+  @override
   Future<List<LabSession>> sessions() async {
     final rows = await _db.query('session', orderBy: 'started_at_utc_ms DESC');
     return rows.map(LabSession.fromJson).toList();
   }
 
+  @override
   Future<void> insertSample(Sample s) => _db.insert('sample', s.toRow());
 
+  @override
   Future<void> insertEvent(LabEvent e) => _db.insert('event', e.toRow());
 
+  @override
   Future<List<Sample>> samples(String sessionId) async {
     final rows = await _db.query(
       'sample',
@@ -100,6 +125,7 @@ class LabStore {
     return rows.map(Sample.fromRow).toList();
   }
 
+  @override
   Future<List<LabEvent>> events(String sessionId) async {
     final rows = await _db.query(
       'event',
@@ -110,6 +136,7 @@ class LabStore {
     return rows.map(LabEvent.fromRow).toList();
   }
 
+  @override
   Future<int> sampleCount(String sessionId) async {
     final rows = await _db.rawQuery(
       'SELECT COUNT(*) AS n FROM sample WHERE session_id = ?',
@@ -118,6 +145,7 @@ class LabStore {
     return (rows.first['n'] as int?) ?? 0;
   }
 
+  @override
   Future<void> deleteSession(String id) => _db.transaction((txn) async {
         await txn.delete('sample', where: 'session_id = ?', whereArgs: [id]);
         await txn.delete('event', where: 'session_id = ?', whereArgs: [id]);
