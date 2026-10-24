@@ -26,3 +26,21 @@ Product decisions come from the handoff. Entries here are engineering choices ma
 - Mock OTP `246810` is only known to `MockAuthRepository`.
 - Self-described identities match only the "Everyone" interest (prototype behaviour). Marked provisional: the handoff says not to guess a mapping.
 - Prototype age guard 18–130 kept for the mock. Production age model is an open product decision.
+
+## 2026-10-24 — Owner decisions for Phase 0 and Phase 5
+
+Product decisions, given by the owner in conversation. Not reversible by engineering choice.
+
+- **Backend:** Supabase (PostgreSQL + PostGIS, Auth, Storage, Realtime). Chosen for built-in PostGIS and phone OTP integration. Engineering detail follows below.
+- **Age input:** the user enters a **birth year**, never an age. Age is derived on the server. Because a year alone cannot prove 18 within the birthday year, the adult check uses `currentYear - birthYear >= 19` until the owner decides otherwise (alternative: ask year + month). Display rule (99+) unchanged.
+- **Raw location sample retention:** 24 hours after server receipt, then deleted. Accepted encounters keep no coordinates.
+- **Markets:** Turkey and abroad from day one. SMS provider must deliver to Turkish and international numbers; KVKK and GDPR both apply.
+- **Devices for Phase 0:** Pixel 9a plus a second Android phone (owner), and a Mac with an iPhone for iOS measurements.
+- **Pending encounters when a delay setting changes:** proposed policy (handoff §4) is keep the original release floor, allow extension when a participant increases their delay, never shorten. Awaiting owner confirmation.
+
+## 2026-10-24 — Engineering choices for Phase 5 (proposed, reversible)
+
+- **SMS/OTP:** Supabase Auth phone sign-in with **Twilio Verify** as the provider. Fastest to set up, covers Turkey and international numbers, and Supabase has a native integration. Alphanumeric sender IDs in Turkey need registration; use a numeric sender until then. Revisit if Turkish delivery cost or latency is poor.
+- **Location storage:** PostGIS `geography(Point, 4326)` column with a GiST index on a time-partitioned `location_sample` table (sample id, account ref, point, horizontal accuracy, observed UTC, received UTC, sequence). Candidate pairs via `ST_DWithin(…, 20)` within the time window, decided by `ST_Distance` plus accuracy, eligibility and tombstone checks in a server function. Accepted encounters go to `encounter` (pair id, encounter UTC, rule version, release floor, state) with no coordinates. Row-level security hides raw samples from clients; a scheduled job deletes samples older than 24 h. what3words and vector databases were considered and rejected: neither answers a 20-metre distance question, and what3words would send raw coordinates to a third party.
+- **Device buffer:** pending samples in a small local SQLite queue (drift), uploaded in batches, deleted on acknowledgement. No location history on the device.
+- **Open until Phase 0 measures them:** max sample age / clock skew window, accuracy threshold, moving vs stationary evidence, encounter deduplication.
