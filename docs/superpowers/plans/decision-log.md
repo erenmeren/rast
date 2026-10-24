@@ -32,11 +32,11 @@ Product decisions come from the handoff. Entries here are engineering choices ma
 Product decisions, given by the owner in conversation. Not reversible by engineering choice.
 
 - **Backend:** Supabase (PostgreSQL + PostGIS, Auth, Storage, Realtime). Chosen for built-in PostGIS and phone OTP integration. Engineering detail follows below.
-- **Age input:** the user enters a **birth year**, never an age. Age is derived on the server. Because a year alone cannot prove 18 within the birthday year, the adult check uses `currentYear - birthYear >= 19` until the owner decides otherwise (alternative: ask year + month). Display rule (99+) unchanged.
+- **Age input:** the user enters their **full birth date**, never an age. Age is derived on the server from the date and the server's UTC date, so the 18 check is exact. The display rule (ages 99 and above show as 99+) is unchanged. Decided 2026-10-24 after the owner first proposed birth year only; a year alone cannot prove 18 within the birthday year.
 - **Raw location sample retention:** 24 hours after server receipt, then deleted. Accepted encounters keep no coordinates.
 - **Markets:** Turkey and abroad from day one. SMS provider must deliver to Turkish and international numbers; KVKK and GDPR both apply.
 - **Devices for Phase 0:** Pixel 9a plus a second Android phone (owner), and a Mac with an iPhone for iOS measurements.
-- **Pending encounters when a delay setting changes:** proposed policy (handoff §4) is keep the original release floor, allow extension when a participant increases their delay, never shorten. Awaiting owner confirmation.
+- **Pending encounters when a delay setting changes:** confirmed by the owner 2026-10-24. The original release floor is kept. If a participant increases their delay, the release time may move later. Reducing a delay never reveals an unrevealed encounter before its floor. Rationale: otherwise one person could shorten their delay after a crossing and defeat the privacy the other chose.
 
 ## 2026-10-24 — Engineering choices for Phase 5 (proposed, reversible)
 
