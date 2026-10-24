@@ -17,6 +17,9 @@ abstract class LabStore {
   Future<List<Sample>> samples(String sessionId);
   Future<List<LabEvent>> events(String sessionId);
   Future<int> sampleCount(String sessionId);
+
+  /// Highest stored seq plus one, or 0 when the session has no samples.
+  Future<int> nextSeq(String sessionId);
   Future<void> deleteSession(String id);
 }
 
@@ -143,6 +146,16 @@ class SqliteLabStore implements LabStore {
       [sessionId],
     );
     return (rows.first['n'] as int?) ?? 0;
+  }
+
+  @override
+  Future<int> nextSeq(String sessionId) async {
+    final rows = await _db.rawQuery(
+      'SELECT MAX(seq) AS m FROM sample WHERE session_id = ?',
+      [sessionId],
+    );
+    final max = rows.first['m'] as int?;
+    return max == null ? 0 : max + 1;
   }
 
   @override

@@ -86,6 +86,14 @@ void main() {
     expect(all.firstWhere((s) => s.id == 'a').endedAtUtcMs, 5000);
   });
 
+  test('nextSeq is max seq plus one, or zero for an empty session', () async {
+    await store.insertSession(session('s1'));
+    expect(await store.nextSeq('s1'), 0);
+    await store.insertSample(sample('s1', 4));
+    await store.insertSample(sample('s1', 2));
+    expect(await store.nextSeq('s1'), 5);
+  });
+
   test('deleteSession removes its samples and events', () async {
     await store.insertSession(session('s1'));
     await store.insertSample(sample('s1', 0));

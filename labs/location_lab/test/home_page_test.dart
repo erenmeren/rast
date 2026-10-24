@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
@@ -43,15 +43,17 @@ void main() {
   late LabStore store;
   late Sampler sampler;
   late StreamController<Position> positions;
+  var nowMs = 1000000;
 
   setUp(() async {
     store = MemoryLabStore();
     positions = StreamController<Position>();
+    nowMs = 1000000;
     sampler = Sampler(
       store: store,
       positions: (_, _) => positions.stream,
       battery: () async => (77, BatteryStateLabel.discharging),
-      now: () => DateTime.fromMillisecondsSinceEpoch(1000000, isUtc: true),
+      now: () => DateTime.fromMillisecondsSinceEpoch(nowMs, isUtc: true),
       newSession: (c) async => LabSession(
         id: 'ui-1',
         deviceId: 'dev',
@@ -112,6 +114,57 @@ void main() {
     await tester.tap(find.text('Together'));
     await tester.pumpAndSettle();
     expect(find.textContaining('marker: together'), findsOneWidget);
+  });
+
+  testWidgets('a stream error is shown in red and the fix age keeps ticking', (tester) async {
+    await pump(tester);
+    await tester.tap(find.text('Start'));
+    await tester.pumpAndSettle();
+    positions.add(pos(1000000));
+    await tester.pumpAndSettle();
+    expect(find.text('Last fix: 0 s ago'), findsOneWidget);
+
+    nowMs += 45000;
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('Last fix: 45 s ago'), findsOneWidget);
+
+    positions.addError(StateError('location services disabled'));
+    await tester.pumpAndSettle();
+    final error = tester.widget<Text>(find.textContaining('Stream error:'));
+    expect(error.data, contains('location services disabled'));
+    expect(error.style?.color, Theme.of(tester.element(find.byType(Scaffold))).colorScheme.error);
+  });
+
+  testWidgets('Start is disabled while the sampler is busy', (tester) async {
+    final gate = Completer<void>();
+    sampler = Sampler(
+      store: store,
+      positions: (_, _) => positions.stream,
+      battery: () async => (77, BatteryStateLabel.discharging),
+      now: () => DateTime.fromMillisecondsSinceEpoch(nowMs, isUtc: true),
+      newSession: (c) async {
+        await gate.future;
+        return LabSession(
+          id: 'ui-2',
+          deviceId: 'dev',
+          deviceModel: 'Test',
+          osVersion: 'T',
+          appVersion: '0.1.0',
+          startedAtUtcMs: nowMs,
+          requestedIntervalS: c.intervalS,
+          requestedAccuracy: c.accuracy,
+        );
+      },
+    );
+    await pump(tester);
+    await tester.tap(find.text('Start'));
+    await tester.pump();
+    final button = tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Starting…'));
+    expect(button.onPressed, isNull);
+    gate.complete();
+    await tester.pumpAndSettle();
+    expect(find.text('Stop'), findsOneWidget);
+    expect((await store.sessions()).length, 1);
   });
 
   testWidgets('missing permission shows Fix button', (tester) async {

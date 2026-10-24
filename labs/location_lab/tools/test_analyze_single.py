@@ -62,6 +62,14 @@ class BatteryTests(unittest.TestCase):
         samples += [mk(2 * hour, pct=95, state="charging"), mk(3 * hour, pct=100, state="charging")]
         self.assertAlmostEqual(analyze.battery_drain_per_hour(samples), 10.0, places=6)
 
+    def test_drain_with_charging_in_the_middle(self):
+        hour = 3600000
+        samples = [mk(0, pct=80), mk(hour, pct=70)]
+        samples += [mk(2 * hour, pct=95, state="charging")]
+        samples += [mk(3 * hour, pct=95), mk(4 * hour, pct=90)]
+        # 10 % over 1 h, then 5 % over 1 h: 15 % over 2 discharging hours.
+        self.assertAlmostEqual(analyze.battery_drain_per_hour(samples), 7.5, places=6)
+
     def test_drain_none_for_short_span(self):
         samples = [mk(0, pct=100), mk(300000, pct=99)]
         self.assertIsNone(analyze.battery_drain_per_hour(samples))

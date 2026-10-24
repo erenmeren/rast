@@ -29,6 +29,8 @@ class SamplerStatus {
     this.batteryPct,
     this.eventRevision = 0,
     this.lastWriteError,
+    this.lastStreamError,
+    this.busy = false,
   });
 
   final bool running;
@@ -45,6 +47,12 @@ class SamplerStatus {
   /// Last storage failure, shown on the home screen so dropped rows are visible.
   final String? lastWriteError;
 
+  /// Last error from the position stream (permission revoked, GPS off, ...).
+  final String? lastStreamError;
+
+  /// True while start, stop or resume is in progress; the UI disables actions.
+  final bool busy;
+
   SamplerStatus copyWith({
     bool? running,
     String? sessionId,
@@ -56,6 +64,9 @@ class SamplerStatus {
     int? batteryPct,
     int? eventRevision,
     String? lastWriteError,
+    String? lastStreamError,
+    bool clearStreamError = false,
+    bool? busy,
   }) =>
       SamplerStatus(
         running: running ?? this.running,
@@ -67,6 +78,8 @@ class SamplerStatus {
         batteryPct: batteryPct ?? this.batteryPct,
         eventRevision: eventRevision ?? this.eventRevision,
         lastWriteError: lastWriteError ?? this.lastWriteError,
+        lastStreamError: clearStreamError ? null : (lastStreamError ?? this.lastStreamError),
+        busy: busy ?? this.busy,
       );
 }
 
@@ -103,59 +116,87 @@ class Sampler extends ChangeNotifier {
 
   int get _nowMs => _now().millisecondsSinceEpoch;
 
+  /// The injected clock, so the UI can compute ages against the same time source.
+  DateTime now() => _now();
+
   /// Completes when every queued sample and event write has landed.
   Future<void> flush() => _writes ?? Future<void>.value();
 
   Future<void> start(SamplerConfig config) async {
-    if (_status.running) return;
-    final session = await _newSession(config);
-    await _store.insertSession(session);
-    _nextSeq = 0;
-    _status = SamplerStatus(sessionId: session.id, lifecycle: _status.lifecycle);
-    await _listen(session.requestedIntervalS, session.requestedAccuracy);
+    if (_status.running || _status.busy) return;
+    _setBusy(true);
+    try {
+      final session = await _newSession(config);
+      await _store.insertSession(session);
+      _nextSeq = 0;
+      _status = SamplerStatus(sessionId: session.id, lifecycle: _status.lifecycle, busy: true);
+      await _listen(session.requestedIntervalS, session.requestedAccuracy);
+    } finally {
+      _setBusy(false);
+    }
   }
 
   Future<bool> resumeIfOpen() async {
     if (_status.running) return true;
-    final session = await _store.openSession();
-    if (session == null) return false;
-    _nextSeq = await _store.sampleCount(session.id);
-    _status = SamplerStatus(
-      sessionId: session.id,
-      sampleCount: _nextSeq,
-      lifecycle: _status.lifecycle,
-    );
-    await _write(LabEvent(
-      sessionId: session.id,
-      timeUtcMs: _nowMs,
-      kind: EventKind.appStart,
-      detail: 'resumed open session',
-    ));
-    await _listen(session.requestedIntervalS, session.requestedAccuracy);
-    return true;
+    if (_status.busy) return false;
+    _setBusy(true);
+    try {
+      final session = await _store.openSession();
+      if (session == null) return false;
+      _nextSeq = await _store.nextSeq(session.id);
+      _status = SamplerStatus(
+        sessionId: session.id,
+        sampleCount: await _store.sampleCount(session.id),
+        lifecycle: _status.lifecycle,
+        busy: true,
+      );
+      await _write(LabEvent(
+        sessionId: session.id,
+        timeUtcMs: _nowMs,
+        kind: EventKind.appStart,
+        detail: 'resumed open session',
+      ));
+      await _listen(session.requestedIntervalS, session.requestedAccuracy);
+      return true;
+    } finally {
+      _setBusy(false);
+    }
+  }
+
+  void _setBusy(bool value) {
+    _status = _status.copyWith(busy: value);
+    notifyListeners();
   }
 
   Future<void> _listen(int intervalS, RequestedAccuracy accuracy) async {
     _sub = _positions(intervalS, accuracy).listen(
       _onPosition,
-      onError: (Object e) => logEvent(EventKind.error, e.toString()),
+      onError: (Object e) {
+        _status = _status.copyWith(lastStreamError: e.toString());
+        notifyListeners();
+        logEvent(EventKind.error, e.toString());
+      },
       cancelOnError: false,
     );
-    _status = _status.copyWith(running: true);
+    _status = _status.copyWith(running: true, clearStreamError: true);
     notifyListeners();
     await logEvent(EventKind.stream, 'started');
   }
 
   Future<void> stop() async {
-    if (!_status.running) return;
-    await _sub?.cancel();
-    _sub = null;
-    await flush();
-    await logEvent(EventKind.stream, 'stopped');
-    final id = _status.sessionId;
-    if (id != null) await _store.endSession(id, _nowMs);
-    _status = _status.copyWith(running: false, clearSession: true);
-    notifyListeners();
+    if (!_status.running || _status.busy) return;
+    _setBusy(true);
+    try {
+      await _sub?.cancel();
+      _sub = null;
+      await flush();
+      await logEvent(EventKind.stream, 'stopped');
+      final id = _status.sessionId;
+      if (id != null) await _store.endSession(id, _nowMs);
+      _status = _status.copyWith(running: false, clearSession: true);
+    } finally {
+      _setBusy(false);
+    }
   }
 
   void onLifecycle(Lifecycle state) {
@@ -171,10 +212,15 @@ class Sampler extends ChangeNotifier {
 
   Future<void> note(String text) => logEvent(EventKind.note, text);
 
+  /// Never throws: a failed write is recorded on [SamplerStatus.lastWriteError].
   Future<void> logEvent(EventKind kind, String detail) async {
     final id = _status.sessionId;
     if (id == null) return;
-    await _write(LabEvent(sessionId: id, timeUtcMs: _nowMs, kind: kind, detail: detail));
+    try {
+      await _write(LabEvent(sessionId: id, timeUtcMs: _nowMs, kind: kind, detail: detail));
+    } catch (_) {
+      // Already recorded by the queue's error handler.
+    }
   }
 
   void _onPosition(Position p) {

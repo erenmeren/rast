@@ -59,6 +59,12 @@ class MemoryLabStore implements LabStore {
       _samples.where((s) => s.sessionId == sessionId).length;
 
   @override
+  Future<int> nextSeq(String sessionId) async {
+    final seqs = _samples.where((s) => s.sessionId == sessionId).map((s) => s.seq);
+    return seqs.isEmpty ? 0 : seqs.reduce((a, b) => a > b ? a : b) + 1;
+  }
+
+  @override
   Future<void> deleteSession(String id) async {
     _sessions.remove(id);
     _samples.removeWhere((s) => s.sessionId == id);

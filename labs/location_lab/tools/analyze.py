@@ -101,23 +101,33 @@ def sample_ages(samples) -> list:
 
 
 def battery_drain_per_hour(samples):
-    """Positive percent per hour lost while discharging; None when too little data."""
-    rows = [s for s in samples if s["battery_state"] == "discharging"]
-    if len(rows) < 2:
+    """Positive percent per hour lost while discharging; None when too little data.
+
+    Discharging rows are split into contiguous segments (a charging or unknown row
+    ends a segment) so a mid-run charge cannot turn the drain negative. The result
+    is total percent dropped across segments divided by total discharging hours.
+    """
+    segments = []
+    current = []
+    for s in samples:
+        if s["battery_state"] == "discharging":
+            current.append(s)
+        elif current:
+            segments.append(current)
+            current = []
+    if current:
+        segments.append(current)
+
+    dropped = 0.0
+    hours = 0.0
+    for seg in segments:
+        if len(seg) < 2:
+            continue
+        hours += (seg[-1]["device_time_utc_ms"] - seg[0]["device_time_utc_ms"]) / 3600000.0
+        dropped += float(seg[0]["battery_pct"]) - float(seg[-1]["battery_pct"])
+    if hours < 10 / 60.0:
         return None
-    t0 = rows[0]["device_time_utc_ms"]
-    xs = [(s["device_time_utc_ms"] - t0) / 3600000.0 for s in rows]
-    if xs[-1] - xs[0] < 10 / 60.0:
-        return None
-    ys = [float(s["battery_pct"]) for s in rows]
-    n = len(xs)
-    mean_x = sum(xs) / n
-    mean_y = sum(ys) / n
-    sxx = sum((x - mean_x) ** 2 for x in xs)
-    if sxx == 0:
-        return None
-    slope = sum((x - mean_x) * (y - mean_y) for x, y in zip(xs, ys)) / sxx
-    return -slope
+    return dropped / hours
 
 
 # ---------------------------------------------------------------- report

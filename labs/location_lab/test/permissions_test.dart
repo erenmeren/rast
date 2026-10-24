@@ -19,6 +19,19 @@ class FakeGateway implements PermissionGateway {
 }
 
 void main() {
+  test('fine location counts as granted only when the fix is precise', () async {
+    var precise = false;
+    final gateway = PermissionHandlerGateway(
+      status: (_) async => true,
+      request: (_) async => true,
+      precise: () async => precise,
+    );
+    expect(await gateway.isGranted(PermissionItem.fineLocation), isFalse);
+    expect(await gateway.isGranted(PermissionItem.backgroundLocation), isTrue);
+    precise = true;
+    expect(await gateway.isGranted(PermissionItem.fineLocation), isTrue);
+  });
+
   test('requests fine before background before notifications', () async {
     final gateway = FakeGateway({});
     final flow = PermissionFlow(gateway);

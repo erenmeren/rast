@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -105,13 +107,17 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         const SizedBox(height: 16),
         FilledButton(
-          onPressed: () => status.running
-              ? sampler.stop()
-              : sampler.start(SamplerConfig(intervalS: _intervalS, accuracy: _accuracy)),
-          child: Text(status.running ? 'Stop' : 'Start'),
+          onPressed: status.busy
+              ? null
+              : () => status.running
+                  ? sampler.stop()
+                  : sampler.start(SamplerConfig(intervalS: _intervalS, accuracy: _accuracy)),
+          child: Text(status.busy
+              ? (status.running ? 'Stopping…' : 'Starting…')
+              : (status.running ? 'Stop' : 'Start')),
         ),
         const SizedBox(height: 16),
-        _livePanel(status),
+        _LivePanel(sampler: sampler),
         const SizedBox(height: 16),
         Row(
           children: [
@@ -195,31 +201,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget _livePanel(SamplerStatus status) {
-    final lastFix = status.lastFixUtcMs;
-    final age = lastFix == null
-        ? '–'
-        : '${((DateTime.now().toUtc().millisecondsSinceEpoch - lastFix) / 1000).round()} s ago';
-    final acc = status.lastAccuracyM;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Samples: ${status.sampleCount}'),
-            Text('Last fix: $age'),
-            Text('Accuracy: ${acc == null ? '–' : '${acc.round()} m'}'),
-            Text('State: ${status.lifecycle.name}'),
-            Text('Battery: ${status.batteryPct == null ? '–' : '${status.batteryPct}%'}'),
-            if (status.lastWriteError != null)
-              Text('Write error: ${status.lastWriteError}',
-                  style: TextStyle(color: Theme.of(context).colorScheme.error)),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 String _accuracyLabel(RequestedAccuracy a) => switch (a) {
@@ -233,6 +214,71 @@ String _permissionLabel(PermissionItem item) => switch (item) {
       PermissionItem.backgroundLocation => 'Always',
       PermissionItem.notifications => 'Notifications',
     };
+
+/// Live numbers. Ticks once a second so "Last fix" keeps ageing even when no
+/// new fix arrives, which is exactly the situation the tester must notice.
+class _LivePanel extends StatefulWidget {
+  const _LivePanel({required this.sampler});
+
+  final Sampler sampler;
+
+  @override
+  State<_LivePanel> createState() => _LivePanelState();
+}
+
+class _LivePanelState extends State<_LivePanel> {
+  Timer? _tick;
+
+  @override
+  void initState() {
+    super.initState();
+    _tick = Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final status = widget.sampler.status;
+    final lastFix = status.lastFixUtcMs;
+    final ageS = lastFix == null
+        ? null
+        : ((widget.sampler.now().millisecondsSinceEpoch - lastFix) / 1000).round();
+    final acc = status.lastAccuracyM;
+    final errorColor = Theme.of(context).colorScheme.error;
+    final stale = ageS != null && status.running && ageS > 3 * _staleIntervalS(status);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Samples: ${status.sampleCount}'),
+            Text(
+              'Last fix: ${ageS == null ? '–' : '$ageS s ago'}',
+              style: stale ? TextStyle(color: errorColor, fontWeight: FontWeight.bold) : null,
+            ),
+            Text('Accuracy: ${acc == null ? '–' : '${acc.round()} m'}'),
+            Text('State: ${status.lifecycle.name}'),
+            Text('Battery: ${status.batteryPct == null ? '–' : '${status.batteryPct}%'}'),
+            if (status.lastStreamError != null)
+              Text('Stream error: ${status.lastStreamError}', style: TextStyle(color: errorColor)),
+            if (status.lastWriteError != null)
+              Text('Write error: ${status.lastWriteError}', style: TextStyle(color: errorColor)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The panel does not know the requested interval; 120 s is the longest
+  /// option, so anything older than 6 minutes is stale for every setting.
+  int _staleIntervalS(SamplerStatus status) => intervalOptions.last;
+}
 
 class _EventFeed extends StatelessWidget {
   const _EventFeed({required this.store, required this.sessionId, required this.revision});
