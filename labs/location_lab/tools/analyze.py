@@ -212,6 +212,175 @@ def single_report(export: Export) -> str:
     return "\n".join(lines) + "\n"
 
 
+# ---------------------------------------------------------------- pair mode
+
+
+@dataclass
+class Pairing:
+    t_utc_ms: int
+    distance_m: float
+    optimistic_m: float
+    acc_a: float
+    acc_b: float
+
+
+@dataclass
+class Interval:
+    start_utc_ms: int
+    end_utc_ms: int
+
+
+@dataclass
+class Score:
+    recall: object
+    false_detections: int
+    min_distance_per_truth: list
+
+
+def haversine_m(lat1, lon1, lat2, lon2) -> float:
+    r = 6371008.8
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dphi = p2 - p1
+    dlmb = math.radians(lon2 - lon1)
+    h = math.sin(dphi / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dlmb / 2) ** 2
+    return 2 * r * math.asin(math.sqrt(h))
+
+
+def corrected_time(sample, session) -> int:
+    return sample["device_time_utc_ms"] + int(session.get("ntp_offset_ms") or 0)
+
+
+def align(a: Export, b: Export, window_s: int) -> list:
+    """Pair each sample of A with B's nearest sample in corrected time within window_s."""
+    b_rows = sorted(((corrected_time(s, b.session), s) for s in b.samples), key=lambda r: r[0])
+    b_times = [t for t, _ in b_rows]
+    window_ms = window_s * 1000
+    result = []
+    import bisect
+
+    for sa in a.samples:
+        ta = corrected_time(sa, a.session)
+        i = bisect.bisect_left(b_times, ta)
+        best = None
+        for j in (i - 1, i):
+            if 0 <= j < len(b_times):
+                dt = abs(b_times[j] - ta)
+                if dt <= window_ms and (best is None or dt < best[0]):
+                    best = (dt, b_rows[j][1])
+        if best is None:
+            continue
+        sb = best[1]
+        d = haversine_m(sa["lat"], sa["lon"], sb["lat"], sb["lon"])
+        acc_a, acc_b = float(sa["accuracy_m"]), float(sb["accuracy_m"])
+        result.append(Pairing(ta, d, max(0.0, d - (acc_a + acc_b)), acc_a, acc_b))
+    return result
+
+
+def detections(pairings, radius_m) -> list:
+    """Consecutive pairings within radius merge into one interval."""
+    result = []
+    current = None
+    for p in pairings:
+        inside = p.distance_m <= radius_m
+        if inside and current is None:
+            current = Interval(p.t_utc_ms, p.t_utc_ms)
+        elif inside:
+            current.end_utc_ms = p.t_utc_ms
+        elif current is not None:
+            result.append(current)
+            current = None
+    if current is not None:
+        result.append(current)
+    return result
+
+
+def _session_end(export: Export) -> int:
+    end = export.session.get("ended_at_utc_ms")
+    if end is not None:
+        return int(end)
+    times = [corrected_time(s, export.session) for s in export.samples]
+    return max(times) if times else int(export.session.get("started_at_utc_ms") or 0)
+
+
+def ground_truth(a: Export, b: Export) -> list:
+    """together/apart markers from either device, in corrected time."""
+    marks = []
+    for ex in (a, b):
+        off = int(ex.session.get("ntp_offset_ms") or 0)
+        for e in ex.events:
+            if e["kind"] == "marker" and e["detail"] in ("together", "apart"):
+                marks.append((e["time_utc_ms"] + off, e["detail"]))
+    marks.sort()
+    result = []
+    open_at = None
+    for t, detail in marks:
+        if detail == "together" and open_at is None:
+            open_at = t
+        elif detail == "apart" and open_at is not None:
+            result.append(Interval(open_at, t))
+            open_at = None
+    if open_at is not None:
+        result.append(Interval(open_at, max(_session_end(a), _session_end(b))))
+    return result
+
+
+def _overlaps(x: Interval, y: Interval) -> bool:
+    return x.start_utc_ms <= y.end_utc_ms and y.start_utc_ms <= x.end_utc_ms
+
+
+def score(found, truth, pairings=None) -> Score:
+    hits = sum(1 for t in truth if any(_overlaps(d, t) for d in found))
+    recall = hits / len(truth) if truth else None
+    false = sum(1 for d in found if not any(_overlaps(d, t) for t in truth))
+    mins = []
+    for t in truth:
+        inside = [p.distance_m for p in (pairings or []) if t.start_utc_ms <= p.t_utc_ms <= t.end_utc_ms]
+        mins.append(min(inside) if inside else None)
+    return Score(recall, false, mins)
+
+
+def pair_report(a: Export, b: Export) -> str:
+    sa, sb = a.session, b.session
+    truth = ground_truth(a, b)
+    lines = [
+        f"# Pair report: {sa.get('device_model', 'A')} vs {sb.get('device_model', 'B')}",
+        "",
+        f"- A: `{sa.get('id', '?')}`, {len(a.samples)} samples, NTP offset {sa.get('ntp_offset_ms', '–')} ms",
+        f"- B: `{sb.get('id', '?')}`, {len(b.samples)} samples, NTP offset {sb.get('ntp_offset_ms', '–')} ms",
+        f"- Ground-truth intervals (together → apart): {len(truth)}",
+        "",
+        "## Sensitivity",
+        "",
+        "| radius (m) | window (s) | pairings | detections | recall | false detections |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
+    for radius in RADII_M:
+        for window in WINDOWS_S:
+            pairs = align(a, b, window)
+            found = detections(pairs, radius)
+            sc = score(found, truth, pairs)
+            recall = "–" if sc.recall is None else f"{sc.recall:.2f}"
+            lines.append(f"| {radius} | {window} | {len(pairs)} | {len(found)} | {recall} | {sc.false_detections} |")
+    lines += ["", "## Ground truth, closest approach (window 60 s)", ""]
+    if truth:
+        pairs = align(a, b, 60)
+        sc = score(detections(pairs, RADII_M[0]), truth, pairs)
+        lines += ["| together (UTC) | apart (UTC) | min distance (m) | optimistic (m) | acc A + B (m) |", "| --- | --- | --- | --- | --- |"]
+        for t, dmin in zip(truth, sc.min_distance_per_truth):
+            inside = [p for p in pairs if t.start_utc_ms <= p.t_utc_ms <= t.end_utc_ms]
+            best = min(inside, key=lambda p: p.distance_m) if inside else None
+            opt = _fmt(best.optimistic_m) if best else "–"
+            acc = _fmt(best.acc_a + best.acc_b) if best else "–"
+            lines.append(f"| {_utc(t.start_utc_ms)} | {_utc(t.end_utc_ms)} | {_fmt(dmin)} | {opt} | {acc} |")
+    else:
+        lines.append("No markers found on either device.")
+    lines += [
+        "",
+        "Optimistic distance = distance − (accuracy A + accuracy B), floored at 0: how much GPS noise could be hiding a real crossing.",
+    ]
+    return "\n".join(lines) + "\n"
+
+
 # ---------------------------------------------------------------- cli
 
 
@@ -220,11 +389,7 @@ def main(argv) -> int:
         print(single_report(load_export(argv[2])), end="")
         return 0
     if len(argv) >= 4 and argv[1] == "pair":
-        from_pair = globals().get("pair_report")
-        if from_pair is None:
-            print("pair mode is not implemented yet", file=sys.stderr)
-            return 2
-        print(from_pair(load_export(argv[2]), load_export(argv[3])), end="")
+        print(pair_report(load_export(argv[2]), load_export(argv[3])), end="")
         return 0
     print(__doc__, file=sys.stderr)
     return 2
