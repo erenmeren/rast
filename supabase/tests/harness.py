@@ -30,6 +30,24 @@ def as_user(uid: str, sql: str) -> str:
     )
 
 
+def member(n: int, *, birth="1998-05-14", gender="woman", custom="", interests="{everyone}",
+           min_age=18, max_age=99, delay=2, interval=30, visible=True, photos=4, status="active") -> str:
+    """SQL inserting a complete member: auth user, account, profile, preferences, photos, one device."""
+    acct, dev = uuid(n), uuid(100 + n)
+    sql = [
+        "insert into auth.users(id, phone) values ('%s', '+90555%07d');" % (acct, n),
+        "insert into account(id, status) values ('%s', '%s');" % (acct, status),
+        "insert into profile(account_id, birth_date, gender, custom_gender, visible) values ('%s', '%s', '%s', '%s', %s);"
+        % (acct, birth, gender, custom, "true" if visible else "false"),
+        "insert into preferences(account_id, interests, min_age, max_age, delay_hours, interval_s) values ('%s', '%s', %d, %d, %d, %d);"
+        % (acct, interests, min_age, max_age, delay, interval),
+        "insert into device(id, account_id, platform) values ('%s', '%s', 'test');" % (dev, acct),
+    ]
+    for slot in range(photos):
+        sql.append("insert into photo(account_id, slot, storage_path, state) values ('%s', %d, 'p%d/%d.jpg', 'ready');" % (acct, slot, n, slot))
+    return "\n".join(sql) + "\n"
+
+
 class Db:
     def __init__(self):
         self.cid = os.environ.get("RAST_PG_CONTAINER")
