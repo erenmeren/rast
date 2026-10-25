@@ -48,6 +48,26 @@ def member(n: int, *, birth="1998-05-14", gender="woman", custom="", interests="
     return "\n".join(sql) + "\n"
 
 
+def sample(n: int, seq: int, *, lat=41.0, lon=29.0, bearing=0, distance=0, accuracy=10,
+           observed="now()", device=None, sample_id=None) -> str:
+    """SQL submitting one sample as user n, `distance` metres from (lat, lon) along `bearing`."""
+    device = device or uuid(100 + n)
+    sid = "'%s'" % sample_id if sample_id else "gen_random_uuid()"
+    if distance:
+        point = "ST_Project(ST_SetSRID(ST_MakePoint(%r, %r), 4326)::geography, %r, radians(%r))::geometry" % (lon, lat, distance, bearing)
+        lat_sql, lon_sql = "ST_Y(%s)" % point, "ST_X(%s)" % point
+    else:
+        # raw values, so malformed coordinates reach the RPC untouched
+        lat_sql, lon_sql = repr(lat), repr(lon)
+    call = (
+        "select public.submit_location_samples(jsonb_build_array(jsonb_build_object("
+        "'id', %s, 'device_id', '%s', 'seq', %d, 'lat', %s, 'lon', %s, "
+        "'accuracy_m', %r, 'observed_at', (%s)::timestamptz)));"
+        % (sid, device, seq, lat_sql, lon_sql, accuracy, observed)
+    )
+    return as_user(uuid(n), call)
+
+
 class Db:
     def __init__(self):
         self.cid = os.environ.get("RAST_PG_CONTAINER")
