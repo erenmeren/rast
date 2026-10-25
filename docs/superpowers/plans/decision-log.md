@@ -74,3 +74,7 @@ Report (`python3 labs/location_lab/tools/analyze.py single labs/location_lab/exp
 What this run settles: the pipeline works end to end (permissions, foreground service, locked-screen sampling, storage, analysis). What it does not settle: battery drain and accuracy outdoors, both need the PROTOCOL runs on battery.
 
 Observation: after the power key the app logged paused → resumed → paused within a minute (screen woke once before timing out). Harmless, but note it when reading lifecycle tables.
+
+### Second phone: Nothing Phone (2a), model A059, Android 16 (SDK 36)
+
+Installed 2026-10-25 over adb after the owner enabled USB debugging. All three permissions granted and shown as Precise/Always/Notifications. Sanity run, 30 s · High, app in the foreground then screen off: 5 samples in 1.4 min, intervals median 30.5 s, max 32.5 s, foreground service up, Stop ended the session cleanly. NTP offset −1047 ms. Nothing OS battery restrictions were not touched (no whitelist entry), so R5 will measure the stock behaviour. Both Android phones are now ready for the PROTOCOL runs.
