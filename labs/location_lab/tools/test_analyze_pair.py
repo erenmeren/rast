@@ -96,3 +96,17 @@ class ReportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NtpAndFixTimeTests(unittest.TestCase):
+    def test_corrected_time_uses_fix_time(self):
+        s = export([mk(5000, fix=3000)], ntp_offset_ms=100)
+        self.assertEqual(analyze.corrected_time(s.samples[0], s.session), 3100)
+
+    def test_reports_warn_when_ntp_offset_is_unknown(self):
+        known = export([mk(0), mk(30000)], ntp_offset_ms=-120)
+        unknown = export([mk(0), mk(30000)], ntp_offset_ms=None)
+        self.assertIn("NTP offset unknown", analyze.single_report(unknown))
+        self.assertNotIn("NTP offset unknown", analyze.single_report(known))
+        self.assertIn("NTP offset unknown", analyze.pair_report(known, unknown))
+        self.assertNotIn("NTP offset unknown", analyze.pair_report(known, known))

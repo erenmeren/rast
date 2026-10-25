@@ -15,7 +15,7 @@ Before the first run on a phone: grant all three permissions (Precise, Always, N
 | R5 | each | 30 s · High | Turn battery saver on. Same as R2. | 20 min |
 | R6 | each | 30 s · High | Sit indoors, phone on a table, screen locked. | 20 min |
 | R7 | each | 30 s · High | Start, lock the screen, wait 2 min, force-stop the app from system settings, wait 3 min, open the app again. | 10 min |
-| R8 | each | 30 s · High | Start, lock the screen, wait 2 min, revoke "Allow all the time" in system settings, wait 3 min, unlock and look at the event feed. | 10 min |
+| R8 | each | 30 s · High | Start, lock the screen, wait 2 min, revoke the app's location permission in system settings (Android kills the process), wait 3 min, open the app again and look at the permission chips and the event feed. | 10 min |
 
 Analysis for each run:
 
@@ -23,7 +23,7 @@ Analysis for each run:
 python3 labs/location_lab/tools/analyze.py single <export_dir>
 ```
 
-Record in the results table: interval median and p90, outages, accuracy median, battery drain. For R7 check that the report lists a process restart (`app_start`) and that samples resume after it. For R8 check that an `error` or `permission` event appears and whether sampling stopped.
+Record in the results table: interval median and p90, outages, accuracy median, battery drain. For R7 check that the report lists a process restart (`app_start`) and that samples resume after it. For R8 expect the process to die on revocation: samples stop at that moment, the reopen writes `app_start`, and the permission chips show the missing grant. The finding is whether the lab resumes sampling or sits silently; either way note it.
 
 ## Two-phone runs
 

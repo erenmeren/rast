@@ -12,7 +12,7 @@ export ANDROID_HOME=$HOME/Android/Sdk
 adb install -r build/app/outputs/flutter-apk/app-debug.apk
 ```
 
-iOS: open `ios/Runner.xcworkspace` on a Mac, set a team, run on the iPhone. Background location and the usage strings are already in `Info.plist`.
+iOS: open `ios/Runner.xcworkspace` on a Mac, set a team, run on the iPhone. Background location and the usage strings are already in `Info.plist`. The interval chips have no effect on iOS: Core Location delivers fixes on its own schedule (distance filter only), so the session records the chosen interval but the stream ignores it.
 
 ## Use
 

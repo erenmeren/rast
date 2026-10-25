@@ -168,7 +168,7 @@ def single_report(export: Export) -> str:
         "",
         f"- Session `{s.get('id', '?')}`, requested interval **{interval_s} s**, accuracy **{s.get('requested_accuracy', '?')}**",
         f"- Samples: **{len(samples)}** over {_fmt(span_min, ' min')}",
-        f"- NTP offset at start: {s.get('ntp_offset_ms', '–')} ms",
+        f"- At start: {_ntp_line(s)}",
         "",
         "## Intervals (s)",
         "",
@@ -256,8 +256,19 @@ def haversine_m(lat1, lon1, lat2, lon2) -> float:
     return 2 * r * math.asin(math.sqrt(h))
 
 
+def _ntp_line(session) -> str:
+    off = session.get("ntp_offset_ms")
+    if off is None:
+        return "NTP offset unknown, device clock used uncorrected"
+    return f"NTP offset {off} ms"
+
+
 def corrected_time(sample, session) -> int:
-    return sample["device_time_utc_ms"] + int(session.get("ntp_offset_ms") or 0)
+    """Fix time (falls back to receive time) shifted by the session's NTP offset."""
+    t = sample.get("fix_time_utc_ms")
+    if t is None:
+        t = sample["device_time_utc_ms"]
+    return t + int(session.get("ntp_offset_ms") or 0)
 
 
 def align(a: Export, b: Export, window_s: int) -> list:
@@ -355,8 +366,8 @@ def pair_report(a: Export, b: Export) -> str:
     lines = [
         f"# Pair report: {sa.get('device_model', 'A')} vs {sb.get('device_model', 'B')}",
         "",
-        f"- A: `{sa.get('id', '?')}`, {len(a.samples)} samples, NTP offset {sa.get('ntp_offset_ms', '–')} ms",
-        f"- B: `{sb.get('id', '?')}`, {len(b.samples)} samples, NTP offset {sb.get('ntp_offset_ms', '–')} ms",
+        f"- A: `{sa.get('id', '?')}`, {len(a.samples)} samples, {_ntp_line(sa)}",
+        f"- B: `{sb.get('id', '?')}`, {len(b.samples)} samples, {_ntp_line(sb)}",
         f"- Ground-truth intervals (together → apart): {len(truth)}",
         "",
         "## Sensitivity",
