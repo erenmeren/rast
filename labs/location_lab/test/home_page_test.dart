@@ -68,7 +68,7 @@ void main() {
   });
   tearDown(() => store.close());
 
-  Future<void> pump(WidgetTester tester, {Set<PermissionItem>? granted}) async {
+  Future<void> pump(WidgetTester tester, {Set<PermissionItem>? granted, FakeGateway? gateway}) async {
     // Phone-tall viewport so the lazily built ListView reaches the event feed.
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2.0;
@@ -78,7 +78,7 @@ void main() {
         labStoreProvider.overrideWith((_) async => store),
         samplerProvider.overrideWith((_) async => sampler),
         permissionFlowProvider.overrideWithValue(
-          PermissionFlow(FakeGateway(granted ?? {...PermissionItem.values})),
+          PermissionFlow(gateway ?? FakeGateway(granted ?? {...PermissionItem.values})),
         ),
       ],
       child: const LabApp(),
@@ -173,6 +173,47 @@ void main() {
     await tester.tap(find.text('Fix'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Fix'));
+    await tester.pumpAndSettle();
+    expect(find.text('Fix'), findsNothing);
+  });
+
+  testWidgets('chips show the resumed session settings, not the defaults', (tester) async {
+    await store.insertSession(const LabSession(
+      id: 'open-1',
+      deviceId: 'dev',
+      deviceModel: 'Test',
+      osVersion: 'T',
+      appVersion: '0.1.0',
+      startedAtUtcMs: 900000,
+      requestedIntervalS: 60,
+      requestedAccuracy: RequestedAccuracy.medium,
+    ));
+    await pump(tester);
+    expect(find.text('Stop'), findsOneWidget);
+    bool selected(String label) => tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, label)).selected;
+    expect(selected('60 s'), isTrue);
+    expect(selected('30 s'), isFalse);
+    expect(selected('Medium'), isTrue);
+    expect(selected('High'), isFalse);
+  });
+
+  testWidgets('permission chips refresh when the app comes back to the foreground', (tester) async {
+    final gateway = FakeGateway({PermissionItem.fineLocation});
+    await pump(tester, gateway: gateway);
+    expect(find.text('Fix'), findsOneWidget);
+    gateway.granted.addAll(PermissionItem.values);
+    // The framework asserts the real transition order on the way to paused and back.
+    const toSettingsAndBack = [
+      AppLifecycleState.inactive,
+      AppLifecycleState.hidden,
+      AppLifecycleState.paused,
+      AppLifecycleState.hidden,
+      AppLifecycleState.inactive,
+      AppLifecycleState.resumed,
+    ];
+    for (final s in toSettingsAndBack) {
+      tester.binding.handleAppLifecycleStateChanged(s);
+    }
     await tester.pumpAndSettle();
     expect(find.text('Fix'), findsNothing);
   });

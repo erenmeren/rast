@@ -18,7 +18,7 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> with WidgetsBindingObserver {
   int _intervalS = 30;
   RequestedAccuracy _accuracy = RequestedAccuracy.high;
   PermissionSnapshot? _permissions;
@@ -27,13 +27,21 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _refreshPermissions();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _note.dispose();
     super.dispose();
+  }
+
+  /// Back from system Settings: the grants may have changed.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _refreshPermissions();
   }
 
   Future<void> _refreshPermissions() async {
@@ -75,6 +83,10 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget _body(BuildContext context, Sampler sampler) {
     final status = sampler.status;
     final store = ref.watch(labStoreProvider).value;
+    // While a session runs (or was resumed) the chips show its settings.
+    final active = status.running ? status.config : null;
+    final intervalS = active?.intervalS ?? _intervalS;
+    final accuracy = active?.accuracy ?? _accuracy;
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -87,7 +99,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             for (final s in intervalOptions)
               ChoiceChip(
                 label: Text('$s s'),
-                selected: _intervalS == s,
+                selected: intervalS == s,
                 onSelected: status.running ? null : (_) => setState(() => _intervalS = s),
               ),
           ],
@@ -100,7 +112,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             for (final a in RequestedAccuracy.values)
               ChoiceChip(
                 label: Text(_accuracyLabel(a)),
-                selected: _accuracy == a,
+                selected: accuracy == a,
                 onSelected: status.running ? null : (_) => setState(() => _accuracy = a),
               ),
           ],

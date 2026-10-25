@@ -78,9 +78,10 @@ class _SessionTile extends ConsumerWidget {
               onChanged();
             }
           },
-          itemBuilder: (_) => const [
-            PopupMenuItem(value: 'export', child: Text('Export')),
-            PopupMenuItem(value: 'delete', child: Text('Delete')),
+          itemBuilder: (_) => [
+            const PopupMenuItem(value: 'export', child: Text('Export')),
+            // A running session is still being written to; stop it first.
+            if (end != null) const PopupMenuItem(value: 'delete', child: Text('Delete')),
           ],
         ),
       ),

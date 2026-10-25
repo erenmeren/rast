@@ -31,6 +31,7 @@ class SamplerStatus {
     this.lastWriteError,
     this.lastStreamError,
     this.busy = false,
+    this.config,
   });
 
   final bool running;
@@ -53,6 +54,10 @@ class SamplerStatus {
   /// True while start, stop or resume is in progress; the UI disables actions.
   final bool busy;
 
+  /// Interval and accuracy of the active session, so the UI can show them
+  /// after a resume instead of its defaults.
+  final SamplerConfig? config;
+
   SamplerStatus copyWith({
     bool? running,
     String? sessionId,
@@ -67,6 +72,7 @@ class SamplerStatus {
     String? lastStreamError,
     bool clearStreamError = false,
     bool? busy,
+    SamplerConfig? config,
   }) =>
       SamplerStatus(
         running: running ?? this.running,
@@ -80,6 +86,7 @@ class SamplerStatus {
         lastWriteError: lastWriteError ?? this.lastWriteError,
         lastStreamError: clearStreamError ? null : (lastStreamError ?? this.lastStreamError),
         busy: busy ?? this.busy,
+        config: config ?? this.config,
       );
 }
 
@@ -129,7 +136,7 @@ class Sampler extends ChangeNotifier {
       final session = await _newSession(config);
       await _store.insertSession(session);
       _nextSeq = 0;
-      _status = SamplerStatus(sessionId: session.id, lifecycle: _status.lifecycle, busy: true);
+      _status = SamplerStatus(sessionId: session.id, lifecycle: _status.lifecycle, busy: true, config: config);
       await _listen(session.requestedIntervalS, session.requestedAccuracy);
     } finally {
       _setBusy(false);
@@ -149,6 +156,7 @@ class Sampler extends ChangeNotifier {
         sampleCount: await _store.sampleCount(session.id),
         lifecycle: _status.lifecycle,
         busy: true,
+        config: SamplerConfig(intervalS: session.requestedIntervalS, accuracy: session.requestedAccuracy),
       );
       await _write(LabEvent(
         sessionId: session.id,

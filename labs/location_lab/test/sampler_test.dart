@@ -169,6 +169,8 @@ void main() {
     expect(await h.sampler.resumeIfOpen(), isTrue);
     expect(h.requested, [(60, RequestedAccuracy.best)]);
     expect(h.sampler.status.sessionId, 'open-1');
+    expect(h.sampler.status.config?.intervalS, 60);
+    expect(h.sampler.status.config?.accuracy, RequestedAccuracy.best);
     await h.emit(pos(1000100));
 
     final events = await store.events('open-1');
