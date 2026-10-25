@@ -205,7 +205,7 @@ void main() {
     final sp = await SharedPreferences.getInstance();
     expect(sp.getStringList('rast.safety.blocked'), isNull);
     expect(sp.getString('rast.intro'), isNull);
-    expect(sp.getInt('rast.profile.age'), isNull);
+    expect(sp.getString('rast.profile.birthDate'), isNull);
     await finishToasts(tester);
   });
 

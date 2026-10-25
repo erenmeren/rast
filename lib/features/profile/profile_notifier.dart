@@ -13,7 +13,7 @@ class ProfileNotifier extends Notifier<Profile> {
     ref.read(profileRepositoryProvider).save(p);
   }
 
-  void setAge(int? age) => _set(state.copyWith(age: age, clearAge: age == null));
+  void setBirthDate(DateTime? date) => _set(state.copyWith(birthDate: date, clearBirthDate: date == null));
   void setGender(Gender? gender) => _set(state.copyWith(gender: gender, clearGender: gender == null));
   void setCustomGender(String text) => _set(state.copyWith(customGender: text));
   void setShowGender(bool value) => _set(state.copyWith(showGender: value));

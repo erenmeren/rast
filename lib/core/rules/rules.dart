@@ -40,6 +40,16 @@ String ageLabel(int age) => age >= 99 ? '99+' : '$age';
 bool isAdultAge(int? age) =>
     age != null && age >= minAge && age <= maxPlausibleAge;
 
+/// Completed years between [birthDate] and [today] (both UTC calendar dates).
+/// A 29 February birthday counts on 1 March in non-leap years.
+int ageOn(DateTime birthDate, DateTime today) {
+  var age = today.year - birthDate.year;
+  final beforeBirthday = today.month < birthDate.month ||
+      (today.month == birthDate.month && today.day < birthDate.day);
+  if (beforeBirthday) age--;
+  return age;
+}
+
 /// A maximum of 99 represents the open-ended "99+" preference.
 bool ageInRange(int age, int min, int max) {
   if (age < 0 || min < 0 || max < min) return false;

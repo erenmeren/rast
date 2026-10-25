@@ -1,9 +1,10 @@
+import '../rules/rules.dart';
 import 'person.dart';
 
 /// The signed-in member. No name, job, religion or biography by design.
 class Profile {
   const Profile({
-    this.age,
+    this.birthDate,
     this.gender,
     this.customGender = '',
     this.showGender = false,
@@ -12,7 +13,8 @@ class Profile {
     this.phone = '',
   });
 
-  final int? age;
+  /// UTC calendar date; null until entered.
+  final DateTime? birthDate;
   final Gender? gender;
   final String customGender;
   final bool showGender;
@@ -23,6 +25,10 @@ class Profile {
   final String phone;
 
   static const empty = Profile();
+
+  /// Age today, derived from the birth date. The production server derives
+  /// it from its own clock; this is for the mock and for display.
+  int? get age => birthDate == null ? null : ageOn(birthDate!, DateTime.now().toUtc());
 
   int get photoCount => photos.where((p) => p != null).length;
   bool get photosComplete => photoCount == 4;
@@ -35,8 +41,8 @@ class Profile {
   }
 
   Profile copyWith({
-    int? age,
-    bool clearAge = false,
+    DateTime? birthDate,
+    bool clearBirthDate = false,
     Gender? gender,
     bool clearGender = false,
     String? customGender,
@@ -46,7 +52,7 @@ class Profile {
     String? phone,
   }) {
     return Profile(
-      age: clearAge ? null : (age ?? this.age),
+      birthDate: clearBirthDate ? null : (birthDate ?? this.birthDate),
       gender: clearGender ? null : (gender ?? this.gender),
       customGender: customGender ?? this.customGender,
       showGender: showGender ?? this.showGender,

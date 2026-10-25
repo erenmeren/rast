@@ -27,7 +27,7 @@ Future<ProviderContainer> activeMember({Map<String, Object> prefs = const {}}) a
   ]);
   addTearDown(container.dispose);
   final profile = container.read(profileProvider.notifier);
-  profile.setAge(28);
+  profile.setBirthDate(DateTime.utc(1998, 5, 14));
   profile.setGender(Gender.woman);
   profile.useSamplePhotos();
   container.read(preferencesProvider.notifier).replace(const Preferences(minAge: 23, maxAge: 36));
@@ -40,6 +40,18 @@ Future<ProviderContainer> activeMember({Map<String, Object> prefs = const {}}) a
 }
 
 void main() {
+  test('birth date persists as an ISO date and loads back', () async {
+    final c = await activeMember();
+    final sp = await SharedPreferences.getInstance();
+    expect(sp.getString('rast.profile.birthDate'), '1998-05-14');
+    expect(sp.getInt('rast.profile.age'), isNull);
+    final again = ProviderContainer(overrides: [preferencesStoreProvider.overrideWithValue(PreferencesStore(sp))]);
+    addTearDown(again.dispose);
+    expect(again.read(profileProvider).birthDate, DateTime.utc(1998, 5, 14));
+    c.read(profileProvider.notifier).setBirthDate(null);
+    expect(sp.getString('rast.profile.birthDate'), isNull);
+  });
+
   test('deck order is a stable permutation and photo taps keep it', () async {
     final c = await activeMember();
     final order = c.read(deckProvider).order;

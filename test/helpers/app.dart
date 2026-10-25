@@ -37,7 +37,7 @@ Future<ProviderContainer> testContainer({Map<String, Object> prefs = const {}, i
 /// Puts the container into the "finished setup, intro complete" state.
 void makeActiveMember(ProviderContainer c, {bool introComplete = true, bool verified = true}) {
   final profile = c.read(profileProvider.notifier);
-  profile.setAge(28);
+  profile.setBirthDate(DateTime.utc(1998, 5, 14));
   profile.setGender(Gender.woman);
   profile.setPhone('+44', '7700 900 123');
   profile.useSamplePhotos();

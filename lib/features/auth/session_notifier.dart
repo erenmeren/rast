@@ -53,7 +53,7 @@ class SessionNotifier extends Notifier<Session> {
     if (!isAdultAge(profile.age) ||
         profile.gender == null ||
         (profile.gender == Gender.self && profile.customGender.trim().isEmpty)) {
-      return const SetupProblem('/setup/about', 'Add your age and gender to finish setup.');
+      return const SetupProblem('/setup/about', 'Add your birth date and gender to finish setup.');
     }
     if (!prefs.isValid) {
       return const SetupProblem('/setup/preferences', 'Choose at least one dating preference.');

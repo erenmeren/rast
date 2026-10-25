@@ -107,12 +107,22 @@ class MockSessionRepository implements SessionRepository {
   }
 }
 
+/// `YYYY-MM-DD` for a UTC calendar date.
+String isoDate(DateTime d) =>
+    '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+DateTime? _parseIsoDate(String? s) {
+  if (s == null) return null;
+  final d = DateTime.tryParse(s);
+  return d == null ? null : DateTime.utc(d.year, d.month, d.day);
+}
+
 class MockProfileRepository implements ProfileRepository {
   MockProfileRepository(this.store);
   final PreferencesStore store;
 
   static const _keys = [
-    'rast.profile.age', 'rast.profile.gender', 'rast.profile.customGender', 'rast.profile.showGender',
+    'rast.profile.birthDate', 'rast.profile.gender', 'rast.profile.customGender', 'rast.profile.showGender',
     'rast.profile.photos', 'rast.profile.dial', 'rast.profile.phone',
     'rast.prefs.interests', 'rast.prefs.minAge', 'rast.prefs.maxAge',
   ];
@@ -122,7 +132,7 @@ class MockProfileRepository implements ProfileRepository {
     final photos = store.getStringList('rast.profile.photos');
     final genderRaw = store.getString('rast.profile.gender');
     return Profile(
-      age: store.getInt('rast.profile.age'),
+      birthDate: _parseIsoDate(store.getString('rast.profile.birthDate')),
       gender: Gender.values.where((g) => g.name == genderRaw).firstOrNull,
       customGender: store.getString('rast.profile.customGender') ?? '',
       showGender: store.getBool('rast.profile.showGender') ?? false,
@@ -136,10 +146,10 @@ class MockProfileRepository implements ProfileRepository {
 
   @override
   Future<void> save(Profile p) async {
-    if (p.age != null) {
-      await store.setInt('rast.profile.age', p.age!);
+    if (p.birthDate != null) {
+      await store.setString('rast.profile.birthDate', isoDate(p.birthDate!));
     } else {
-      await store.remove('rast.profile.age');
+      await store.remove('rast.profile.birthDate');
     }
     if (p.gender != null) {
       await store.setString('rast.profile.gender', p.gender!.name);

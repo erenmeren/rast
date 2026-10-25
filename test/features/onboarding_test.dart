@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rast/core/models/models.dart';
+import 'package:rast/core/rules/rules.dart';
 import 'package:rast/core/ui/ui.dart';
 import 'package:rast/features/auth/phone_page.dart';
 import 'package:rast/features/auth/session_notifier.dart';
@@ -23,14 +24,19 @@ void main() {
     expect(validatePhone('+90', '5321234567'), isNull);
   });
 
-  test('age validation matches the prototype', () {
-    expect(validateAgeInput('17'), 'You must be 18 or older to use rast.');
-    expect(validateAgeInput('18.5'), 'Enter a valid whole-number age from 18 to 130.');
-    expect(validateAgeInput(''), 'Enter a valid whole-number age from 18 to 130.');
-    expect(validateAgeInput('131'), 'Enter a valid whole-number age from 18 to 130.');
-    expect(validateAgeInput(' 25 '), isNull);
-    expect(validateAgeInput('18'), isNull);
-    expect(validateAgeInput('130'), isNull);
+  test('birth date validation: exact 18 check, real calendar dates, 130-year guard', () {
+    final today = DateTime.utc(2026, 10, 25);
+    expect(validateBirthDateInput('25', '10', '2008', today), isNull);
+    expect(validateBirthDateInput('26', '10', '2008', today), 'You must be 18 or older to use rast.');
+    expect(validateBirthDateInput(' 14 ', '5', '1998', today), isNull);
+    expect(validateBirthDateInput('', '', '', today), 'Enter your birth date as day, month and year.');
+    expect(validateBirthDateInput('31', '2', '2000', today), 'Enter your birth date as day, month and year.');
+    expect(validateBirthDateInput('14', '13', '1998', today), 'Enter your birth date as day, month and year.');
+    expect(validateBirthDateInput('14', '5', '98', today), 'Enter your birth date as day, month and year.');
+    expect(validateBirthDateInput('1', '1', '1890', today), 'Enter a valid birth date.');
+    expect(validateBirthDateInput('1', '1', '2030', today), 'Enter a valid birth date.');
+    expect(parseBirthDate('14', '5', '1998'), DateTime.utc(1998, 5, 14));
+    expect(parseBirthDate('31', '2', '2000'), isNull);
   });
 
   testWidgets('full signup flow ends at the required introduction', (tester) async {
@@ -58,10 +64,12 @@ void main() {
 
     // No gender preselected.
     expect(c.read(profileProvider).gender, isNull);
-    await tester.enterText(find.byType(TextField).first, '17');
+    await tester.enterText(find.bySemanticsLabel('Day').last, '14');
+    await tester.enterText(find.bySemanticsLabel('Month').last, '5');
+    await tester.enterText(find.bySemanticsLabel('Year').last, '2012');
     await tapPrimary(tester, 'Continue');
     expect(find.text('You must be 18 or older to use rast.'), findsOneWidget);
-    await tester.enterText(find.byType(TextField).first, '28');
+    await tester.enterText(find.bySemanticsLabel('Year').last, '1998');
     await tapPrimary(tester, 'Continue');
     expect(find.text('Select your gender to continue.'), findsOneWidget);
     await tester.tap(find.text('Self-describe'));
@@ -72,7 +80,8 @@ void main() {
     await tester.pumpAndSettle();
     await tapPrimary(tester, 'Continue');
     expect(currentPath(c), '/setup/preferences');
-    expect(c.read(profileProvider).age, 28);
+    expect(c.read(profileProvider).birthDate, DateTime.utc(1998, 5, 14));
+    expect(c.read(profileProvider).age, ageOn(DateTime.utc(1998, 5, 14), DateTime.now().toUtc()));
 
     // Deselecting Everyone leaves nothing selected.
     await tester.tap(find.text('Women'));

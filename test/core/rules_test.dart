@@ -47,6 +47,15 @@ void main() {
   test('99+ is a display and range boundary', () {
     expect(ageLabel(98), '98');
     expect(ageLabel(99), '99+');
+  });
+
+  test('ageOn counts completed years, birthday inclusive, leap day on 1 March', () {
+    final today = DateTime.utc(2026, 10, 25);
+    expect(ageOn(DateTime.utc(1998, 5, 14), today), 28);
+    expect(ageOn(DateTime.utc(1998, 10, 25), today), 28);
+    expect(ageOn(DateTime.utc(1998, 10, 26), today), 27);
+    expect(ageOn(DateTime.utc(2008, 2, 29), DateTime.utc(2026, 2, 28)), 17);
+    expect(ageOn(DateTime.utc(2008, 2, 29), DateTime.utc(2026, 3, 1)), 18);
     expect(ageLabel(105), '99+');
     expect(ageInRange(105, 18, 99), isTrue);
     expect(ageInRange(99, 18, 98), isFalse);

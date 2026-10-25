@@ -98,7 +98,7 @@ Mock mode uses fictional profiles and stock placeholder photos. The sample verif
 - No real permission prompt: "Enable location" only flips a flag. The production adapter must request precise and background access and handle denial and recovery.
 - The Likes You blur is cosmetic. A free client must never receive the original image from the server.
 - No network, loading, retry or offline states yet; everything is synchronous and local.
-- Age is a typed whole number guarded to 18–130, as in the prototype. The production age model and age assurance are undecided.
+- Signup asks for the full birth date (day, month, year); age is derived on the device for the mock and will be derived on the server in production. Age assurance beyond self-report is undecided.
 - A self-described gender matches only the "Everyone" interest. The handoff says not to guess a finer mapping.
 - Chats, likes and passes reset on relaunch (like the prototype). Profile, preferences, timing, appearance, intro status and safety state persist on the device.
 - iOS is configured but has not been built here (no Xcode on the build machine). Visual parity on physical devices is unverified; the screenshots come from the widget-test renderer.
