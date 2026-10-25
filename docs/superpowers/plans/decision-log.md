@@ -85,7 +85,7 @@ Implements the 2026-10-24 product decision. `Profile.age` is gone as a stored fi
 
 ### 2026-10-25 — Nothing Phone (2a) locked-screen run
 
-Same setup as the Pixel run (30 s · High, Start then power key, desk indoors), but on battery, 74 %. Pulled after 12.2 min via `db2export.py`; session left open (PIN lock). Report: 25 samples, intervals median 30.0 s, p90 31.0 s, max 40.1 s, no outages, 24 of 25 samples in `paused`; accuracy median 18.0 m, p90 28.1 m, 17 of 25 ≤ 20 m; sample age p90 2.2 s; battery unchanged over 12 min (too short to quantify); NTP offset −1022 ms. Nothing OS did not throttle the foreground-service stream at 30 s on a locked screen in this window. R5 (battery saver) still needed.
+Same setup as the Pixel run (30 s · High, Start then power key, desk indoors), but on battery, 74 %. The owner pressed Stop after 26.3 min; the session closed cleanly (`stopped` event, service gone). Report: 52 samples, intervals median 30.0 s, p90 31.8 s, max 56.0 s, no outages, all but one sample in `paused`; accuracy median 17.6 m, p90 25.6 m, worst 35.9 m; sample age p90 1.8 s; battery drain 0.0 %/h (the phone turned out to be charging over USB, so no battery conclusion); NTP offset −1022 ms. Nothing OS did not throttle the foreground-service stream at 30 s on a locked screen in this window. R5 (battery saver) still needed.
 
 ## 2026-10-25 — Backend core (Phase 5a), engineering
 
