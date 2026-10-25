@@ -19,6 +19,17 @@ create index location_sample_received on location_sample (received_at);
 alter table location_sample enable row level security;
 revoke all on location_sample from anon, authenticated;
 
+-- Advisory lock keys for the ~1 km grid cell of a point and its 8 neighbours.
+-- Overlapping intake transactions in the same area wait for each other, so
+-- the second one sees the first one's sample.
+create or replace function app.cell_keys(pt geography) returns bigint[]
+language sql immutable as $$
+  select array_agg(((ix + dx) * 100000 + (iy + dy))::bigint order by (ix + dx) * 100000 + (iy + dy))
+  from (select floor((ST_X(pt::geometry) + 180) / 0.01)::bigint as ix,
+               floor((ST_Y(pt::geometry) + 90) / 0.01)::bigint as iy) g,
+       generate_series(-1, 1) dx, generate_series(-1, 1) dy
+$$;
+
 -- For the new sample S of account A: every other account with a sample within
 -- radius_m and max_skew_s becomes a candidate; the closest-in-time sample per
 -- account is used; distance is centre to centre, rounded to millimetres.
@@ -34,6 +45,9 @@ begin
   select * into s from location_sample where id = sample_id;
   if s.id is null then return 0; end if;
   select * into prm from encounter_params;
+  for r in select k from unnest(app.cell_keys(s.point)) as k loop
+    perform pg_advisory_xact_lock(r.k);
+  end loop;
 
   for r in
     select distinct on (t.account_id)

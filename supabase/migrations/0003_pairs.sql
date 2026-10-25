@@ -103,20 +103,36 @@ alter table report enable row level security;
 alter table pair_event enable row level security;
 alter table encounter_params enable row level security;
 
-create policy pair_member on pair for select to authenticated using (auth.uid() in (a, b));
-create policy pair_like_member on pair_like for select to authenticated
-  using (exists (select 1 from pair p where p.id = pair_id and auth.uid() in (p.a, p.b)));
+-- A pair exists for the caller only once it is matched or has a released
+-- encounter. Before that nothing about it, not even its existence, is visible.
+-- Security definer so policies can read pair and encounter without recursion.
+create or replace function app.pair_visible(pid uuid, who uuid) returns boolean
+language sql stable security definer
+set search_path = public, app, extensions
+as $$
+  select exists (
+    select 1 from pair p
+    where p.id = pid
+      and who in (p.a, p.b)
+      and (p.matched_at is not null
+           or exists (select 1 from encounter e where e.pair_id = p.id and e.state = 'released'))
+  )
+$$;
+grant usage on schema app to authenticated;
+grant execute on function app.pair_visible(uuid, uuid) to authenticated;
+
+create policy pair_member on pair for select to authenticated using (app.pair_visible(id, auth.uid()));
+create policy pair_like_own on pair_like for select to authenticated using (from_account = auth.uid());
 create policy encounter_member on encounter for select to authenticated
-  using (exists (select 1 from pair p where p.id = pair_id and auth.uid() in (p.a, p.b)));
-create policy message_member on message for select to authenticated
-  using (exists (select 1 from pair p where p.id = pair_id and auth.uid() in (p.a, p.b)));
-create policy pair_event_member on pair_event for select to authenticated
-  using (exists (select 1 from pair p where p.id = pair_id and auth.uid() in (p.a, p.b)));
+  using (state = 'released' and app.pair_visible(pair_id, auth.uid()));
+create policy message_member on message for select to authenticated using (app.pair_visible(pair_id, auth.uid()));
+create policy pair_event_member on pair_event for select to authenticated using (app.pair_visible(pair_id, auth.uid()));
 create policy block_own on block for select to authenticated using (blocker = auth.uid());
 create policy report_own on report for select to authenticated using (reporter = auth.uid());
 create policy params_read on encounter_params for select to authenticated using (true);
 
--- Clients never write these tables, and never see encounter times.
+-- Clients never write these tables, and never see when anything happened.
 revoke all on pair, pair_like, block, encounter, message, report, pair_event, encounter_params from anon, authenticated;
-grant select on pair, pair_like, block, message, report, pair_event, encounter_params to authenticated;
-grant select (id, pair_id, state, rule_version, created_at) on encounter to authenticated;
+grant select on pair_like, block, message, report, pair_event, encounter_params to authenticated;
+grant select (id, a, b, revision, matched_at, disconnected_at) on pair to authenticated;
+grant select (id, pair_id, state, rule_version) on encounter to authenticated;

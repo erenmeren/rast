@@ -2,7 +2,7 @@ import unittest
 
 from harness import SqlError, as_user, db, member, uuid
 
-PAIR = "insert into pair(id, a, b) values ('%s', '%s', '%s');" % (uuid(50), uuid(1), uuid(2))
+PAIR = "insert into pair(id, a, b, matched_at) values ('%s', '%s', '%s', now());" % (uuid(50), uuid(1), uuid(2))
 ENC = "insert into encounter(id, pair_id, encountered_at, rule_version, release_at, state) values (gen_random_uuid(), '%s', now(), 1, now(), '%s');"
 
 

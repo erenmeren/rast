@@ -75,6 +75,14 @@ class EncounterTests(unittest.TestCase):
         later = self.two(a=dict(delay=1), b=dict(delay=0)) + sample(1, 1) + sample(2, 1, distance=5)
         self.assertEqual(db().run(later + "select app.release_due_encounters(); select state from encounter;")[-2:], [["0"], ["pending"]])
 
+    def test_concurrent_intake_still_pairs(self):
+        db().run(self.two(), commit=True)
+        try:
+            db().run_concurrent(sample(1, 1) + "select pg_sleep(1.5);", sample(2, 1, distance=5))
+            self.assertEqual(db().run("select count(*) from encounter;"), [["1"]])
+        finally:
+            db().run("truncate auth.users cascade; truncate pair cascade;", commit=True)
+
     def test_clients_cannot_read_samples(self):
         with self.assertRaisesRegex(SqlError, "permission denied"):
             db().run(member(1) + sample(1, 1) + as_user(uuid(1), "select count(*) from location_sample;"))

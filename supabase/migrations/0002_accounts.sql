@@ -84,13 +84,29 @@ alter table intro_progress enable row level security;
 alter table device enable row level security;
 alter table entitlement enable row level security;
 
-create policy account_own on account for all to authenticated using (id = auth.uid()) with check (id = auth.uid());
-create policy profile_own on profile for all to authenticated using (account_id = auth.uid()) with check (account_id = auth.uid());
-create policy photo_own on photo for all to authenticated using (account_id = auth.uid()) with check (account_id = auth.uid());
-create policy preferences_own on preferences for all to authenticated using (account_id = auth.uid()) with check (account_id = auth.uid());
-create policy intro_own on intro_progress for all to authenticated using (account_id = auth.uid()) with check (account_id = auth.uid());
-create policy device_own on device for all to authenticated using (account_id = auth.uid()) with check (account_id = auth.uid());
+-- Clients may read and edit their own rows, never delete them, and never
+-- touch account.status: deletion goes through delete_account().
+create policy account_select on account for select to authenticated using (id = auth.uid());
+create policy account_insert on account for insert to authenticated with check (id = auth.uid());
+create policy profile_select on profile for select to authenticated using (account_id = auth.uid());
+create policy profile_insert on profile for insert to authenticated with check (account_id = auth.uid());
+create policy profile_update on profile for update to authenticated using (account_id = auth.uid()) with check (account_id = auth.uid());
+create policy photo_select on photo for select to authenticated using (account_id = auth.uid());
+create policy photo_insert on photo for insert to authenticated with check (account_id = auth.uid());
+create policy photo_update on photo for update to authenticated using (account_id = auth.uid()) with check (account_id = auth.uid());
+create policy preferences_select on preferences for select to authenticated using (account_id = auth.uid());
+create policy preferences_insert on preferences for insert to authenticated with check (account_id = auth.uid());
+create policy preferences_update on preferences for update to authenticated using (account_id = auth.uid()) with check (account_id = auth.uid());
+create policy intro_select on intro_progress for select to authenticated using (account_id = auth.uid());
+create policy intro_insert on intro_progress for insert to authenticated with check (account_id = auth.uid());
+create policy intro_update on intro_progress for update to authenticated using (account_id = auth.uid()) with check (account_id = auth.uid());
+create policy device_select on device for select to authenticated using (account_id = auth.uid());
+create policy device_insert on device for insert to authenticated with check (account_id = auth.uid());
+create policy device_update on device for update to authenticated using (account_id = auth.uid()) with check (account_id = auth.uid());
 create policy entitlement_read on entitlement for select to authenticated using (account_id = auth.uid());
 
-revoke all on all tables in schema public from anon;
-revoke insert, update, delete on entitlement from authenticated;
+-- Supabase's default privileges grant ALL; keep only what the policies need.
+revoke all on all tables in schema public from anon, authenticated;
+grant select, insert, update on profile, photo, preferences, intro_progress, device to authenticated;
+grant select on account, entitlement to authenticated;
+grant insert (id) on account to authenticated;

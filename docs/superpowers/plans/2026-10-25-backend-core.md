@@ -26,7 +26,7 @@
 - `submit_location_samples('[]')` and a non-array payload return `{"accepted":[],"rejected":[]}` and an error respectively, never a partial insert (Task 5).
 - `like_account(self)` and `send_message(self)` must return `unavailable`, never create a pair with `a = b` (Task 7).
 - A message body that is empty or longer than 2000 characters is rejected (Task 7).
-- A disconnect issued while another session holds the pair lock in an unfinished like must wait and win; the final state is disconnected with no match (Task 7).
+- A disconnect issued while another session holds the pair lock in an unfinished like must wait; the like commits first (a matching like does match), then the pair is disconnected, in that event order (Task 7).
 
 ---
 

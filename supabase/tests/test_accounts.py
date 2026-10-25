@@ -31,6 +31,14 @@ class AccountTests(unittest.TestCase):
         sql = member(1) + member(2) + as_user(uuid(1), "select count(*) from profile; select count(*) from preferences; select count(*) from device;")
         self.assertEqual(db().run(sql), [["1"], ["1"], ["1"]])
 
+    def test_client_cannot_undelete_or_delete_rows(self):
+        base = member(1) + as_user(uuid(1), "select public.delete_account();")
+        with self.assertRaisesRegex(SqlError, "permission denied"):
+            db().run(base + as_user(uuid(1), "update account set status = 'active', deleted_at = null where id = '%s';" % uuid(1)))
+        for table in ["account", "profile", "preferences", "photo", "device"]:
+            with self.subTest(table=table), self.assertRaisesRegex(SqlError, "permission denied"):
+                db().run(member(1) + as_user(uuid(1), "delete from %s;" % table))
+
     def test_anon_sees_nothing(self):
         with self.assertRaises(SqlError):
             db().run(member(1) + "set local role anon; select count(*) from profile;")

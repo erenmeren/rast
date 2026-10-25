@@ -22,13 +22,17 @@ begin
   return p;
 end $$;
 
+-- Bumps the revision; writes an event when kind is given. A like bumps
+-- without an event: the other person must not learn of it.
 create or replace function app.bump(pid uuid, kind text) returns bigint
 language plpgsql volatile as $$
 declare
   r bigint;
 begin
   update pair set revision = revision + 1 where id = pid returning revision into r;
-  insert into pair_event (pair_id, revision, kind) values (pid, r, kind);
+  if kind is not null then
+    insert into pair_event (pair_id, revision, kind) values (pid, r, kind);
+  end if;
   return r;
 end $$;
 
@@ -45,6 +49,11 @@ end $$;
 create or replace function app.account_exists(acct uuid) returns boolean
 language sql stable as $$
   select exists (select 1 from account where id = acct)
+$$;
+
+create or replace function app.account_active(acct uuid) returns boolean
+language sql stable as $$
+  select exists (select 1 from account where id = acct and status = 'active')
 $$;
 
 create or replace function public.like_account(target uuid, client_op_id uuid) returns jsonb
@@ -75,7 +84,7 @@ begin
     return jsonb_build_object('outcome', 'matched');
   end if;
   if inserted > 0 then
-    perform app.bump(p.id, 'liked');
+    perform app.bump(p.id, null);
   end if;
   return jsonb_build_object('outcome', case when p.matched_at is null then 'liked' else 'matched' end);
 end $$;
@@ -147,7 +156,8 @@ begin
   if existing.id is not null then
     return jsonb_build_object('outcome', 'sent', 'seq', existing.seq);
   end if;
-  if p.matched_at is null or p.disconnected_at is not null or not app.pair_open(p.id) then
+  if p.matched_at is null or p.disconnected_at is not null or not app.pair_open(p.id)
+     or not app.account_active(me) or not app.account_active(target) then
     return jsonb_build_object('outcome', 'unavailable');
   end if;
   select coalesce(max(seq), 0) + 1 into next_seq from message where pair_id = p.id;
@@ -188,9 +198,14 @@ set search_path = public, app, extensions
 as $$
 declare
   me uuid := app.uid();
+  conn pair;
 begin
   update account set status = 'deleted', deleted_at = now() where id = me;
   update profile set visible = false where account_id = me;
+  -- Open connections close like a disconnect, so the other side is told.
+  for conn in select * from pair where me in (a, b) and matched_at is not null and disconnected_at is null for update loop
+    perform app.close_pair(conn);
+  end loop;
   update encounter e set state = 'void'
   from pair p
   where p.id = e.pair_id and me in (p.a, p.b) and e.state <> 'void';

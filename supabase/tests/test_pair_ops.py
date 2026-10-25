@@ -92,6 +92,12 @@ class PairOpsTests(unittest.TestCase):
         rows = db().run(sql + "select status from account where id = '%s'; select visible from profile where account_id = '%s'; select count(*) from pair; select state from encounter;" % (uuid(1), uuid(1)))
         self.assertEqual(rows[-4:], [["deleted"], ["f"], ["1"], ["void"]])
 
+    def test_messages_unavailable_after_delete(self):
+        sql = self.matched() + call(2, "delete_account()")
+        self.assertEqual(self.last(sql + call(1, "send_message('%s','%s','hi')" % (uuid(2), uuid(720))))["outcome"], "unavailable")
+        self.assertEqual(self.last(sql + call(2, "send_message('%s','%s','hi')" % (uuid(1), uuid(721))))["outcome"], "unavailable")
+        self.assertEqual(db().run(sql + "select disconnected_at is not null from pair; select kind from pair_event order by id desc limit 1;")[-2:], [["t"], ["disconnected"]])
+
     def test_disconnect_waits_for_in_flight_like(self):
         db().run(self.released(), commit=True)
         a = as_user(uuid(1), "select public.like_account('%s','%s'); select pg_sleep(2);" % (uuid(2), uuid(700)))
@@ -99,7 +105,21 @@ class PairOpsTests(unittest.TestCase):
         try:
             _, out_b = db().run_concurrent(a, b)
             self.assertEqual(json.loads(out_b[-1][0])["outcome"], "disconnected")
-            self.assertEqual(db().run("select disconnected_at is not null, matched_at is null from pair;"), [["t", "t"]])
+            self.assertEqual(db().run("select disconnected_at is not null, matched_at is null, revision from pair;"), [["t", "t", "2"]])
+            self.assertEqual(db().run("select kind from pair_event order by id;"), [["disconnected"]])
+            self.assertEqual(db().run("select count(*) from pair_like;"), [["1"]])
+        finally:
+            db().run("truncate auth.users cascade; truncate pair cascade;", commit=True)
+
+    def test_disconnect_waits_for_in_flight_matching_like(self):
+        db().run(self.released() + like(2, 1, 701), commit=True)
+        a = as_user(uuid(1), "select public.like_account('%s','%s'); select pg_sleep(2);" % (uuid(2), uuid(700)))
+        b = as_user(uuid(2), "select public.disconnect_pair('%s','%s');" % (uuid(1), uuid(702)))
+        try:
+            out_a, out_b = db().run_concurrent(a, b)
+            self.assertEqual(json.loads(out_a[0][0])["outcome"], "matched")
+            self.assertEqual(json.loads(out_b[-1][0])["outcome"], "disconnected")
+            self.assertEqual(db().run("select kind from pair_event order by id;"), [["matched"], ["disconnected"]])
         finally:
             db().run("truncate auth.users cascade; truncate pair cascade;", commit=True)
 

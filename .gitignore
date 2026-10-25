@@ -35,3 +35,5 @@ graphify-out/
 labs/*/build/
 labs/*/.dart_tool/
 labs/*/exports/
+__pycache__/
+*.pyc

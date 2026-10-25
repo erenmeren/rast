@@ -1,6 +1,6 @@
 import unittest
 
-from harness import db, member, sample, uuid
+from harness import as_user, db, member, sample, uuid
 
 
 class DelayPolicyTests(unittest.TestCase):
@@ -16,6 +16,10 @@ class DelayPolicyTests(unittest.TestCase):
 
     def test_increase_extends(self):
         self.assertEqual(self.release(self.pending() + "update preferences set delay_hours = 6 where account_id = '%s';" % uuid(2)), "2026-10-25 16:00:00+00")
+
+    def test_client_can_change_delay_and_the_floor_extends(self):
+        sql = self.pending() + as_user(uuid(2), "update preferences set delay_hours = 6 where account_id = '%s';" % uuid(2))
+        self.assertEqual(self.release(sql), "2026-10-25 16:00:00+00")
 
     def test_released_rows_untouched(self):
         sql = self.pending() + "update encounter set state = 'released'; update preferences set delay_hours = 24 where account_id = '%s';" % uuid(1)

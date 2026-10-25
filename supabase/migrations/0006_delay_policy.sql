@@ -2,7 +2,9 @@
 -- a reduction never moves it earlier (owner decision, 2026-10-24).
 
 create or replace function app.extend_release_floor() returns trigger
-language plpgsql as $$
+language plpgsql security definer
+set search_path = public, app, extensions
+as $$
 begin
   update encounter e
   set release_at = greatest(
