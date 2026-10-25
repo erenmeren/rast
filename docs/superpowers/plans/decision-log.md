@@ -86,3 +86,16 @@ Implements the 2026-10-24 product decision. `Profile.age` is gone as a stored fi
 ### 2026-10-25 — Nothing Phone (2a) locked-screen run
 
 Same setup as the Pixel run (30 s · High, Start then power key, desk indoors), but on battery, 74 %. Pulled after 12.2 min via `db2export.py`; session left open (PIN lock). Report: 25 samples, intervals median 30.0 s, p90 31.0 s, max 40.1 s, no outages, 24 of 25 samples in `paused`; accuracy median 18.0 m, p90 28.1 m, 17 of 25 ≤ 20 m; sample age p90 2.2 s; battery unchanged over 12 min (too short to quantify); NTP offset −1022 ms. Nothing OS did not throttle the foreground-service stream at 30 s on a locked screen in this window. R5 (battery saver) still needed.
+
+## 2026-10-25 — Backend core (Phase 5a), engineering
+
+Built under `supabase/` as eight plain SQL migrations, proven by 55 Python tests against a local `postgis/postgis:17-3.5` container (no Supabase account needed; `supabase/README.md`). Spec: `docs/superpowers/specs/2026-10-25-backend-core-design.md`.
+
+- **Provisional thresholds** in `encounter_params`, to be replaced after Phase 0: radius 20 m (product rule), max skew between the two samples 60 s, max sample age 24 h (offline uploads inside the retention window still count), max future 60 s, max accuracy 50 m (the largest radius the lab's sensitivity table uses).
+- **Distance rule:** centre to centre, PostGIS spheroid distance rounded to millimetres, `<= 20.000` passes and `20.001` fails. Accuracy is a gate only; it is not subtracted from the distance.
+- **One live encounter per pair:** a partial unique index; repeated crossings while one is pending or released add nothing; after a void a new one can be created. Encounter time is the later of the two samples.
+- **Encounter times are hidden** from clients at the column-privilege level (`encountered_at`, `release_at` are not selectable by `authenticated`); raw samples are not readable by clients at all.
+- **Blocks are silent:** block/unblock write no `pair_event` and create no pair row, so the blocked person cannot infer it; blocking a match removes the connection with the ordinary `disconnected` event.
+- **delete_account** voids every live encounter of the account and hides the profile; pairs and tombstones remain, so "never again" holds for the account pair (SAFE-14 scope).
+- **No partitioning** of `location_sample` yet: a plain table with GiST + time indexes and an hourly purge. Revisit if volume demands it.
+- **Not yet in place (Phase 5b):** discovery sessions and cursors, media derivatives for Likes You, Edge Functions, Twilio Verify, Flutter adapters, a scheduled call of `release_due_encounters`.
