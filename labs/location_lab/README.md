@@ -22,6 +22,7 @@ iOS: open `ios/Runner.xcworkspace` on a Mac, set a team, run on the iPhone. Back
 4. Stop, open Sessions, Export. Files: `session.json`, `samples.csv`, `events.csv`.
 
 Exports also sit in the app's documents directory under `exports/<session_id>/`.
+Without the share sheet (debug build, phone over USB): `adb exec-out run-as app.rast.location_lab cat app_flutter/lab.db > lab.db` then `python3 labs/location_lab/tools/db2export.py lab.db <export_dir>` writes the same three files for the newest session.
 
 ## Analyse
 

@@ -57,3 +57,20 @@ Product decisions, given by the owner in conversation. Not reversible by enginee
 | path_provider, share_plus | 2.1.6, 13.3.1 | export directory and share sheet |
 | ntp | 2.0.0 | clock offset at session start |
 | uuid, intl, flutter_riverpod | 4.6.0, 0.20.3, 3.4.3 | ids, time formatting, state |
+
+## 2026-10-25 — Phase 0 first run (Pixel 9a)
+
+Setup: Pixel 9a (Android 17, SDK 37), lab 0.1.0 debug build installed over adb, all three permissions granted, 30 s · High, Start pressed at 08:43 local, screen locked with the power key, phone on a desk indoors, **USB-powered the whole time** (battery drain not measurable). Pulled after 11 minutes with `adb exec-out run-as app.rast.location_lab cat app_flutter/lab.db` and converted with `labs/location_lab/tools/db2export.py` because the phone has a PIN lock and Stop/Export could not be pressed over adb; the session is still open on the phone.
+
+Report (`python3 labs/location_lab/tools/analyze.py single labs/location_lab/exports/pixel9a-T10-20261025`):
+
+- Samples: 22 over 11.1 min; intervals median 31.0 s, p90 34.0 s, p99 44.0 s, max 44.0 s; outages: none.
+- By lifecycle: resumed 3 samples (median 30.4 s), paused 19 samples (median 31.0 s, p90 42.0 s). Sampling continued unchanged while the screen was locked and the device reported Dozing.
+- Accuracy: median 59.2 m, p90 98.5 m, worst 132.7 m; 1 of 22 samples ≤ 20 m. Indoors, so expected; no conclusion for the 20 m radius yet.
+- Sample age (device clock − fix time): median 0.1 s, p90 0.2 s.
+- NTP offset at start: −3080 ms. Cross-checked: the phone clock was 3.2 s ahead of the host even with automatic time on. Pair analysis must keep using the NTP correction.
+- Foreground service stayed up (`isForeground=true`, geolocator channel) for the whole run.
+
+What this run settles: the pipeline works end to end (permissions, foreground service, locked-screen sampling, storage, analysis). What it does not settle: battery drain and accuracy outdoors, both need the PROTOCOL runs on battery.
+
+Observation: after the power key the app logged paused → resumed → paused within a minute (screen woke once before timing out). Harmless, but note it when reading lifecycle tables.

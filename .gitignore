@@ -34,3 +34,4 @@ Thumbs.db
 graphify-out/
 labs/*/build/
 labs/*/.dart_tool/
+labs/*/exports/
