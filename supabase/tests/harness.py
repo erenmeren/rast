@@ -88,14 +88,19 @@ class Db:
             subprocess.run(["docker", "stop", self.cid], capture_output=True)
 
     def _wait_ready(self):
+        """The postgres image starts, runs its init scripts, restarts, then serves.
+        pg_isready answers during the first start too, so wait for the init line first."""
+        for _ in range(240):
+            logs = subprocess.run(["docker", "logs", self.cid], capture_output=True, text=True)
+            if "PostgreSQL init process complete; ready for start up." in logs.stdout + logs.stderr:
+                break
+            time.sleep(0.5)
+        else:
+            raise RuntimeError("postgres init did not finish")
         for _ in range(120):
             ok = subprocess.run(["docker", "exec", self.cid, "pg_isready", "-U", "postgres"], capture_output=True)
             if ok.returncode == 0:
-                # pg_isready can answer before the init scripts restart the server.
-                time.sleep(1.5)
-                ok = subprocess.run(["docker", "exec", self.cid, "pg_isready", "-U", "postgres"], capture_output=True)
-                if ok.returncode == 0:
-                    return
+                return
             time.sleep(0.5)
         raise RuntimeError("postgres did not become ready")
 
@@ -112,6 +117,24 @@ class Db:
             self._psql(path.read_text(encoding="utf-8"))
         except SqlError as e:
             raise SqlError("%s: %s" % (path.name, e)) from None
+
+    def run_concurrent(self, sql_a: str, sql_b: str) -> tuple:
+        """Two sessions: A starts first, B half a second later; both commit.
+        The caller is responsible for cleaning up what they committed."""
+        def script(sql):
+            return "begin;\n%s\ncommit;\n" % sql
+        cmd = ["docker", "exec", "-i", self.cid, "psql", "-U", "postgres", "-d", "postgres",
+               "-v", "ON_ERROR_STOP=1", "-X", "-q", "-At", "-F", "\t"]
+        a = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        a.stdin.write(script(sql_a)); a.stdin.close()
+        time.sleep(0.5)
+        b = subprocess.run(cmd, input=script(sql_b), capture_output=True, text=True)
+        out_a, err_a = a.communicate()
+        if a.returncode != 0:
+            raise SqlError("A: " + err_a.strip())
+        if b.returncode != 0:
+            raise SqlError("B: " + b.stderr.strip())
+        return ([l.split("\t") for l in out_a.splitlines()], [l.split("\t") for l in b.stdout.splitlines()])
 
     def run(self, sql: str, commit: bool = False) -> list:
         script = "begin;\n%s\n%s;\n" % (sql, "commit" if commit else "rollback")
