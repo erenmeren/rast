@@ -8,6 +8,7 @@ import '../profile/preferences_notifier.dart';
 import '../profile/profile_notifier.dart';
 import '../profile/settings_notifier.dart';
 import '../safety/safety_notifier.dart';
+import '../likes/likes_notifier.dart';
 import 'deck_notifier.dart';
 import 'people_directory.dart';
 
@@ -73,9 +74,16 @@ final eligiblePeopleProvider = Provider<List<Person>>((ref) {
   ];
 });
 
-final incomingLikesProvider = Provider<List<Person>>(
-  (ref) => [for (final p in ref.watch(eligiblePeopleProvider)) if (p.likesYou) p],
-);
+/// Who likes the member. Server: the Likes You answer (cards when premium,
+/// locked previews otherwise). Mock: the eligible people flagged likesYou.
+final incomingLikesProvider = Provider<List<Person>>((ref) {
+  if (ref.watch(backendKindProvider) == BackendKind.supabase) {
+    final r = ref.watch(likesProvider);
+    if (r == null) return const [];
+    return r.premium ? r.cards : LikesNotifier.previewsAsPeople(r);
+  }
+  return [for (final p in ref.watch(eligiblePeopleProvider)) if (p.likesYou) p];
+});
 
 /// The card on top of the deck: the focused person if still eligible, else the first.
 final currentPersonProvider = Provider<Person?>((ref) {

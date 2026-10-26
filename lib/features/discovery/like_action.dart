@@ -7,6 +7,8 @@ import '../../core/ui/ui.dart';
 import '../../data/repositories.dart';
 import '../chat/threads_notifier.dart';
 import '../premium/premium_notifier.dart';
+import '../../app/providers.dart';
+import '../likes/likes_notifier.dart';
 import 'deck_notifier.dart';
 import 'eligibility.dart';
 
@@ -23,6 +25,7 @@ Future<void> likePerson(BuildContext context, WidgetRef ref, Person person, {req
     return;
   }
   final outcome = await ref.read(deckProvider.notifier).like(person.id);
+  if (ref.read(backendKindProvider) == BackendKind.supabase) ref.read(likesProvider.notifier).refresh();
   if (!context.mounted) return;
   switch (outcome) {
     case LikeOutcome.matched:

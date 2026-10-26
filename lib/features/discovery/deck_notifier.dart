@@ -6,6 +6,7 @@ import '../../app/providers.dart';
 import '../../core/rules/rules.dart';
 import '../../data/mock/mock_people.dart';
 import '../../data/repositories.dart';
+import '../likes/likes_notifier.dart';
 import '../safety/safety_notifier.dart';
 import 'people_directory.dart';
 
@@ -96,6 +97,7 @@ class DeckNotifier extends Notifier<DeckState> {
       return Future.value();
     }
     state = state.copyWith(loading: true);
+    ref.read(likesProvider.notifier).refresh();
     return _ready = _load();
   }
 
