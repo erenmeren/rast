@@ -115,3 +115,16 @@ Phase 5b was started without a question round (owner: "yapılması gerekenleri y
 - **Photo access rule:** self, open match, or current candidate (`app.can_view_photos`, security definer and callable by `authenticated` so a Storage policy can use it). A "premium with incoming like" clause was dropped as unreachable: every eligible liker is already a candidate, and likers appear in Discover as ordinary cards; what Likes You protects is the fact of the like, not the photos.
 - **Review minors deferred (0014 fixed the four important findings):** `discovery_session.seed` is selectable by its owner (harmless, could be column-restricted); two concurrent `start_discovery_session()` calls can leave two rows until the purge; a repeated pass keeps the first `created_at`; a cursor from an old session is accepted against a new seed (client bug only); `app.card` returns null without a profile row (unreachable through `candidate`); the plpgsql variable `out` in `discovery_cards` could be renamed.
 - **Moved to 5c:** Storage bucket and policy on `app.can_view_photos`, the blurred derivative and the Edge Function that resolves a preview token, Twilio Verify (owner: create a Twilio Verify service and enter its SID/token under Authentication → Phone in the dashboard). **5d:** Flutter adapters for the RPCs.
+
+## 2026-10-26 — Photos, previews and phone sign-in (Phase 5c), engineering
+
+Spec `docs/superpowers/specs/2026-10-26-media-design.md`; migration `0015`, two Edge Functions, 99 harness tests (storage stub added). Calls, reversible:
+
+- **Buckets:** `photos` private, 5 MB, jpeg/png, path `<account_id>/<photo_id>.jpg` (check constraint `photo_path_own_folder`); `previews` private with no client policy, so preview bytes only ever leave through `like-preview` and a free member never learns a photo id.
+- **Storage policies** reuse `app.can_view_photos`; `app.photo_owner(name)` parses the folder as a uuid or returns null, so junk paths fail closed.
+- **`ready` is server-only:** trigger `photo_ready_guard` rejects a client update to `ready`; the finalize function sets it with the service key after rendering the preview. Clients may still set `removed`.
+- **Preview = 32 px wide JPEG**, upscaled on the client. Low resolution is the blur; no second blurred original exists.
+- **Edge Functions** use `https://deno.land/x/imagescript@1.3.0/mod.ts` (the npm build loads native codecs the edge runtime rejects). Redeploys through the MCP server need `import_map_path: deno.json`.
+- **Clock-relative tests:** `test_delay` and `test_encounter_fields` had fixed 2026-10-25 timestamps that fell outside the 24 h sample window a day later; they now anchor on `date_trunc('hour', now()) - 2 h`.
+- **Deferred:** deleting storage objects and previews when a photo row becomes `removed` (client deletes its original; a purge can follow); EXIF stripping (Flutter side, 5d); end-to-end run of the functions with a real user (first task of 5d, no auth user exists yet).
+- **Owner to do:** Twilio Verify in the dashboard (checklist in `supabase/README.md`).
