@@ -20,9 +20,10 @@ class EncounterTests(unittest.TestCase):
                 self.assertEqual(self.count(self.two() + sample(1, 1) + sample(2, 1, distance=d)), "0")
 
     def test_encounter_fields(self):
-        rows = db().run(self.two(a=dict(delay=1), b=dict(delay=4)) + sample(1, 1, observed="'2026-10-25T10:00:00Z'") + sample(2, 1, distance=5, observed="'2026-10-25T10:00:30Z'")
-                        + "select state, rule_version, encountered_at, release_at, pair_id = app.pair_for('%s','%s') from encounter;" % (uuid(1), uuid(2)))
-        self.assertEqual(rows[-1], ["pending", "1", "2026-10-25 10:00:30+00", "2026-10-25 14:00:30+00", "t"])
+        t0 = "date_trunc('hour', now()) - interval '2 hours'"
+        rows = db().run(self.two(a=dict(delay=1), b=dict(delay=4)) + sample(1, 1, observed=t0) + sample(2, 1, distance=5, observed=t0 + " + interval '30 seconds'")
+                        + "select state, rule_version, encountered_at = %s + interval '30 seconds', release_at = %s + interval '4 hours 30 seconds', pair_id = app.pair_for('%s','%s') from encounter;" % (t0, t0, uuid(1), uuid(2)))
+        self.assertEqual(rows[-1], ["pending", "1", "t", "t", "t"])
 
     def test_rule_04_ineligible_pairs(self):
         cases = [dict(a=dict(birth='2010-01-01')), dict(a=dict(visible=False)), dict(b=dict(photos=3)),

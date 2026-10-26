@@ -44,7 +44,7 @@ def member(n: int, *, birth="1998-05-14", gender="woman", custom="", interests="
         "insert into device(id, account_id, platform) values ('%s', '%s', 'test');" % (dev, acct),
     ]
     for slot in range(photos):
-        sql.append("insert into photo(account_id, slot, storage_path, state) values ('%s', %d, 'p%d/%d.jpg', 'ready');" % (acct, slot, n, slot))
+        sql.append("insert into photo(account_id, slot, storage_path, state) values ('%s', %d, '%s/%d.jpg', 'ready');" % (acct, slot, acct, slot))
     return "\n".join(sql) + "\n"
 
 
@@ -80,6 +80,7 @@ class Db:
             atexit.register(self.stop)
             self._wait_ready()
             self._apply(HERE / "auth_stub.sql")
+            self._apply(HERE / "storage_stub.sql")
             for migration in sorted(MIGRATIONS.glob("*.sql")):
                 self._apply(migration)
 

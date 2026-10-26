@@ -23,7 +23,7 @@ class AccountTests(unittest.TestCase):
             db().run(member(1, interests="{everyone,women}"))
 
     def test_photo_slot_unique_among_live_photos(self):
-        sql = member(1) + "insert into photo(id, account_id, slot, storage_path, state) values (gen_random_uuid(), '%s', 0, 'x', 'uploading');" % uuid(1)
+        sql = member(1) + "insert into photo(id, account_id, slot, storage_path, state) values (gen_random_uuid(), '%s', 0, '%s/x', 'uploading');" % (uuid(1), uuid(1))
         with self.assertRaises(SqlError):
             db().run(sql)
 

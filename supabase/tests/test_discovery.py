@@ -57,7 +57,7 @@ class DiscoveryTests(unittest.TestCase):
         sql = self.base() + "update profile set show_gender = true where account_id = '%s';" % uuid(2)
         card = [c for c in self.last(sql + cards(1))["cards"] if c["account_id"] == uuid(2)][0]
         self.assertEqual(card, {"account_id": uuid(2), "age": 28, "gender": "woman", "custom_gender": "",
-                                "photos": ["p2/0.jpg", "p2/1.jpg", "p2/2.jpg", "p2/3.jpg"]})
+                                "photos": ["%s/%d.jpg" % (uuid(2), i) for i in range(4)]})
         hidden = [c for c in self.last(sql + cards(1))["cards"] if c["account_id"] == uuid(3)][0]
         self.assertIsNone(hidden["gender"])
 
