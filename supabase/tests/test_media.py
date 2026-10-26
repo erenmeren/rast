@@ -43,6 +43,15 @@ class MediaTests(unittest.TestCase):
             db().run(sql + as_user(uuid(1), "update photo set state = 'ready' where id = '%s';" % uuid(500)))
         self.assertEqual(db().run(sql + as_user(uuid(1), "update photo set state = 'removed' where id = '%s';" % uuid(500)) + "select state from photo;")[-1], ["removed"])
         self.assertEqual(db().run(sql + "update photo set state = 'ready' where id = '%s'; select state from photo;" % uuid(500))[-1], ["ready"])
+        with self.assertRaisesRegex(SqlError, "photo_ready_is_server_only"):
+            db().run(member(1, photos=0) + as_user(uuid(1), "insert into photo(account_id, slot, storage_path, state) values ('%s', 0, '%s/0.jpg', 'ready');" % (uuid(1), uuid(1))))
+
+    def test_clients_change_only_state_and_slot(self):
+        sql = member(1)
+        with self.assertRaisesRegex(SqlError, "permission denied"):
+            db().run(sql + as_user(uuid(1), "update photo set storage_path = '%s/evil.jpg' where slot = 0;" % uuid(1)))
+        rows = db().run(sql + as_user(uuid(1), "update photo set state = 'removed' where slot = 3; update photo set slot = 3 where slot = 2; select slot from photo where state = 'ready' order by slot;"))
+        self.assertEqual(rows[-3:], [["0"], ["1"], ["3"]])
 
     def test_resolve_like_preview(self):
         # the token is read as postgres: clients never see like_preview

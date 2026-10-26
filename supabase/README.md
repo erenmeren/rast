@@ -35,6 +35,7 @@ Link the project once (`supabase link --project-ref <ref>`) and run `supabase db
 | `0013_likes_you.sql` | `app.is_premium`, `app.incoming_likes`, like_preview, `likes_you`, `app.can_view_photos`, `app.purge_discovery` (daily) |
 | `0014_review_fixes.sql` | passes no longer hide likers from Likes You; previews ordered by token; `pair_pass` index; `app.can_view_photos` security definer, callable by `authenticated` |
 | `0015_media.sql` | buckets `photos`, `previews`; `storage.objects` policies on `app.can_view_photos` / `app.photo_owner`; `photo_path_own_folder` check; `photo_ready_guard` trigger; `resolve_like_preview` |
+| `0016_photo_guard.sql` | `ready` is server-only on insert too; clients may update only `photo.state` and `photo.slot` |
 
 Thresholds live in the single `encounter_params` row and are provisional until Phase 0 replaces them: radius 20 m, skew 60 s, sample age 24 h, future 60 s, accuracy 50 m. Change them with an `update`, not a migration, until the field numbers are in. `app.release_due_encounters()` runs every minute under pg_cron (0011).
 
@@ -60,6 +61,7 @@ Design: `docs/superpowers/specs/2026-10-26-media-design.md`.
 - Originals: download from bucket `photos` with the user's JWT; Storage RLS applies `app.can_view_photos(viewer, folder owner)`. Owners may insert, update and delete under their own folder only.
 - Likes You previews: `GET /functions/v1/like-preview?token=<token from likes_you()>` with the user's JWT returns `image/jpeg` bytes (`Cache-Control: private, max-age=300`) or `404 unknown_token`. The token is re-checked against `app.incoming_likes` at fetch time. Never request `previews` from Storage directly: the bucket has no client policy.
 - Edge Function sources live in `functions/`; deploy with the MCP `deploy_edge_function` tool (pass `import_map_path: deno.json`) or `supabase functions deploy`.
+- MCP note: a migration containing `drop …` makes the Supabase MCP server ask for a confirmation that this workflow cannot answer (`Invalid or expired requestState`). Use `create or replace` forms instead.
 
 ## Phone sign-in (owner checklist)
 

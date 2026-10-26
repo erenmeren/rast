@@ -25,7 +25,7 @@ def uuid(n: int) -> str:
 
 def as_user(uid: str, sql: str) -> str:
     return (
-        "set local role authenticated; set local \"request.jwt.claim.sub\" = '%s';\n%s\nreset role;\n"
+        "set local role authenticated; set local \"request.jwt.claim.sub\" = '%s';\n%s\nreset role; reset \"request.jwt.claim.sub\";\n"
         % (uid, sql)
     )
 

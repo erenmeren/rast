@@ -49,7 +49,9 @@ Deno.serve(async (req: Request) => {
   const { error: up } = await admin.storage.from("previews").upload(`${photo.id}.jpg`, preview, { contentType: "image/jpeg", upsert: true });
   if (up) return reply(500, { error: "preview_failed" });
 
-  const { error: mark } = await admin.from("photo").update({ state: "ready" }).eq("id", photo.id);
+  // Never resurrect a row the owner removed while the preview was rendering.
+  const { data: marked, error: mark } = await admin.from("photo").update({ state: "ready" }).eq("id", photo.id).neq("state", "removed").select("id");
   if (mark) return reply(500, { error: "mark_failed" });
+  if (!marked || marked.length === 0) return reply(404, { error: "unknown_photo" });
   return reply(200, { outcome: "ready" });
 });
