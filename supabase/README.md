@@ -30,5 +30,6 @@ Link the project once (`supabase link --project-ref <ref>`) and run `supabase db
 | `0008_retention.sql` | `app.purge_location_samples` (24 h), `app.purge_void_encounters` (30 d), pg_cron schedule when available |
 | `0009_app_function_grants.sql` | explicit execute revoke on `app` functions (the 0001 default-privilege revoke is a no-op on Supabase) |
 | `0010_search_path.sql` | pins `search_path` on every `app` function |
+| `0011_release_schedule.sql` | pg_cron: `app.release_due_encounters` every minute |
 
 Thresholds live in the single `encounter_params` row and are provisional until Phase 0 replaces them: radius 20 m, skew 60 s, sample age 24 h, future 60 s, accuracy 50 m. Change them with an `update`, not a migration, until the field numbers are in. Something still has to call `app.release_due_encounters()` on a schedule (a pg_cron job once the cadence is decided, or the discovery RPC in Phase 5b before it reads).
