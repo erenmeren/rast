@@ -32,6 +32,12 @@ class PrivacyTests(unittest.TestCase):
         self.assertEqual(rows[-2:], [["0"], ["0"]])
         self.assertEqual(db().run(sql + as_user(uuid(1), "select count(*) from pair_like;"))[-1], ["1"])
 
+    def test_internal_functions_are_not_callable_by_api_roles(self):
+        rows = db().run("select has_function_privilege('authenticated', 'app.evaluate_encounters(uuid)', 'execute'),"
+                        " has_function_privilege('anon', 'app.uid()', 'execute'),"
+                        " has_function_privilege('authenticated', 'app.pair_visible(uuid, uuid)', 'execute');")
+        self.assertEqual(rows[-1], ["f", "f", "t"])
+
 
 if __name__ == "__main__":
     unittest.main()
