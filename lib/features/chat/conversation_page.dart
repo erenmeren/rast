@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../discovery/people_directory.dart';
 import '../../core/models/models.dart';
 import '../../core/theme/rast_colors.dart';
 import '../../core/theme/rast_theme.dart';
 import '../../core/ui/ui.dart';
-import '../../data/mock/mock_people.dart';
 import '../safety/safety_notifier.dart';
 import '../safety/sheets/person_menu_sheet.dart';
 import 'threads_notifier.dart';
@@ -52,7 +52,7 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
     for (final t in threads) {
       if (t.id == widget.threadId) thread = t;
     }
-    final person = personById(thread?.personId);
+    final person = ref.person(thread?.personId);
     if (thread == null || person == null || safety.isUnavailable(person.id)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted) context.go('/chats');

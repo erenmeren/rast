@@ -61,6 +61,51 @@ abstract class PhotoRepository {
   Future<ImageRequest?> resolve(String source);
 }
 
+enum LikeOutcome { liked, matched, unavailable }
+
+class CardPage {
+  const CardPage(this.cards, this.next);
+  final List<Person> cards;
+  /// Cursor for the next page; null at the end.
+  final String? next;
+}
+
+class LikePreview {
+  const LikePreview(this.token, this.age);
+  final String token;
+  final int age;
+}
+
+class LikesYouResult {
+  const LikesYouResult({required this.premium, required this.count, required this.previews, required this.cards});
+  final bool premium;
+  final int count;
+  final List<LikePreview> previews;
+  final List<Person> cards;
+}
+
+class Connection {
+  const Connection({required this.pairId, required this.revision, required this.person});
+  final String pairId;
+  final int revision;
+  final Person person;
+}
+
+/// The Discover deck and everything that shows another member. Production:
+/// server sessions with a stable random order; every gate is applied there.
+abstract class DiscoveryRepository {
+  Future<String> startSession();
+  Future<CardPage> cards(String sessionId, {String? after});
+  Future<LikeOutcome> like(String id);
+  /// False when the person is no longer available.
+  Future<bool> pass(String id);
+  /// The restored person, or null when nothing could be restored.
+  Future<String?> rewind();
+  Future<LikesYouResult> likesYou();
+  Future<List<Connection>> connections();
+  Future<Person?> personCard(String id);
+}
+
 /// Reveal delay, sampling interval and visibility live on the server;
 /// notifications and the location flag stay on the device.
 abstract class SettingsRepository {

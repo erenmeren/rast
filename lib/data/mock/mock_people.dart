@@ -11,6 +11,7 @@ final List<Person> mockPeople = [
   Person(id: 'p6', age: 30, gender: Gender.man, photo: portrait(5), delayHours: 2, hoursAgo: 7, distanceMeters: 20, likesYou: true),
 ];
 
+/// Mock-only lookup; the app goes through the people directory.
 Person? personById(String? id) {
   if (id == null) return null;
   for (final p in mockPeople) {
@@ -18,8 +19,6 @@ Person? personById(String? id) {
   }
   return null;
 }
-
-bool isKnownPerson(String? id) => personById(id) != null;
 
 /// Sample photos for the member in debug builds.
 final List<String?> samplePhotos = [portrait(7), portrait(7), cityPhoto, portrait(7)];

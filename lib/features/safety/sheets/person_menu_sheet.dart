@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../discovery/people_directory.dart';
 import '../../../core/models/models.dart';
 import '../../../core/theme/rast_colors.dart';
 import '../../../core/theme/rast_theme.dart';
 import '../../../core/ui/ui.dart';
-import '../../../data/mock/mock_people.dart';
 import '../../chat/threads_notifier.dart';
 import '../safety_actions.dart';
 
 /// Remove connection (when matched), Report profile, Block profile.
 /// [returnTo] is where the member lands after a removal.
 Future<void> showPersonMenu(BuildContext context, WidgetRef ref, String personId, {required String returnTo}) {
-  final person = personById(personId);
+  final person = ref.person(personId);
   if (person == null) return Future.value();
   final matched = ref.read(threadsProvider.notifier).byPerson(personId) != null;
   return showRastSheet<void>(

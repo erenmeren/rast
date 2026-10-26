@@ -2,6 +2,7 @@ import '../../core/models/models.dart';
 import '../../core/rules/rules.dart';
 import '../../core/storage/preferences_store.dart';
 import '../repositories.dart';
+import 'mock_people.dart';
 
 /// Accepts the fixed demo code. No SMS is sent. Never ship this.
 class MockAuthRepository implements AuthRepository {
@@ -250,4 +251,26 @@ class MockPhotoRepository implements PhotoRepository {
   Future<void> remove(String source) async {}
   @override
   Future<ImageRequest?> resolve(String source) async => null;
+}
+
+/// The mock deck never goes through this; it exists so the production
+/// code paths compile and tests can script it.
+class MockDiscoveryRepository implements DiscoveryRepository {
+  @override
+  Future<String> startSession() async => 'mock';
+  @override
+  Future<CardPage> cards(String sessionId, {String? after}) async => CardPage(mockPeople, null);
+  @override
+  Future<LikeOutcome> like(String id) async => (personById(id)?.likesYou ?? false) ? LikeOutcome.matched : LikeOutcome.liked;
+  @override
+  Future<bool> pass(String id) async => true;
+  @override
+  Future<String?> rewind() async => null;
+  @override
+  Future<LikesYouResult> likesYou() async =>
+      LikesYouResult(premium: false, count: 0, previews: const [], cards: [for (final p in mockPeople) if (p.likesYou) p]);
+  @override
+  Future<List<Connection>> connections() async => [];
+  @override
+  Future<Person?> personCard(String id) async => personById(id);
 }

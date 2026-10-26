@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../discovery/people_directory.dart';
 import '../../core/theme/rast_colors.dart';
 import '../../core/theme/rast_theme.dart';
 import '../../core/ui/ui.dart';
-import '../../data/mock/mock_people.dart';
 import '../profile/profile_notifier.dart';
 import '../safety/safety_notifier.dart';
 import 'threads_notifier.dart';
@@ -18,7 +18,7 @@ class MatchPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
-    final person = personById(personId);
+    final person = ref.person(personId);
     final safety = ref.watch(safetyProvider);
     if (person == null || safety.isUnavailable(personId)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

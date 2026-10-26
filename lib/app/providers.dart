@@ -23,6 +23,7 @@ final settingsRepositoryProvider =
     Provider<SettingsRepository>((ref) => MockSettingsRepository(ref.watch(preferencesStoreProvider)));
 final backendSyncProvider = Provider<BackendSync>((ref) => MockBackendSync());
 final photoRepositoryProvider = Provider<PhotoRepository>((ref) => MockPhotoRepository());
+final discoveryRepositoryProvider = Provider<DiscoveryRepository>((ref) => MockDiscoveryRepository());
 
 /// Which backend bootstrap wired. Screens may branch on it for copy
 /// (demo hints) and for the data source of the feed.

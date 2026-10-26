@@ -36,8 +36,9 @@ class _DiscoverPageState extends ConsumerState<DiscoverPage> {
     }
   }
 
-  void _rewind() {
-    final id = ref.read(deckProvider.notifier).rewind();
+  Future<void> _rewind() async {
+    final id = await ref.read(deckProvider.notifier).rewind();
+    if (!mounted) return;
     showToast(context, id == null ? 'No passes to rewind yet.' : 'Your last pass has been undone.');
   }
 

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../discovery/people_directory.dart';
 import '../../../core/rules/rules.dart';
 import '../../../core/theme/rast_colors.dart';
 import '../../../core/theme/rast_theme.dart';
 import '../../../core/ui/ui.dart';
-import '../../../data/mock/mock_people.dart';
 import '../../auth/session_notifier.dart';
 import '../safety_actions.dart';
 import '../safety_notifier.dart';
@@ -26,7 +26,7 @@ Future<void> showBlockedProfilesSheet(BuildContext context, WidgetRef ref) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             for (final id in safety.blocked)
-              if (personById(id) case final p?)
+              if (ref.person(id) case final p?)
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(border: Border(bottom: BorderSide(color: c.outline))),
@@ -71,7 +71,7 @@ Future<void> showRemovedConnectionsSheet(BuildContext context, WidgetRef ref) {
             Text('These connections are permanently closed. You will not see or match with each other again.', style: rastStyle(size: 13, weight: 450, height: 1.65, color: c.body)),
             const SizedBox(height: 6),
             for (final id in safety.disconnected)
-              if (personById(id) case final p?)
+              if (ref.person(id) case final p?)
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(border: Border(bottom: BorderSide(color: c.outline))),

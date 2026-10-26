@@ -142,12 +142,12 @@ void main() {
     final first = c.read(currentPersonProvider)!.id;
     deck.pass(first);
     expect(c.read(currentPersonProvider)!.id, isNot(first));
-    expect(deck.rewind(), first);
+    expect(await deck.rewind(), first);
     expect(c.read(currentPersonProvider)!.id, first);
 
     deck.pass(first);
     c.read(safetyProvider.notifier).block(first);
-    expect(deck.rewind(), isNull);
+    expect(await deck.rewind(), isNull);
     expect(c.read(deckProvider).history, isEmpty);
   });
 

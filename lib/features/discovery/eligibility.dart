@@ -3,13 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/providers.dart';
 import '../../core/models/models.dart';
 import '../../core/rules/rules.dart';
-import '../../data/mock/mock_people.dart';
 import '../chat/threads_notifier.dart';
 import '../profile/preferences_notifier.dart';
 import '../profile/profile_notifier.dart';
 import '../profile/settings_notifier.dart';
 import '../safety/safety_notifier.dart';
 import 'deck_notifier.dart';
+import 'people_directory.dart';
 
 /// Whether the member is currently discoverable at all.
 final discoveryActiveProvider = Provider<bool>((ref) {
@@ -20,8 +20,13 @@ final discoveryActiveProvider = Provider<bool>((ref) {
 
 /// Everyone who passes every gate right now, in deck order, including people
 /// the member already acted on. Mirrors `eligiblePeople(true)` in the prototype.
+/// With the server backend the deck is already gated; this is its card list.
 final eligibleIncludingSeenProvider = Provider<List<Person>>((ref) {
   final deck = ref.watch(deckProvider);
+  final people = ref.watch(peopleProvider);
+  if (ref.watch(backendKindProvider) == BackendKind.supabase) {
+    return [for (final id in deck.order) ?people[id]];
+  }
   final settings = ref.watch(settingsProvider);
   final profile = ref.watch(profileProvider);
   final prefs = ref.watch(preferencesProvider);
@@ -32,7 +37,7 @@ final eligibleIncludingSeenProvider = Provider<List<Person>>((ref) {
   final myGender = profile.gender;
   return [
     for (final id in deck.order)
-      if (personById(id) case final p?)
+      if (people[id] case final p?)
         if (canRevealEncounter(
           distanceMeters: p.distanceMeters,
           encounterAt: sampleTime.subtract(Duration(hours: p.hoursAgo)),
@@ -44,7 +49,8 @@ final eligibleIncludingSeenProvider = Provider<List<Person>>((ref) {
           visibleA: visibleA,
           visibleB: true,
           mutualPreferences: ageInRange(p.age, prefs.minAge, prefs.maxAge) &&
-              interestsMatch(prefs.interests, p.gender) &&
+              p.gender != null &&
+              interestsMatch(prefs.interests, p.gender!) &&
               profile.age != null &&
               ageInRange(profile.age!, p.minAge, p.maxAge) &&
               myGender != null &&
@@ -84,7 +90,8 @@ final currentPersonProvider = Provider<Person?>((ref) {
 /// Threads whose person is still available.
 final visibleThreadsProvider = Provider<List<Thread>>((ref) {
   final safety = ref.watch(safetyProvider);
-  return [for (final t in ref.watch(threadsProvider)) if (isKnownPerson(t.personId) && !safety.isUnavailable(t.personId)) t];
+  final people = ref.watch(peopleProvider);
+  return [for (final t in ref.watch(threadsProvider)) if (people.containsKey(t.personId) && !safety.isUnavailable(t.personId)) t];
 });
 
 final hasUnreadProvider = Provider<bool>((ref) => ref.watch(visibleThreadsProvider).any((t) => t.unread > 0));

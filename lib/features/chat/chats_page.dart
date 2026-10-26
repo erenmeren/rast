@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../discovery/people_directory.dart';
 import '../../core/models/models.dart';
 import '../../core/rules/rules.dart';
 import '../../core/theme/rast_colors.dart';
 import '../../core/theme/rast_theme.dart';
 import '../../core/ui/ui.dart';
-import '../../data/mock/mock_people.dart';
 import '../discovery/eligibility.dart';
 import '../premium/premium_notifier.dart';
 import 'threads_notifier.dart';
@@ -70,7 +70,7 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                   children: [
                     for (final t in all.take(4))
-                      if (personById(t.personId) case final p?)
+                      if (ref.person(t.personId) case final p?)
                         Padding(
                           padding: const EdgeInsets.only(right: 20),
                           child: Semantics(
@@ -97,7 +97,7 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
                 const EmptyState(icon: 'chat', title: 'It starts with a hello.', text: 'Your conversations will appear here.')
               else
                 for (final t in threads)
-                  if (personById(t.personId) case final p?) _Row(thread: t, person: p, onTap: () => _open(t)),
+                  if (ref.person(t.personId) case final p?) _Row(thread: t, person: p, onTap: () => _open(t)),
               const SizedBox(height: 32),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

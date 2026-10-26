@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/mock/mock_people.dart';
+import '../discovery/people_directory.dart';
 import '../chat/threads_notifier.dart';
 import '../discovery/deck_notifier.dart';
 import 'safety_notifier.dart';
@@ -16,7 +16,7 @@ class SafetyActions {
   /// With [block]: the block is reversible, but if a connection existed it is
   /// also removed permanently.
   bool removePerson(String id, {bool block = false}) {
-    if (!isKnownPerson(id)) return false;
+    if (!ref.knowsPerson(id)) return false;
     final threads = ref.read(threadsProvider.notifier);
     final safety = ref.read(safetyProvider.notifier);
     final hadConnection = threads.byPerson(id) != null;
