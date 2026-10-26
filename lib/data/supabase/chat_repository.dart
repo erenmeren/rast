@@ -19,9 +19,9 @@ class SupabaseChatRepository implements ChatRepository {
   static String _readKey(String threadId) => 'rast.read.$threadId';
 
   @override
-  Future<List<Thread>> load() async {
+  Future<ChatSnapshot> load() async {
     final me = client.auth.currentUser?.id;
-    if (me == null) return const [];
+    if (me == null) return const ChatSnapshot([], []);
     final results = await Future.wait<dynamic>([
       client.rpc('connections'),
       client.from('message').select('pair_id, sender, seq, body, created_at').order('pair_id', ascending: true).order('seq', ascending: true),
@@ -33,8 +33,10 @@ class SupabaseChatRepository implements ChatRepository {
       byPair.putIfAbsent(m['pair_id'] as String, () => []).add(m);
     }
     final threads = <Thread>[];
+    final people = <Person>[];
     for (final c in connections) {
       final person = personFromCard((c['card'] as Map).cast());
+      people.add(person);
       final rows = byPair[c['pair_id'] as String] ?? const [];
       final readUpTo = store.getInt(_readKey(person.id)) ?? 0;
       final lastSeq = rows.isEmpty ? 0 : rows.last['seq'] as int;
@@ -49,7 +51,7 @@ class SupabaseChatRepository implements ChatRepository {
         ],
       ));
     }
-    return threads;
+    return ChatSnapshot(threads, people);
   }
 
   static String _hhmm(DateTime t) => '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';

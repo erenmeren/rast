@@ -79,6 +79,7 @@ class DeckNotifier extends Notifier<DeckState> {
       String? after;
       for (var page = 0; page < 5; page++) {
         final result = await _repo.cards(_session!, after: after);
+        if (!ref.mounted) return;
         ref.read(peopleProvider.notifier).add(result.cards);
         cards.addAll(result.cards.map((p) => p.id));
         after = result.next;
@@ -86,7 +87,7 @@ class DeckNotifier extends Notifier<DeckState> {
       }
       state = state.copyWith(order: cards, loading: false, clearFocus: true, photoIndex: 0);
     } catch (_) {
-      state = state.copyWith(loading: false);
+      if (ref.mounted) state = state.copyWith(loading: false);
     }
   }
 
@@ -107,15 +108,25 @@ class DeckNotifier extends Notifier<DeckState> {
         photoIndex: 0,
       );
 
+  /// Throws [BackendFailure] when the server could not be reached; the deck
+  /// is then exactly as before.
   Future<LikeOutcome> like(String id) async {
+    final before = state;
     state = state.copyWith(liked: {...state.liked, id}, clearFocus: true, photoIndex: 0);
     if (!_server) return (personById(id)?.likesYou ?? false) ? LikeOutcome.matched : LikeOutcome.liked;
-    final outcome = await _repo.like(id);
-    _drop(id);
+    final LikeOutcome outcome;
+    try {
+      outcome = await _repo.like(id);
+    } catch (e) {
+      if (ref.mounted) state = before;
+      throw BackendFailure(BackendFailureKind.offline, e);
+    }
+    if (ref.mounted) _drop(id);
     return outcome;
   }
 
   Future<void> pass(String id) async {
+    final before = state;
     state = state.copyWith(
       passed: {...state.passed, id},
       history: [...state.history, id],
@@ -123,15 +134,20 @@ class DeckNotifier extends Notifier<DeckState> {
       photoIndex: 0,
     );
     if (!_server) return;
-    await _repo.pass(id);
-    _drop(id);
+    try {
+      await _repo.pass(id);
+    } catch (e) {
+      if (ref.mounted) state = before;
+      throw BackendFailure(BackendFailureKind.offline, e);
+    }
+    if (ref.mounted) _drop(id);
   }
 
   /// Restores the most recent pass that is still available, or returns null.
   Future<String?> rewind() async {
     if (_server) {
       final id = await _repo.rewind();
-      if (id == null) return null;
+      if (id == null || !ref.mounted) return null;
       state = state.copyWith(
         order: [id, ...state.order.where((o) => o != id)],
         passed: {...state.passed}..remove(id),

@@ -39,10 +39,15 @@ class _VerifyPageState extends ConsumerState<VerifyPage> {
       return;
     }
     // A returning member: pull the server state, then let the phase decide.
-    await ref.read(backendSyncProvider).hydrate();
-    if (!mounted) return;
-    ref.read(sessionProvider.notifier).refreshFromStore();
-    if (ref.read(sessionProvider).phase != SessionPhase.onboarding) return; // the router redirects
+    // Offline at this point is not fatal: setup continues from what is local.
+    try {
+      await ref.read(backendSyncProvider).hydrate();
+      if (!mounted) return;
+      ref.read(sessionProvider.notifier).refreshFromStore();
+      if (ref.read(sessionProvider).phase != SessionPhase.onboarding) return; // the router redirects
+    } catch (_) {
+      if (!mounted) return;
+    }
     ref.read(sessionProvider.notifier).markVerified();
     context.push('/setup/about');
   }

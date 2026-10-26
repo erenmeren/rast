@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rast/app/providers.dart';
 import 'package:rast/core/models/models.dart';
 import 'package:rast/features/chat/threads_notifier.dart';
+import 'package:rast/features/discovery/eligibility.dart';
 import 'package:rast/features/discovery/people_directory.dart';
 
 import '../helpers/app.dart';
@@ -12,6 +13,7 @@ import '../helpers/fake_discovery.dart';
 void main() {
   Future<(ProviderContainer, FakeChat)> server() async {
     final chat = FakeChat()
+      ..people = [card('b')]
       ..threads = [
         Thread(id: 'b', personId: 'b', messages: const [Message(text: 'hey', own: false, time: '09:00')], unread: 1),
       ];
@@ -20,15 +22,16 @@ void main() {
       chatRepositoryProvider.overrideWithValue(chat),
     ]);
     makeActiveMember(c);
-    c.read(peopleProvider.notifier).add([card('b')]);
     await c.read(threadsProvider.notifier).ready;
     return (c, chat);
   }
 
-  test('threads load from the server and appear in Chats', () async {
+  test('threads load from the server, their people enter the directory and Chats shows them', () async {
     final (c, _) = await server();
     expect(c.read(threadsProvider).single.personId, 'b');
     expect(c.read(threadsProvider).single.unread, 1);
+    expect(c.read(peopleProvider.notifier).knows('b'), isTrue);
+    expect(c.read(visibleThreadsProvider).map((t) => t.id), ['b']);
   });
 
   test('send appends at once and posts to the server; markRead is recorded', () async {
@@ -49,6 +52,7 @@ void main() {
       ...chat.threads,
       Thread(id: 'a', personId: 'a', messages: const [], unread: 0),
     ];
+    chat.people = [...chat.people, card('a')];
     chat.emit();
     await Future<void>.delayed(const Duration(milliseconds: 20));
     expect([for (final t in c.read(threadsProvider)) t.id], ['b', 'a']);

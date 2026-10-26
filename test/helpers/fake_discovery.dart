@@ -22,9 +22,11 @@ class FakeDiscovery implements DiscoveryRepository {
   @override
   Future<CardPage> cards(String sessionId, {String? after}) async => CardPage([for (final p in deck) if (!gone.contains(p.id)) p], null);
 
+  bool offline = false;
   @override
   Future<LikeOutcome> like(String id) async {
     log.add('like $id');
+    if (offline) throw Exception('offline');
     if (gone.contains(id)) return LikeOutcome.unavailable;
     return likesMe.contains(id) ? LikeOutcome.matched : LikeOutcome.liked;
   }
@@ -32,6 +34,7 @@ class FakeDiscovery implements DiscoveryRepository {
   @override
   Future<bool> pass(String id) async {
     log.add('pass $id');
+    if (offline) throw Exception('offline');
     return !gone.contains(id);
   }
 

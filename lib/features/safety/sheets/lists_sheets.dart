@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/providers.dart';
 import '../../discovery/people_directory.dart';
 import '../../../core/rules/rules.dart';
 import '../../../core/theme/rast_colors.dart';
@@ -116,11 +117,15 @@ Future<void> showDeleteAccountSheet(BuildContext context, WidgetRef ref) {
         Text('Your demo profile, photos, matches and messages will be cleared. There is no real account attached to this preview.', style: rastStyle(size: 13, weight: 450, height: 1.65, color: sheetContext.colors.body)),
         const SizedBox(height: 20),
         PrimaryButton(
-          label: 'Delete demo account',
+          label: ref.read(backendKindProvider) == BackendKind.mock ? 'Delete demo account' : 'Delete my account',
           onPressed: () async {
             Navigator.of(sheetContext).pop();
-            await ref.read(sessionProvider.notifier).deleteAccount();
-            if (context.mounted) showToast(context, 'Demo account cleared.');
+            try {
+              await ref.read(sessionProvider.notifier).deleteAccount();
+              if (context.mounted) showToast(context, ref.read(backendKindProvider) == BackendKind.mock ? 'Demo account cleared.' : 'Your account has been deleted.');
+            } catch (_) {
+              if (context.mounted) showToast(context, 'Your account could not be deleted right now. Check your connection and try again.');
+            }
           },
         ),
         const SizedBox(height: 9),

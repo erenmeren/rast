@@ -4,7 +4,10 @@ import '../../app/providers.dart';
 import '../../core/models/models.dart';
 import '../../core/rules/rules.dart';
 import '../chat/threads_notifier.dart';
+import '../../core/storage/preferences_store.dart';
 import '../discovery/deck_notifier.dart';
+import '../discovery/people_directory.dart';
+import '../likes/likes_notifier.dart';
 import '../intro/intro_notifier.dart';
 import '../premium/premium_notifier.dart';
 import '../profile/preferences_notifier.dart';
@@ -42,11 +45,21 @@ class SessionNotifier extends Notifier<Session> {
   /// notifier that caches a repository value is rebuilt.
   void refreshFromStore() {
     state = ref.read(sessionRepositoryProvider).load();
+    _rebuildMemberState();
+  }
+
+  /// Everything that belongs to one member and lives in memory.
+  void _rebuildMemberState() {
     ref.invalidate(profileProvider);
     ref.invalidate(preferencesProvider);
     ref.invalidate(settingsProvider);
     ref.invalidate(introProvider);
     ref.invalidate(premiumProvider);
+    ref.invalidate(peopleProvider);
+    ref.invalidate(deckProvider);
+    ref.invalidate(threadsProvider);
+    ref.invalidate(likesProvider);
+    ref.invalidate(safetyProvider);
   }
 
   /// Validates every prerequisite in order and either returns the problem or
@@ -89,11 +102,18 @@ class SessionNotifier extends Notifier<Session> {
     _set(state.copyWith(phase: SessionPhase.active));
   }
 
-  void logOut() {
-    ref.read(authRepositoryProvider).signOut();
+  /// Signs out and forgets the member on this device: store and memory.
+  Future<void> logOut() async {
+    state = Session.signedOut;
     ref.read(premiumProvider.notifier).end();
     ref.read(profileProvider.notifier).reset();
-    ref.read(sessionRepositoryProvider).clear();
+    ref.read(preferencesProvider.notifier).reset();
+    await ref.read(sessionRepositoryProvider).clear();
+    await ref.read(preferencesStoreProvider).removeWhere((k) => k.startsWith('rast.read.'));
+    try {
+      await ref.read(authRepositoryProvider).signOut();
+    } catch (_) {}
+    _rebuildMemberState();
     state = Session.signedOut;
   }
 

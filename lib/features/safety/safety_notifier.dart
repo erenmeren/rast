@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
 import '../../core/models/models.dart';
+import '../../data/repositories.dart';
 import '../discovery/people_directory.dart';
 
 /// Blocks, permanent removals and reports. Loaded once from the repository,
@@ -17,7 +18,9 @@ class SafetyNotifier extends Notifier<SafetyState> {
   Future<void> _load() async {
     final repo = ref.read(safetyRepositoryProvider);
     final loaded = await repo.load();
-    ref.read(peopleProvider.notifier).add(await repo.blockedPeople());
+    final blocked = await repo.blockedPeople();
+    if (!ref.mounted) return;
+    ref.read(peopleProvider.notifier).add(blocked);
     state = _merge(state, loaded);
   }
 
@@ -36,29 +39,38 @@ class SafetyNotifier extends Notifier<SafetyState> {
 
   bool isUnavailable(String? id) => id == null || !ref.knowsPerson(id) || state.isUnavailable(id);
 
-  void block(String id) {
-    if (!ref.knowsPerson(id)) return;
-    state = state.copyWith(blocked: {...state.blocked, id});
-    ref.read(safetyRepositoryProvider).block(id);
+  /// Applies the change at once, sends it, and puts the old state back when
+  /// the server could not be reached. Returns false in that case.
+  Future<bool> _apply(SafetyState next, Future<void> Function(SafetyRepository repo) op) async {
+    final before = state;
+    state = next;
+    try {
+      await op(ref.read(safetyRepositoryProvider));
+      return true;
+    } catch (_) {
+      if (ref.mounted) state = before;
+      return false;
+    }
+  }
+
+  Future<bool> block(String id) {
+    if (!ref.knowsPerson(id)) return Future.value(false);
+    return _apply(state.copyWith(blocked: {...state.blocked, id}), (r) => r.block(id));
   }
 
   /// Removes only the block edge. A permanent removal stays.
-  void unblock(String id) {
-    state = state.copyWith(blocked: {...state.blocked}..remove(id));
-    ref.read(safetyRepositoryProvider).unblock(id);
+  Future<bool> unblock(String id) => _apply(state.copyWith(blocked: {...state.blocked}..remove(id)), (r) => r.unblock(id));
+
+  Future<bool> disconnect(String id) {
+    if (!ref.knowsPerson(id)) return Future.value(false);
+    return _apply(state.copyWith(disconnected: {...state.disconnected, id}), (r) => r.disconnect(id));
   }
 
-  void disconnect(String id) {
-    if (!ref.knowsPerson(id)) return;
-    state = state.copyWith(disconnected: {...state.disconnected, id});
-    ref.read(safetyRepositoryProvider).disconnect(id);
-  }
-
-  void report(String id, String reason, {bool alsoBlock = false}) {
-    if (!ref.knowsPerson(id) || !reportReasons.contains(reason)) return;
-    if (state.reports.any((r) => r.personId == id && r.reason == reason)) return;
-    state = state.copyWith(reports: [...state.reports, Report(personId: id, reason: reason)]);
-    ref.read(safetyRepositoryProvider).report(id, reason, alsoBlock: alsoBlock);
+  Future<bool> report(String id, String reason, {bool alsoBlock = false}) {
+    if (!ref.knowsPerson(id) || !reportReasons.contains(reason)) return Future.value(false);
+    if (state.reports.any((r) => r.personId == id && r.reason == reason)) return Future.value(true);
+    return _apply(state.copyWith(reports: [...state.reports, Report(personId: id, reason: reason)]),
+        (r) => r.report(id, reason, alsoBlock: alsoBlock));
   }
 
   Future<void> reset() async {

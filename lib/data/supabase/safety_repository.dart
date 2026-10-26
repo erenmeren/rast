@@ -2,7 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' hide Session;
 
 import '../../core/models/models.dart';
 import '../repositories.dart';
-import 'ids.dart';
+import '../../core/ids.dart';
 
 /// Every operation is an RPC with the server's own idempotency; `load` reads
 /// the member's block, report and pair rows back through RLS.

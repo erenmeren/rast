@@ -10,8 +10,9 @@ class FakeChat implements ChatRepository {
   final _changes = StreamController<void>.broadcast();
   bool unavailable = false;
 
+  List<Person> people = [];
   @override
-  Future<List<Thread>> load() async => threads;
+  Future<ChatSnapshot> load() async => ChatSnapshot(threads, people);
 
   @override
   Future<int?> send(String targetId, String clientOpId, String body) async {

@@ -23,6 +23,7 @@ class LikesNotifier extends Notifier<LikesYouResult?> {
   Future<void> refresh() async {
     try {
       final result = await ref.read(discoveryRepositoryProvider).likesYou();
+      if (!ref.mounted) return;
       ref.read(peopleProvider.notifier).add(result.cards);
       state = result;
     } catch (_) {}

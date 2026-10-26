@@ -4,7 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' hide Session;
 
 import '../repositories.dart';
 import 'backend.dart';
-import 'ids.dart';
+import '../../core/ids.dart';
 import 'profile_repository.dart' show storagePrefix;
 
 const String previewPrefix = 'preview:';

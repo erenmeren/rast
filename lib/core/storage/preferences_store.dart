@@ -8,6 +8,8 @@ class PreferencesStore {
 
   final SharedPreferences _prefs;
 
+  Set<String> get keys => _prefs.getKeys();
+
   String? getString(String key) => _prefs.getString(key);
   Future<void> setString(String key, String value) =>
       _prefs.setString(key, value);
@@ -22,6 +24,14 @@ class PreferencesStore {
 }
 
 /// Overridden at bootstrap with the loaded instance.
+extension PreferencesStoreKeys on PreferencesStore {
+  Future<void> removeWhere(bool Function(String key) test) async {
+    for (final k in keys.where(test).toList()) {
+      await remove(k);
+    }
+  }
+}
+
 final preferencesStoreProvider = Provider<PreferencesStore>((ref) {
   throw UnimplementedError('preferencesStoreProvider must be overridden');
 });

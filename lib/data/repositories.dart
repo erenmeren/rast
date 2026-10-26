@@ -112,11 +112,30 @@ abstract class DiscoveryRepository {
   Future<Person?> personCard(String id);
 }
 
+/// Why a server call did not go through; pages turn it into a toast.
+class BackendFailure implements Exception {
+  const BackendFailure(this.kind, [this.cause]);
+  final BackendFailureKind kind;
+  final Object? cause;
+  @override
+  String toString() => 'BackendFailure($kind)';
+}
+
+enum BackendFailureKind { offline, unauthenticated, unknown }
+
+/// Threads plus the people they are with, so the directory learns about
+/// matched members that never were a deck card.
+class ChatSnapshot {
+  const ChatSnapshot(this.threads, this.people);
+  final List<Thread> threads;
+  final List<Person> people;
+}
+
 /// Conversations. Production: one thread per open match, keyed by the other
 /// person's id; messages through the send_message RPC; `changes` fires on
 /// every pair event the server publishes for the member.
 abstract class ChatRepository {
-  Future<List<Thread>> load();
+  Future<ChatSnapshot> load();
   /// The server sequence number, or null when the pair is closed.
   Future<int?> send(String targetId, String clientOpId, String body);
   Stream<void> changes();

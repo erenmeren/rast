@@ -5,7 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/providers.dart';
 import '../../core/models/models.dart';
 import '../../data/mock/mock_people.dart';
-import '../../data/supabase/ids.dart';
+import '../../core/ids.dart';
+import '../discovery/people_directory.dart';
 
 const int maxMessageLength = 1000;
 
@@ -29,7 +30,10 @@ class ThreadsNotifier extends Notifier<List<Thread>> {
   Future<void> refresh() async {
     if (!_server) return;
     try {
-      final loaded = await ref.read(chatRepositoryProvider).load();
+      final snapshot = await ref.read(chatRepositoryProvider).load();
+      if (!ref.mounted) return;
+      ref.read(peopleProvider.notifier).add(snapshot.people);
+      final loaded = snapshot.threads;
       // keep a placeholder thread the server does not know yet (fresh match)
       final known = {for (final t in loaded) t.id};
       state = [...loaded, for (final t in state) if (!known.contains(t.id) && t.messages.isEmpty) t];
@@ -77,9 +81,9 @@ class ThreadsNotifier extends Notifier<List<Thread>> {
     ];
     if (_server) {
       ref.read(chatRepositoryProvider).send(thread.personId, newUuid(), clipped).then((seq) {
-        if (seq == null) refresh();
+        if (seq == null && ref.mounted) refresh();
       }, onError: (Object _) {
-        refresh();
+        if (ref.mounted) refresh();
       });
     }
     return true;

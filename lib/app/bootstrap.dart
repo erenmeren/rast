@@ -7,11 +7,14 @@ import '../core/storage/preferences_store.dart';
 import '../data/mock/mock_repositories.dart';
 import '../data/supabase/auth_repository.dart';
 import '../data/supabase/backend.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 import '../data/supabase/chat_repository.dart';
 import '../data/supabase/discovery_repository.dart';
 import '../data/supabase/photo_repository.dart';
 import '../data/supabase/profile_repository.dart';
 import '../data/supabase/safety_repository.dart';
+import '../core/models/models.dart';
+import '../features/auth/session_notifier.dart';
 import 'app.dart';
 import 'providers.dart';
 
@@ -27,7 +30,20 @@ Future<void> bootstrap() async {
   final store = PreferencesStore(prefs);
   final overrides = <Override>[preferencesStoreProvider.overrideWithValue(store)];
   if (_backendFlag == 'supabase') overrides.addAll(await supabaseOverrides(store));
-  runApp(ProviderScope(overrides: overrides, child: const RastApp()));
+  final container = ProviderContainer(overrides: overrides);
+  if (_backendFlag == 'supabase') _watchSession(container);
+  runApp(UncontrolledProviderScope(container: container, child: const RastApp()));
+}
+
+/// A session the server ended (revoked, unrefreshable) signs the member out
+/// here too, so no screen keeps acting on a dead token.
+void _watchSession(ProviderContainer container) {
+  final client = container.read(backendProvider).client;
+  client.auth.onAuthStateChange.listen((change) {
+    if (change.event != AuthChangeEvent.signedOut) return;
+    if (container.read(sessionProvider).phase == SessionPhase.signedOut) return;
+    container.read(sessionProvider.notifier).logOut();
+  });
 }
 
 /// The composition root for the production backend. Nothing else in the app
@@ -39,7 +55,7 @@ Future<List<Override>> supabaseOverrides(PreferencesStore store) async {
   // A returning member's store may be empty (reinstall) or stale.
   if (client.auth.currentSession != null) {
     try {
-      await sync.hydrate();
+      await sync.hydrate().timeout(const Duration(seconds: 5));
     } catch (_) {
       // offline at start: the store still holds the last known state
     }

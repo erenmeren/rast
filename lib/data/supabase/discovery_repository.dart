@@ -2,7 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' hide Session;
 
 import '../../core/models/models.dart';
 import '../repositories.dart';
-import 'ids.dart';
+import '../../core/ids.dart';
 import 'profile_repository.dart' show storagePrefix;
 
 /// A server card as the app's [Person]. Nothing about time or distance.

@@ -122,7 +122,7 @@ flutter run --dart-define=RAST_BACKEND=supabase
 Phone sign-in then sends a real SMS (Twilio Verify). Adapter tests against the live project use the test user and run only on demand:
 
 ```bash
-flutter test test/live --dart-define=RAST_LIVE=true --timeout 120s
+flutter test test/live --concurrency=1 --dart-define=RAST_LIVE=true --timeout 120s
 ```
 
 Backend contract: `supabase/README.md`. Design: `docs/superpowers/specs/2026-10-26-flutter-adapters-design.md`.

@@ -24,7 +24,13 @@ Future<void> likePerson(BuildContext context, WidgetRef ref, Person person, {req
     showToast(context, 'This profile is no longer available.');
     return;
   }
-  final outcome = await ref.read(deckProvider.notifier).like(person.id);
+  final LikeOutcome outcome;
+  try {
+    outcome = await ref.read(deckProvider.notifier).like(person.id);
+  } on BackendFailure {
+    if (context.mounted) showToast(context, offlineMessage);
+    return;
+  }
   if (ref.read(backendKindProvider) == BackendKind.supabase) ref.read(likesProvider.notifier).refresh();
   if (!context.mounted) return;
   switch (outcome) {
@@ -43,6 +49,10 @@ Future<void> likePerson(BuildContext context, WidgetRef ref, Person person, {req
 }
 
 void passPerson(BuildContext context, WidgetRef ref, Person person, {String? returnTo}) {
-  ref.read(deckProvider.notifier).pass(person.id);
+  ref.read(deckProvider.notifier).pass(person.id).catchError((Object _) {
+    if (context.mounted) showToast(context, offlineMessage);
+  });
   if (returnTo != null) context.go(returnTo);
 }
+
+const String offlineMessage = 'That did not reach the server. Check your connection and try again.';

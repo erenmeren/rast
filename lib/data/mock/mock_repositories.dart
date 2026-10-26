@@ -140,7 +140,8 @@ class MockSessionRepository implements SessionRepository {
 String isoDate(DateTime d) =>
     '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
-DateTime? _parseIsoDate(String? s) {
+/// `YYYY-MM-DD` as a UTC calendar date, whatever the device time zone.
+DateTime? parseIsoDate(String? s) {
   if (s == null) return null;
   final d = DateTime.tryParse(s);
   return d == null ? null : DateTime.utc(d.year, d.month, d.day);
@@ -161,7 +162,7 @@ class MockProfileRepository implements ProfileRepository {
     final photos = store.getStringList('rast.profile.photos');
     final genderRaw = store.getString('rast.profile.gender');
     return Profile(
-      birthDate: _parseIsoDate(store.getString('rast.profile.birthDate')),
+      birthDate: parseIsoDate(store.getString('rast.profile.birthDate')),
       gender: Gender.values.where((g) => g.name == genderRaw).firstOrNull,
       customGender: store.getString('rast.profile.customGender') ?? '',
       showGender: store.getBool('rast.profile.showGender') ?? false,
@@ -301,7 +302,7 @@ class MockDiscoveryRepository implements DiscoveryRepository {
 
 class MockChatRepository implements ChatRepository {
   @override
-  Future<List<Thread>> load() async => seedThreads();
+  Future<ChatSnapshot> load() async => ChatSnapshot(seedThreads(), const []);
   @override
   Future<int?> send(String targetId, String clientOpId, String body) async => 1;
   @override

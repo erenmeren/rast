@@ -150,6 +150,25 @@ class SupabaseSync implements BackendSync {
   final SupabaseClient client;
   final PreferencesStore store;
 
+  /// The profile the server rows describe. Dates are calendar dates: never
+  /// through the device time zone.
+  static Profile profileFromRows({required Map<String, dynamic>? profile, required List<Map<String, dynamic>> photos, required String phone}) {
+    final slots = List<String?>.filled(4, null);
+    for (final ph in photos) {
+      final slot = ph['slot'] as int;
+      if (slot >= 0 && slot < 4) slots[slot] = '$storagePrefix${ph['storage_path']}';
+    }
+    return Profile(
+      birthDate: profile == null ? null : parseIsoDate(profile['birth_date'] as String?),
+      gender: profile == null ? null : Gender.values.where((g) => g.name == profile['gender']).firstOrNull,
+      customGender: (profile?['custom_gender'] as String?) ?? '',
+      showGender: (profile?['show_gender'] as bool?) ?? false,
+      photos: slots,
+      dial: '',
+      phone: phone.isEmpty ? '' : '+$phone',
+    );
+  }
+
   @override
   Future<void> hydrate() async {
     final session = MockSessionRepository(store);
@@ -174,21 +193,9 @@ class SupabaseSync implements BackendSync {
     final intro = rows[4] as Map<String, dynamic>?;
     final entitlement = rows[5] as Map<String, dynamic>?;
 
-    final slots = List<String?>.filled(4, null);
-    for (final ph in photos) {
-      final slot = ph['slot'] as int;
-      if (slot >= 0 && slot < 4) slots[slot] = '$storagePrefix${ph['storage_path']}';
-    }
-    final phone = user.phone ?? '';
-    await MockProfileRepository(store).save(Profile(
-      birthDate: profile == null ? null : DateTime.tryParse(profile['birth_date'] as String)?.toUtc(),
-      gender: profile == null ? null : Gender.values.where((g) => g.name == profile['gender']).firstOrNull,
-      customGender: (profile?['custom_gender'] as String?) ?? '',
-      showGender: (profile?['show_gender'] as bool?) ?? false,
-      photos: slots,
-      dial: '',
-      phone: phone.isEmpty ? '' : '+$phone',
-    ));
+    final mirrored = profileFromRows(profile: profile, photos: photos, phone: user.phone ?? '');
+    final slots = mirrored.photos;
+    await MockProfileRepository(store).save(mirrored);
     if (prefs != null) {
       final names = (prefs['interests'] as List).cast<String>();
       await MockProfileRepository(store).savePreferences(Preferences(
