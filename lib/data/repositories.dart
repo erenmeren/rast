@@ -34,6 +34,24 @@ abstract class SessionRepository {
   Future<void> clear();
 }
 
+/// Reveal delay, sampling interval and visibility live on the server;
+/// notifications and the location flag stay on the device.
+abstract class SettingsRepository {
+  Settings load();
+  Future<void> setDelay(int hours);
+  Future<void> setInterval(int seconds);
+  Future<void> setVisible(bool value);
+  Future<void> setLocation(bool value);
+  Future<void> setNotifications(bool value);
+  Future<void> clear();
+}
+
+/// Pulls the signed-in member's server state into the local store so the
+/// synchronous notifiers see it. The mock has nothing to pull.
+abstract class BackendSync {
+  Future<void> hydrate();
+}
+
 abstract class ProfileRepository {
   Profile load();
   Future<void> save(Profile profile);

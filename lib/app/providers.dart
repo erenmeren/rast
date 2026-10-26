@@ -19,6 +19,9 @@ final sessionRepositoryProvider =
     Provider<SessionRepository>((ref) => MockSessionRepository(ref.watch(preferencesStoreProvider)));
 final profileRepositoryProvider =
     Provider<ProfileRepository>((ref) => MockProfileRepository(ref.watch(preferencesStoreProvider)));
+final settingsRepositoryProvider =
+    Provider<SettingsRepository>((ref) => MockSettingsRepository(ref.watch(preferencesStoreProvider)));
+final backendSyncProvider = Provider<BackendSync>((ref) => MockBackendSync());
 
 /// Which backend bootstrap wired. Screens may branch on it for copy
 /// (demo hints) and for the data source of the feed.

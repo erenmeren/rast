@@ -1,4 +1,5 @@
 import '../../core/models/models.dart';
+import '../../core/rules/rules.dart';
 import '../../core/storage/preferences_store.dart';
 import '../repositories.dart';
 
@@ -192,4 +193,51 @@ class MockProfileRepository implements ProfileRepository {
       await store.remove(k);
     }
   }
+}
+
+class MockSettingsRepository implements SettingsRepository {
+  MockSettingsRepository(this.store);
+  final PreferencesStore store;
+
+  static const intervalKey = 'rast.interval';
+  static const delayKey = 'rast.delay';
+  static const notificationsKey = 'rast.notifications';
+  static const visibleKey = 'rast.visible';
+  static const locationKey = 'rast.location';
+
+  @override
+  Settings load() {
+    final interval = store.getInt(intervalKey);
+    final delay = store.getInt(delayKey);
+    return Settings(
+      intervalSeconds: updateIntervalSeconds.contains(interval) ? interval! : defaultIntervalSeconds,
+      delayHours: revealDelayHours.contains(delay) ? delay! : defaultDelayHours,
+      notifications: store.getBool(notificationsKey) ?? true,
+      visible: store.getBool(visibleKey) ?? true,
+      locationEnabled: store.getBool(locationKey) ?? false,
+    );
+  }
+
+  @override
+  Future<void> setDelay(int hours) => store.setInt(delayKey, hours);
+  @override
+  Future<void> setInterval(int seconds) => store.setInt(intervalKey, seconds);
+  @override
+  Future<void> setVisible(bool value) => store.setBool(visibleKey, value);
+  @override
+  Future<void> setLocation(bool value) => store.setBool(locationKey, value);
+  @override
+  Future<void> setNotifications(bool value) => store.setBool(notificationsKey, value);
+
+  @override
+  Future<void> clear() async {
+    for (final k in [intervalKey, delayKey, notificationsKey, visibleKey, locationKey]) {
+      await store.remove(k);
+    }
+  }
+}
+
+class MockBackendSync implements BackendSync {
+  @override
+  Future<void> hydrate() async {}
 }

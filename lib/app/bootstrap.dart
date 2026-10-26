@@ -7,6 +7,7 @@ import '../core/storage/preferences_store.dart';
 import '../data/mock/mock_repositories.dart';
 import '../data/supabase/auth_repository.dart';
 import '../data/supabase/backend.dart';
+import '../data/supabase/profile_repository.dart';
 import 'app.dart';
 import 'providers.dart';
 
@@ -29,10 +30,25 @@ Future<void> bootstrap() async {
 /// imports `data/supabase`.
 Future<List<Override>> supabaseOverrides(PreferencesStore store) async {
   final backend = await Backend.init();
+  final client = backend.client;
+  final sync = SupabaseSync(client, store);
+  // A returning member's store may be empty (reinstall) or stale.
+  if (client.auth.currentSession != null) {
+    try {
+      await sync.hydrate();
+    } catch (_) {
+      // offline at start: the store still holds the last known state
+    }
+  }
   return [
     backendProvider.overrideWithValue(backend),
     backendKindProvider.overrideWithValue(BackendKind.supabase),
-    authRepositoryProvider.overrideWithValue(SupabaseAuthRepository(backend.client)),
-    sessionRepositoryProvider.overrideWithValue(SupabaseSessionRepository(backend.client, MockSessionRepository(store))),
+    backendSyncProvider.overrideWithValue(sync),
+    authRepositoryProvider.overrideWithValue(SupabaseAuthRepository(client)),
+    sessionRepositoryProvider.overrideWithValue(SupabaseSessionRepository(client, MockSessionRepository(store))),
+    profileRepositoryProvider.overrideWithValue(SupabaseProfileRepository(client, MockProfileRepository(store), store)),
+    settingsRepositoryProvider.overrideWithValue(SupabaseSettingsRepository(client, MockSettingsRepository(store))),
+    introRepositoryProvider.overrideWithValue(SupabaseIntroRepository(client, MockIntroRepository(store))),
+    entitlementRepositoryProvider.overrideWithValue(SupabaseEntitlementRepository(MockEntitlementRepository(store))),
   ];
 }

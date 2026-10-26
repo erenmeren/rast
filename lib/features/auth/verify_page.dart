@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
+import '../../core/models/models.dart';
 import '../../core/theme/rast_colors.dart';
 import '../../core/theme/rast_theme.dart';
 import '../../core/ui/ui.dart';
@@ -37,6 +38,11 @@ class _VerifyPageState extends ConsumerState<VerifyPage> {
           : 'That code does not match. Check the SMS and try again.');
       return;
     }
+    // A returning member: pull the server state, then let the phase decide.
+    await ref.read(backendSyncProvider).hydrate();
+    if (!mounted) return;
+    ref.read(sessionProvider.notifier).refreshFromStore();
+    if (ref.read(sessionProvider).phase != SessionPhase.onboarding) return; // the router redirects
     ref.read(sessionProvider.notifier).markVerified();
     context.push('/setup/about');
   }

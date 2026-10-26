@@ -38,6 +38,17 @@ class SessionNotifier extends Notifier<Session> {
 
   void markVerified() => _set(state.copyWith(verified: true));
 
+  /// After a hydrate: the store holds the server-derived state; every
+  /// notifier that caches a repository value is rebuilt.
+  void refreshFromStore() {
+    state = ref.read(sessionRepositoryProvider).load();
+    ref.invalidate(profileProvider);
+    ref.invalidate(preferencesProvider);
+    ref.invalidate(settingsProvider);
+    ref.invalidate(introProvider);
+    ref.invalidate(premiumProvider);
+  }
+
   /// Validates every prerequisite in order and either returns the problem or
   /// moves the session on. Both location choices lead to the introduction
   /// if it has never been completed.
