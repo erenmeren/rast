@@ -31,5 +31,21 @@ Link the project once (`supabase link --project-ref <ref>`) and run `supabase db
 | `0009_app_function_grants.sql` | explicit execute revoke on `app` functions (the 0001 default-privilege revoke is a no-op on Supabase) |
 | `0010_search_path.sql` | pins `search_path` on every `app` function |
 | `0011_release_schedule.sql` | pg_cron: `app.release_due_encounters` every minute |
+| `0012_discovery.sql` | discovery_session, pair_pass, `app.candidate`, `app.order_key`, `app.card`, `app.deck`; `start_discovery_session`, `discovery_cards`, `pass_account`, `rewind_pass` |
+| `0013_likes_you.sql` | `app.is_premium`, `app.incoming_likes`, like_preview, `likes_you`, `app.can_view_photos`, `app.purge_discovery` (daily) |
 
 Thresholds live in the single `encounter_params` row and are provisional until Phase 0 replaces them: radius 20 m, skew 60 s, sample age 24 h, future 60 s, accuracy 50 m. Change them with an `update`, not a migration, until the field numbers are in. Something still has to call `app.release_due_encounters()` on a schedule (a pg_cron job once the cadence is decided, or the discovery RPC in Phase 5b before it reads).
+
+## Phase 5b RPCs (discovery)
+
+Design: `docs/superpowers/specs/2026-10-26-discovery-design.md`. All return `jsonb` with an `outcome` key.
+
+| RPC | Outcomes |
+| --- | --- |
+| `start_discovery_session()` | `ok` + `session_id`. Replaces the caller's previous session; sessions expire after 24 h. |
+| `discovery_cards(session_id, after, page_size)` | `ok` + `cards` + `next` (pass `next` back as `after`; null means the end); `session_expired`; `bad_cursor`. `page_size` is clamped to 1..50. |
+| `pass_account(target, client_op_id)` | `passed`, `unavailable`. |
+| `rewind_pass()` | `restored` + `account_id`, `unavailable` (no pass, or the person is no longer available). |
+| `likes_you()` | `ok` + `premium` + `count` + either `cards` (premium) or `previews` of `{token, age}` (free). |
+
+A card is `{account_id, age, gender|null, custom_gender, photos}`; `gender` is null unless the member shows it. Photo bytes are not served yet (Phase 5c); `app.can_view_photos(viewer, owner)` is the rule the Storage policy will use.
