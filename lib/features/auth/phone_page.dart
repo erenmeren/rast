@@ -55,9 +55,17 @@ class _PhonePageState extends ConsumerState<PhonePage> {
     }
     setState(() => _error = null);
     ref.read(profileProvider.notifier).setPhone(_dial, _phone.text.trim());
-    await ref.read(authRepositoryProvider).sendCode(_dial, _phone.text.trim());
+    try {
+      await ref.read(authRepositoryProvider).sendCode(_dial, _phone.text.trim());
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _error = 'The code could not be sent. Check the number and try again.');
+      return;
+    }
     if (!mounted) return;
-    showToast(context, 'Demo SMS code: 246810. No real SMS is sent.');
+    showToast(context, ref.read(backendKindProvider) == BackendKind.mock
+        ? 'Demo SMS code: 246810. No real SMS is sent.'
+        : 'We sent you a code by SMS.');
     context.push('/auth/verify');
   }
 

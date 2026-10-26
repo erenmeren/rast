@@ -4,6 +4,7 @@ import '../core/models/models.dart';
 abstract class AuthRepository {
   Future<void> sendCode(String dial, String phone);
   Future<bool> verify(String code);
+  Future<void> signOut();
 }
 
 /// Blocks, permanent removals and reports. Production: server-authoritative

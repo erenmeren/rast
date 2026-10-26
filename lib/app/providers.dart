@@ -20,6 +20,12 @@ final sessionRepositoryProvider =
 final profileRepositoryProvider =
     Provider<ProfileRepository>((ref) => MockProfileRepository(ref.watch(preferencesStoreProvider)));
 
+/// Which backend bootstrap wired. Screens may branch on it for copy
+/// (demo hints) and for the data source of the feed.
+enum BackendKind { mock, supabase }
+
+final backendKindProvider = Provider<BackendKind>((ref) => BackendKind.mock);
+
 /// Injected clock and randomness for deterministic tests.
 final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
 final randomProvider = Provider<Random>((ref) => Random());

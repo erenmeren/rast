@@ -32,7 +32,9 @@ class _VerifyPageState extends ConsumerState<VerifyPage> {
     final ok = await ref.read(authRepositoryProvider).verify(_code.text);
     if (!mounted) return;
     if (!ok) {
-      setState(() => _error = 'That code does not match. Use 246810 for this prototype.');
+      setState(() => _error = ref.read(backendKindProvider) == BackendKind.mock
+          ? 'That code does not match. Use 246810 for this prototype.'
+          : 'That code does not match. Check the SMS and try again.');
       return;
     }
     ref.read(sessionProvider.notifier).markVerified();

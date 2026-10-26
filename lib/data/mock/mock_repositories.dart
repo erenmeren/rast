@@ -11,6 +11,9 @@ class MockAuthRepository implements AuthRepository {
 
   @override
   Future<bool> verify(String code) async => code == demoCode;
+
+  @override
+  Future<void> signOut() async {}
 }
 
 class MockSafetyRepository implements SafetyRepository {

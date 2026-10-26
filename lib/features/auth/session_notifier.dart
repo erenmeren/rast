@@ -79,6 +79,7 @@ class SessionNotifier extends Notifier<Session> {
   }
 
   void logOut() {
+    ref.read(authRepositoryProvider).signOut();
     ref.read(premiumProvider.notifier).end();
     ref.read(profileProvider.notifier).reset();
     ref.read(sessionRepositoryProvider).clear();
