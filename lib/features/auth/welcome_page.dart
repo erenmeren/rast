@@ -30,7 +30,7 @@ class WelcomePage extends ConsumerWidget {
           builder: (context, constraints) => SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(25, 25, 25, 23),
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight - 48),
+              constraints: BoxConstraints(minHeight: (constraints.maxHeight - 48).clamp(0.0, double.infinity)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

@@ -8,11 +8,9 @@ import '../repositories.dart';
 /// Photo source prefix for an uploaded original (`sb:<bucket path>`).
 const String storagePrefix = 'sb:';
 
-String _uid(SupabaseClient client) {
-  final id = client.auth.currentUser?.id;
-  if (id == null) throw const AuthException('not signed in');
-  return id;
-}
+/// The signed-in member, or null before the OTP: then every write stays in
+/// the store and reaches the server with the first save after sign-in.
+String? _uid(SupabaseClient client) => client.auth.currentUser?.id;
 
 /// Local store as the synchronous cache, server as the truth: every save
 /// writes the store, then the row. Incomplete profiles (no birth date or
@@ -34,6 +32,7 @@ class SupabaseProfileRepository implements ProfileRepository {
     await cache.save(p);
     if (p.birthDate == null || p.gender == null) return;
     final me = _uid(client);
+    if (me == null) return;
     await client.from('account').upsert({'id': me}, onConflict: 'id', ignoreDuplicates: true);
     await client.from('profile').upsert({
       'account_id': me,
@@ -49,6 +48,7 @@ class SupabaseProfileRepository implements ProfileRepository {
   Future<void> savePreferences(Preferences p) async {
     await cache.savePreferences(p);
     final me = _uid(client);
+    if (me == null) return;
     final settings = MockSettingsRepository(store).load();
     await client.from('account').upsert({'id': me}, onConflict: 'id', ignoreDuplicates: true);
     await client.from('preferences').upsert({
@@ -76,7 +76,9 @@ class SupabaseSettingsRepository implements SettingsRepository {
   /// Updates the row when it exists; before setup the value waits in the
   /// store and `savePreferences` carries it.
   Future<void> _prefs(Map<String, Object> patch) async {
-    await client.from('preferences').update(patch).eq('account_id', _uid(client));
+    final me = _uid(client);
+    if (me == null) return;
+    await client.from('preferences').update(patch).eq('account_id', me);
   }
 
   @override
@@ -94,7 +96,9 @@ class SupabaseSettingsRepository implements SettingsRepository {
   @override
   Future<void> setVisible(bool value) async {
     await cache.setVisible(value);
-    await client.from('profile').update({'visible': value}).eq('account_id', _uid(client));
+    final me = _uid(client);
+    if (me == null) return;
+    await client.from('profile').update({'visible': value}).eq('account_id', me);
   }
 
   @override
@@ -118,6 +122,7 @@ class SupabaseIntroRepository implements IntroRepository {
   Future<void> set(IntroStatus status) async {
     await cache.set(status);
     final me = _uid(client);
+    if (me == null) return;
     if (status == IntroStatus.none) {
       await client.from('intro_progress').delete().eq('account_id', me);
       return;

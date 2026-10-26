@@ -36,7 +36,7 @@ class MatchPage extends ConsumerWidget {
           builder: (context, constraints) => SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(25, 23, 25, 22),
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight - 45),
+              constraints: BoxConstraints(minHeight: (constraints.maxHeight - 45).clamp(0.0, double.infinity)),
               child: Column(
                 children: [
                   Row(

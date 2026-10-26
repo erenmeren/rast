@@ -572,11 +572,12 @@ class _HelloLayer extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('YOUR NEXT HELLO', style: rastStyle(size: 7, weight: 800, letterSpacing: 0.9, color: p.cardMuted)),
-                          const SizedBox(height: 5),
-                          Text('Hey. Coffee sometime?', maxLines: 1, overflow: TextOverflow.ellipsis, style: rastStyle(size: 12, weight: 650, height: 1.3, color: p.cardText)),
+                          Text('YOUR NEXT HELLO', maxLines: 1, overflow: TextOverflow.ellipsis, style: rastStyle(size: 7, weight: 800, letterSpacing: 0.9, color: p.cardMuted)),
+                          const SizedBox(height: 4),
+                          Text('Hey. Coffee sometime?', maxLines: 1, overflow: TextOverflow.ellipsis, style: rastStyle(size: 12, weight: 650, height: 1.2, color: p.cardText)),
                         ],
                       ),
                     ),
