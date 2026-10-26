@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/providers.dart';
 import '../../../core/theme/rast_colors.dart';
 import '../../../core/theme/rast_theme.dart';
 import '../../../core/ui/ui.dart';
@@ -27,8 +28,13 @@ Future<void> showLocationSheet(BuildContext context, WidgetRef ref) {
             const SizedBox(height: 20),
             PrimaryButton(
               label: enabled ? 'Turn location off' : 'Enable location',
-              onPressed: () {
+              onPressed: () async {
                 final next = !enabled;
+                if (next && !await ref.read(locationRepositoryProvider).requestPermissions()) {
+                  if (sheetContext.mounted) showToast(sheetContext, 'Location stays off until you allow it all the time in Settings.');
+                  return;
+                }
+                if (!sheetContext.mounted) return;
                 ref.read(settingsProvider.notifier).setLocation(next);
                 if (next) ref.read(settingsProvider.notifier).setVisible(true);
                 Navigator.of(sheetContext).pop();

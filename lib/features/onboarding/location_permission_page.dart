@@ -2,17 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/providers.dart';
 import '../../core/theme/rast_colors.dart';
 import '../../core/ui/ui.dart';
 import '../auth/session_notifier.dart';
 import 'onboarding_scaffold.dart';
 
-/// Step 5. Both choices finish setup. No real permission prompt in this
-/// milestone; the production adapter requests precise + background access.
+/// Step 5. Both choices finish setup. "Enable location" asks the platform
+/// through the location repository (the mock grants at once).
 class LocationPermissionPage extends ConsumerWidget {
   const LocationPermissionPage({super.key});
 
-  void _finish(BuildContext context, WidgetRef ref, {required bool granted}) {
+  Future<void> _finish(BuildContext context, WidgetRef ref, {required bool granted}) async {
+    if (granted) {
+      // precise location, then "allow all the time", then notifications
+      granted = await ref.read(locationRepositoryProvider).requestPermissions();
+      if (!context.mounted) return;
+      if (!granted) showToast(context, 'Location stays off until you allow it all the time in Settings.');
+    }
     final problem = ref.read(sessionProvider.notifier).finishSetup(locationGranted: granted);
     if (problem != null) {
       showToast(context, problem.message);

@@ -6,8 +6,17 @@ import '../../core/rules/rules.dart';
 import '../../core/theme/rast_colors.dart';
 import '../../core/theme/rast_theme.dart';
 import '../../core/ui/ui.dart';
+import '../location/location_service.dart';
 import 'settings_notifier.dart';
 import 'sheets/location_sheet.dart';
+
+String _statusLine(LocationStatus status) {
+  if (status.lastError != null) return 'Sampling stopped: ${status.lastError}';
+  if (!status.running) return 'Sampling starts when setup is complete.';
+  final last = status.lastFixAt?.toLocal();
+  final seen = last == null ? 'no fix yet' : 'last fix ${last.hour.toString().padLeft(2, '0')}:${last.minute.toString().padLeft(2, '0')}';
+  return 'Sampling in the background, $seen, ${status.pending} waiting to upload.';
+}
 
 /// Location update target, reveal delay, visibility and location access.
 class LocationSettingsPage extends ConsumerWidget {
@@ -97,6 +106,10 @@ class LocationSettingsPage extends ConsumerWidget {
                             ),
                           ),
                         ),
+                        if (s.locationEnabled) ...[
+                          const SizedBox(height: 11),
+                          Text(_statusLine(ref.watch(locationProvider)), style: _copy(c)),
+                        ],
                       ],
                     ),
                   ],

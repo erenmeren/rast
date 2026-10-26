@@ -68,5 +68,13 @@
 	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>rast uses your photo library so you can add your four profile photos.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>rast uses your location to notice when you cross paths with someone. Exact locations are never shared.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>rast notices crossings in the background. Exact locations are never shared.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 </dict>
 </plist>

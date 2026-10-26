@@ -125,4 +125,6 @@ Phone sign-in then sends a real SMS (Twilio Verify). Adapter tests against the l
 flutter test test/live --concurrency=1 --dart-define=RAST_LIVE=true --timeout 120s
 ```
 
-Backend contract: `supabase/README.md`. Design: `docs/superpowers/specs/2026-10-26-flutter-adapters-design.md`.
+Location sampling runs only under the Supabase backend, while the member is active with location on; it asks for precise location, "allow all the time" and notifications, keeps a foreground-service notification on Android and uploads batches to `submit_location_samples`.
+
+Backend contract: `supabase/README.md`. Designs: `docs/superpowers/specs/2026-10-26-flutter-adapters-design.md`, `docs/superpowers/specs/2026-10-26-location-upload-design.md`.
