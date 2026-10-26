@@ -43,12 +43,36 @@ class MockSafetyRepository implements SafetyRepository {
     );
   }
 
-  @override
-  Future<void> save(SafetyState state) async {
+  Future<void> _save(SafetyState state) async {
     await store.setStringList(blockedKey, state.blocked.toList());
     await store.setStringList(disconnectedKey, state.disconnected.toList());
     await store.setStringList(reportsKey, [for (final r in state.reports) '${r.personId}|${r.reason}']);
   }
+
+  // read-modify-write, one operation at a time, so two quick calls cannot
+  // overwrite each other
+  Future<void> _chain = Future.value();
+  Future<void> _edit(SafetyState Function(SafetyState s) change) =>
+      _chain = _chain.then((_) async => _save(change(await load())));
+
+  @override
+  Future<void> block(String id) => _edit((s) => s.copyWith(blocked: {...s.blocked, id}));
+  @override
+  Future<void> unblock(String id) => _edit((s) => s.copyWith(blocked: {...s.blocked}..remove(id)));
+  @override
+  Future<void> disconnect(String id) => _edit((s) => s.copyWith(disconnected: {...s.disconnected, id}));
+
+  @override
+  Future<void> report(String id, String reason, {required bool alsoBlock}) => _edit((s) {
+        final reports = s.reports.any((r) => r.personId == id && r.reason == reason) ? s.reports : [...s.reports, Report(personId: id, reason: reason)];
+        return s.copyWith(reports: reports, blocked: alsoBlock ? {...s.blocked, id} : null);
+      });
+
+  @override
+  Future<List<Person>> blockedPeople() async => const [];
+
+  @override
+  Future<void> deleteAccount() async {}
 
   @override
   Future<void> clear() async {

@@ -31,7 +31,7 @@ class SafetyActions {
   void unblock(String id) => ref.read(safetyProvider.notifier).unblock(id);
 
   void report(String id, String reason, {required bool alsoBlock}) {
-    ref.read(safetyProvider.notifier).report(id, reason);
+    ref.read(safetyProvider.notifier).report(id, reason, alsoBlock: alsoBlock);
     if (alsoBlock) removePerson(id, block: true);
   }
 }

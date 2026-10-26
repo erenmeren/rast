@@ -8,10 +8,16 @@ abstract class AuthRepository {
 }
 
 /// Blocks, permanent removals and reports. Production: server-authoritative
-/// pair records with idempotent operations.
+/// pair records with idempotent operations; the client mirrors the result.
 abstract class SafetyRepository {
   Future<SafetyState> load();
-  Future<void> save(SafetyState state);
+  Future<void> block(String id);
+  Future<void> unblock(String id);
+  Future<void> disconnect(String id);
+  Future<void> report(String id, String reason, {required bool alsoBlock});
+  /// Placeholder people for the blocked list (age only; photos are hidden).
+  Future<List<Person>> blockedPeople();
+  Future<void> deleteAccount();
   Future<void> clear();
 }
 
