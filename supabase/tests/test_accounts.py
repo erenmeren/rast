@@ -23,9 +23,13 @@ class AccountTests(unittest.TestCase):
             db().run(member(1, interests="{everyone,women}"))
 
     def test_photo_slot_unique_among_live_photos(self):
+        # one ready and one uploading photo may share a slot (replacement in flight); two of a kind may not
         sql = member(1) + "insert into photo(id, account_id, slot, storage_path, state) values (gen_random_uuid(), '%s', 0, '%s/x', 'uploading');" % (uuid(1), uuid(1))
-        with self.assertRaises(SqlError):
-            db().run(sql)
+        self.assertEqual(db().run(sql + "select count(*) from photo where slot = 0;")[-1], ["2"])
+        with self.assertRaisesRegex(SqlError, "photo_uploading_slot"):
+            db().run(sql + "insert into photo(id, account_id, slot, storage_path, state) values (gen_random_uuid(), '%s', 0, '%s/y', 'uploading');" % (uuid(1), uuid(1)))
+        with self.assertRaisesRegex(SqlError, "photo_ready_slot"):
+            db().run(sql + "update photo set state = 'ready' where storage_path = '%s/x';" % uuid(1))
 
     def test_rls_own_rows_only(self):
         sql = member(1) + member(2) + as_user(uuid(1), "select count(*) from profile; select count(*) from preferences; select count(*) from device;")

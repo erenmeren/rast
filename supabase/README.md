@@ -36,6 +36,7 @@ Link the project once (`supabase link --project-ref <ref>`) and run `supabase db
 | `0014_review_fixes.sql` | passes no longer hide likers from Likes You; previews ordered by token; `pair_pass` index; `app.can_view_photos` security definer, callable by `authenticated` |
 | `0015_media.sql` | buckets `photos`, `previews`; `storage.objects` policies on `app.can_view_photos` / `app.photo_owner`; `photo_path_own_folder` check; `photo_ready_guard` trigger; `resolve_like_preview` |
 | `0016_photo_guard.sql` | `ready` is server-only on insert too; clients may update only `photo.state` and `photo.slot` |
+| `0018_photo_replace.sql` | one `ready` and one `uploading` photo may share a slot while a replacement is in flight; finalize retires the old one |
 
 Thresholds live in the single `encounter_params` row and are provisional until Phase 0 replaces them: radius 20 m, skew 60 s, sample age 24 h, future 60 s, accuracy 50 m. Change them with an `update`, not a migration, until the field numbers are in. `app.release_due_encounters()` runs every minute under pg_cron (0011).
 

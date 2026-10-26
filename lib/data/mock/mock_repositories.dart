@@ -241,3 +241,13 @@ class MockBackendSync implements BackendSync {
   @override
   Future<void> hydrate() async {}
 }
+
+/// The picked file is the photo. Nothing is uploaded.
+class MockPhotoRepository implements PhotoRepository {
+  @override
+  Future<String> upload(int slot, String filePath) async => filePath;
+  @override
+  Future<void> remove(String source) async {}
+  @override
+  Future<ImageRequest?> resolve(String source) async => null;
+}

@@ -34,6 +34,33 @@ abstract class SessionRepository {
   Future<void> clear();
 }
 
+/// The server refused a photo. [reason] is the finalize code: `too_small`,
+/// `bad_image`, `missing_upload` or `unknown_photo`.
+class PhotoRejected implements Exception {
+  const PhotoRejected(this.reason);
+  final String reason;
+  @override
+  String toString() => 'PhotoRejected($reason)';
+}
+
+/// How to fetch a remote photo source: the URL plus the headers it needs.
+class ImageRequest {
+  const ImageRequest(this.uri, {this.headers = const {}});
+  final Uri uri;
+  final Map<String, String> headers;
+}
+
+/// Own photos. Production: upload the original, let the server render the
+/// preview and mark the row ready; sources are `sb:<path>` afterwards.
+abstract class PhotoRepository {
+  /// Returns the source to store in the profile slot.
+  Future<String> upload(int slot, String filePath);
+  Future<void> remove(String source);
+
+  /// Null for sources the widget can render itself (assets, local files).
+  Future<ImageRequest?> resolve(String source);
+}
+
 /// Reveal delay, sampling interval and visibility live on the server;
 /// notifications and the location flag stay on the device.
 abstract class SettingsRepository {

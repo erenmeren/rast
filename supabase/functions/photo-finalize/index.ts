@@ -27,7 +27,7 @@ Deno.serve(async (req: Request) => {
 
   // The caller's own row only: RLS on photo hides everyone else's.
   const user = createClient(url, anonKey, { global: { headers: { Authorization: auth } } });
-  const { data: photo, error } = await user.from("photo").select("id, storage_path, state").eq("id", photoId).maybeSingle();
+  const { data: photo, error } = await user.from("photo").select("id, account_id, slot, storage_path, state").eq("id", photoId).maybeSingle();
   if (error) return reply(401, { error: "unauthenticated" });
   if (!photo || photo.state === "removed") return reply(404, { error: "unknown_photo" });
 
@@ -49,7 +49,9 @@ Deno.serve(async (req: Request) => {
   const { error: up } = await admin.storage.from("previews").upload(`${photo.id}.jpg`, preview, { contentType: "image/jpeg", upsert: true });
   if (up) return reply(500, { error: "preview_failed" });
 
+  // The photo this one replaces retires first (one ready photo per slot).
   // Never resurrect a row the owner removed while the preview was rendering.
+  await admin.from("photo").update({ state: "removed" }).eq("account_id", photo.account_id).eq("slot", photo.slot).eq("state", "ready").neq("id", photo.id);
   const { data: marked, error: mark } = await admin.from("photo").update({ state: "ready" }).eq("id", photo.id).neq("state", "removed").select("id");
   if (mark) return reply(500, { error: "mark_failed" });
   if (!marked || marked.length === 0) return reply(404, { error: "unknown_photo" });

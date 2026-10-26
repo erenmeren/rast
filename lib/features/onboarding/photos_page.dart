@@ -9,6 +9,8 @@ import '../../core/ui/ui.dart';
 import '../profile/profile_notifier.dart';
 import 'onboarding_scaffold.dart';
 import 'photo_grid.dart';
+import '../../app/providers.dart';
+import '../../data/repositories.dart';
 import 'photo_picker.dart';
 
 /// Setup step 4, or the Profile → Edit photos editor when [editing].
@@ -27,12 +29,27 @@ class _PhotosPageState extends ConsumerState<PhotosPage> {
     try {
       final path = await ref.read(photoPickerProvider)();
       if (path == null || !mounted) return;
-      ref.read(profileProvider.notifier).setPhoto(slot, path);
+      final src = await ref.read(photoRepositoryProvider).upload(slot, path);
+      if (!mounted) return;
+      ref.read(profileProvider.notifier).setPhoto(slot, src);
       setState(() => _error = null);
+    } on PhotoRejected catch (e) {
+      if (!mounted) return;
+      setState(() => _error = switch (e.reason) {
+            'too_small' => 'That photo is too small. Choose one at least 320 pixels wide.',
+            'bad_image' => 'That file is not a JPEG or PNG photo.',
+            _ => 'This photo could not be uploaded. Try again.',
+          });
     } catch (_) {
       if (!mounted) return;
       setState(() => _error = 'This photo could not be opened. Try another file.');
     }
+  }
+
+  void _remove(int slot) {
+    final src = ref.read(profileProvider).photos[slot];
+    ref.read(profileProvider.notifier).setPhoto(slot, null);
+    if (src != null) ref.read(photoRepositoryProvider).remove(src);
   }
 
   void _continue() {
@@ -62,7 +79,7 @@ class _PhotosPageState extends ConsumerState<PhotosPage> {
         PhotoGrid(
           photos: profile.photos,
           onPick: _pick,
-          onRemove: (i) => ref.read(profileProvider.notifier).setPhoto(i, null),
+          onRemove: _remove,
         ),
         const SizedBox(height: 13),
         Row(

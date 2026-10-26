@@ -7,6 +7,7 @@ import '../core/storage/preferences_store.dart';
 import '../data/mock/mock_repositories.dart';
 import '../data/supabase/auth_repository.dart';
 import '../data/supabase/backend.dart';
+import '../data/supabase/photo_repository.dart';
 import '../data/supabase/profile_repository.dart';
 import 'app.dart';
 import 'providers.dart';
@@ -50,5 +51,6 @@ Future<List<Override>> supabaseOverrides(PreferencesStore store) async {
     settingsRepositoryProvider.overrideWithValue(SupabaseSettingsRepository(client, MockSettingsRepository(store))),
     introRepositoryProvider.overrideWithValue(SupabaseIntroRepository(client, MockIntroRepository(store))),
     entitlementRepositoryProvider.overrideWithValue(SupabaseEntitlementRepository(MockEntitlementRepository(store))),
+    photoRepositoryProvider.overrideWithValue(SupabasePhotoRepository(client)),
   ];
 }

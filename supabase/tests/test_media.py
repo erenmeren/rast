@@ -63,6 +63,14 @@ class MediaTests(unittest.TestCase):
         self.assertEqual(db().run(base + "update like_preview set expires_at = now() - interval '1 second';" + call(1, "resolve_like_preview(%s)" % token))[-1], [""])
         self.assertEqual(db().run(base + call(1, "block_account('%s')" % uuid(2)) + call(1, "resolve_like_preview(%s)" % token))[-1], [""])
 
+    def test_replacement_upload_coexists_with_the_ready_photo(self):
+        sql = member(1) + "insert into photo(account_id, slot, storage_path) values ('%s', 0, '%s/new.jpg');" % (uuid(1), uuid(1))
+        self.assertEqual(db().run(sql + "select count(*) from photo where slot = 0;")[-1], ["2"])
+        with self.assertRaisesRegex(SqlError, "photo_uploading_slot"):
+            db().run(sql + "insert into photo(account_id, slot, storage_path) values ('%s', 0, '%s/again.jpg');" % (uuid(1), uuid(1)))
+        with self.assertRaisesRegex(SqlError, "photo_ready_slot"):
+            db().run(sql + "update photo set state = 'ready' where storage_path like '%%/new.jpg';")
+
     def test_privileges(self):
         with self.assertRaisesRegex(SqlError, "permission denied"):
             db().run("set local role anon; select public.resolve_like_preview(gen_random_uuid());")
