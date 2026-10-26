@@ -110,3 +110,19 @@ Everything about the product, screens, copy and visual system is in `rast-flutte
 ## License
 
 Private. The bundled Plus Jakarta Sans font is licensed under the SIL Open Font License (see `rast-flutter-handoff/design/flutter-assets/fonts/OFL.txt`). Placeholder photographs are credited in `rast-flutter-handoff/prototype/dist/assets/credits.json`; the people pictured are not rast users.
+
+## Running against the Supabase backend
+
+The app defaults to the mock. The production adapters are wired at the composition root when the build carries the flag:
+
+```bash
+flutter run --dart-define=RAST_BACKEND=supabase
+```
+
+Phone sign-in then sends a real SMS (Twilio Verify). Adapter tests against the live project use the test user and run only on demand:
+
+```bash
+flutter test test/live --dart-define=RAST_LIVE=true --timeout 120s
+```
+
+Backend contract: `supabase/README.md`. Design: `docs/superpowers/specs/2026-10-26-flutter-adapters-design.md`.
