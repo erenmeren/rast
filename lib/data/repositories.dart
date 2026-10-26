@@ -106,6 +106,17 @@ abstract class DiscoveryRepository {
   Future<Person?> personCard(String id);
 }
 
+/// Conversations. Production: one thread per open match, keyed by the other
+/// person's id; messages through the send_message RPC; `changes` fires on
+/// every pair event the server publishes for the member.
+abstract class ChatRepository {
+  Future<List<Thread>> load();
+  /// The server sequence number, or null when the pair is closed.
+  Future<int?> send(String targetId, String clientOpId, String body);
+  Stream<void> changes();
+  Future<void> markRead(String threadId);
+}
+
 /// Reveal delay, sampling interval and visibility live on the server;
 /// notifications and the location flag stay on the device.
 abstract class SettingsRepository {

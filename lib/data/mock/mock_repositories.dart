@@ -274,3 +274,14 @@ class MockDiscoveryRepository implements DiscoveryRepository {
   @override
   Future<Person?> personCard(String id) async => personById(id);
 }
+
+class MockChatRepository implements ChatRepository {
+  @override
+  Future<List<Thread>> load() async => seedThreads();
+  @override
+  Future<int?> send(String targetId, String clientOpId, String body) async => 1;
+  @override
+  Stream<void> changes() => const Stream.empty();
+  @override
+  Future<void> markRead(String threadId) async {}
+}

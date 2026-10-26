@@ -3,13 +3,42 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/theme/appearance.dart';
 import '../core/theme/rast_theme.dart';
+import '../features/chat/threads_notifier.dart';
+import '../features/likes/likes_notifier.dart';
+import 'providers.dart';
 import 'router.dart';
 
-class RastApp extends ConsumerWidget {
+class RastApp extends ConsumerStatefulWidget {
   const RastApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RastApp> createState() => _RastAppState();
+}
+
+class _RastAppState extends ConsumerState<RastApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  /// What may have changed while the app was in the background.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    if (ref.read(backendKindProvider) != BackendKind.supabase) return;
+    ref.read(threadsProvider.notifier).refresh();
+    ref.read(likesProvider.notifier).refresh();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final appearance = ref.watch(appearanceProvider);
     final router = ref.watch(routerProvider);
     return MaterialApp.router(

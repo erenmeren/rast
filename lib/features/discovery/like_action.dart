@@ -29,6 +29,8 @@ Future<void> likePerson(BuildContext context, WidgetRef ref, Person person, {req
   if (!context.mounted) return;
   switch (outcome) {
     case LikeOutcome.matched:
+      await ref.read(threadsProvider.notifier).refresh();
+      if (!context.mounted) return;
       ref.read(threadsProvider.notifier).ensureThread(person.id);
       context.go('/matches/${person.id}');
     case LikeOutcome.liked:
