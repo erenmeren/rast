@@ -8,6 +8,7 @@ import '../features/chat/threads_notifier.dart';
 import '../features/profile/preferences_notifier.dart';
 import '../features/profile/profile_notifier.dart';
 import '../features/likes/likes_notifier.dart';
+import '../features/location/location_service.dart';
 import 'providers.dart';
 import 'router.dart';
 
@@ -33,6 +34,7 @@ class _RastAppState extends ConsumerState<RastApp> with WidgetsBindingObserver {
     if (!ref.read(sessionProvider).verified) return;
     ref.read(threadsProvider.notifier).refresh();
     ref.read(likesProvider.notifier).refresh();
+    ref.read(locationProvider.notifier).flush();
     // a save that failed offline is sent again from the store
     final profiles = ref.read(profileRepositoryProvider);
     profiles.save(ref.read(profileProvider)).catchError((Object _) {});
@@ -49,6 +51,7 @@ class _RastAppState extends ConsumerState<RastApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final appearance = ref.watch(appearanceProvider);
     final router = ref.watch(routerProvider);
+    ref.watch(locationProvider); // keeps the sampler alive for the app's lifetime
     return MaterialApp.router(
       title: 'rast',
       debugShowCheckedModeBanner: false,

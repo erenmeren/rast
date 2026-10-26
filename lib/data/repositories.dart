@@ -143,6 +143,51 @@ abstract class ChatRepository {
   Future<void> markRead(String threadId);
 }
 
+/// One position from the platform.
+class Fix {
+  const Fix({required this.lat, required this.lon, required this.accuracyM, required this.observedAt});
+  final double lat;
+  final double lon;
+  final double accuracyM;
+  /// The fix's own UTC time, never the upload time.
+  final DateTime observedAt;
+}
+
+/// A fix queued for upload, as the intake RPC wants it.
+class LocationSample {
+  const LocationSample({required this.id, required this.deviceId, required this.seq, required this.lat, required this.lon, required this.accuracyM, required this.observedAt});
+  final String id;
+  final String deviceId;
+  final int seq;
+  final double lat;
+  final double lon;
+  final double accuracyM;
+  final DateTime observedAt;
+
+  Map<String, dynamic> toJson() => {
+        'id': id, 'device_id': deviceId, 'seq': seq, 'lat': lat, 'lon': lon, 'accuracy_m': accuracyM,
+        'observed_at': observedAt.toUtc().toIso8601String(),
+      };
+
+  static LocationSample fromJson(Map<String, dynamic> j) => LocationSample(
+        id: j['id'] as String, deviceId: j['device_id'] as String, seq: j['seq'] as int,
+        lat: (j['lat'] as num).toDouble(), lon: (j['lon'] as num).toDouble(), accuracyM: (j['accuracy_m'] as num).toDouble(),
+        observedAt: DateTime.parse(j['observed_at'] as String).toUtc(),
+      );
+}
+
+/// Position sampling and intake. Production: geolocator with a foreground
+/// service, the device row of this install, submit_location_samples.
+abstract class LocationRepository {
+  Future<bool> hasPermissions();
+  /// Precise location, then background, then notifications.
+  Future<bool> requestPermissions();
+  Stream<Fix> fixes(int intervalSeconds);
+  Future<String> deviceId();
+  /// The ids the server accepted (a retry of a stored sample counts as accepted).
+  Future<List<String>> upload(List<LocationSample> samples);
+}
+
 /// Reveal delay, sampling interval and visibility live on the server;
 /// notifications and the location flag stay on the device.
 abstract class SettingsRepository {

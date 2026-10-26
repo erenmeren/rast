@@ -310,3 +310,17 @@ class MockChatRepository implements ChatRepository {
   @override
   Future<void> markRead(String threadId) async {}
 }
+
+/// No real positions in the mock; permissions are a given.
+class MockLocationRepository implements LocationRepository {
+  @override
+  Future<bool> hasPermissions() async => true;
+  @override
+  Future<bool> requestPermissions() async => true;
+  @override
+  Stream<Fix> fixes(int intervalSeconds) => const Stream.empty();
+  @override
+  Future<String> deviceId() async => 'mock-device';
+  @override
+  Future<List<String>> upload(List<LocationSample> samples) async => [for (final s in samples) s.id];
+}

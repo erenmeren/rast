@@ -10,6 +10,7 @@ import '../data/supabase/backend.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 import '../data/supabase/chat_repository.dart';
 import '../data/supabase/discovery_repository.dart';
+import '../data/supabase/location_repository.dart';
 import '../data/supabase/photo_repository.dart';
 import '../data/supabase/profile_repository.dart';
 import '../data/supabase/safety_repository.dart';
@@ -74,5 +75,6 @@ Future<List<Override>> supabaseOverrides(PreferencesStore store) async {
     discoveryRepositoryProvider.overrideWithValue(SupabaseDiscoveryRepository(client)),
     chatRepositoryProvider.overrideWithValue(SupabaseChatRepository(client, store)),
     safetyRepositoryProvider.overrideWithValue(SupabaseSafetyRepository(client)),
+    locationRepositoryProvider.overrideWithValue(SupabaseLocationRepository(client, store)),
   ];
 }
