@@ -33,12 +33,23 @@ class LikesYouTests(unittest.TestCase):
         r = self.last(self.base() + premium(1, "now() - interval '1 day'") + call(1, "likes_you()"))
         self.assertFalse(r["premium"])
 
-    def test_passed_liker_and_pending_liker_are_excluded(self):
+    def test_passed_liker_still_counts_and_pending_liker_is_excluded(self):
+        # a pass must not change the count: otherwise pass + count + rewind names every liker
         sql = self.base() + passes(1, 2, 702)
-        self.assertEqual(self.last(sql + call(1, "likes_you()"))["count"], 1)
+        self.assertEqual(self.last(sql + call(1, "likes_you()"))["count"], 2)
         pending = (released_group(1, 2, delay=2)
                    + "insert into pair_like(pair_id, from_account) values (app.pair_for('%s','%s'), '%s');" % (uuid(1), uuid(2), uuid(2)))
         self.assertEqual(self.last(pending + call(1, "likes_you()"))["count"], 0)
+
+    def test_previews_are_ordered_by_token_not_pair_hash(self):
+        sql = released_group(1, 2, 3, 4, 5, 6) + "".join(like(n, 1, 700 + n) for n in range(2, 7))
+        tokens = [p["token"] for p in self.last(sql + call(1, "likes_you()"))["previews"]]
+        self.assertEqual(len(tokens), 5)
+        self.assertEqual(tokens, sorted(tokens))
+
+    def test_can_view_photos_is_callable_by_signed_in_users(self):
+        rows = db().run(self.base() + as_user(uuid(1), "select app.can_view_photos('%s','%s'), app.can_view_photos('%s','%s');" % (uuid(1), uuid(2), uuid(1), uuid(4))))
+        self.assertEqual(rows[-1], ["t", "t"])
 
     def test_incomplete_setup_sees_no_likes(self):
         sql = self.base() + "update profile set visible = false where account_id = '%s';" % uuid(1)

@@ -133,6 +133,10 @@ class DiscoveryTests(unittest.TestCase):
     def test_pass_on_pending_pair_is_unavailable(self):
         self.assertEqual(self.last(released_group(1, 2, delay=2) + passes(1, 2, 701))["outcome"], "unavailable")
 
+    def test_rewind_lookup_has_an_index(self):
+        rows = db().run("select count(*) from pg_indexes where tablename = 'pair_pass' and indexdef like '%(from_account, created_at DESC)';")
+        self.assertEqual(rows[-1], ["1"])
+
     def test_privileges(self):
         with self.assertRaisesRegex(SqlError, "permission denied"):
             db().run("set local role anon; select public.start_discovery_session();")

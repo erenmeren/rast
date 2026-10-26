@@ -30,20 +30,20 @@ The server side of the Discover deck and the Likes You tab: a scheduled release 
 
 ## Pass and rewind
 
-- `pair_pass(pair_id, from_account, created_at)`, pk `(pair_id, from_account)`, own-row select. A pass is per pair and permanent until rewound; it writes no `pair_event` and no revision bump, the other person never learns of it.
+- `pair_pass(pair_id, from_account, created_at)`, pk `(pair_id, from_account)`, index `(from_account, created_at desc)` for rewind, own-row select. A pass is per pair and permanent until rewound; it writes no `pair_event` and no revision bump, the other person never learns of it.
 - `public.pass_account(target uuid, client_op_id uuid) -> {"outcome":"passed"|"unavailable"}`: `unavailable` unless the pair is a candidate (same gate as `like_account`). Idempotent: a repeat is `passed`.
 - `public.rewind_pass() -> {"outcome":"restored","account_id":…}` or `{"outcome":"unavailable"}`: removes the caller's most recent pass only if that pair is still a candidate; otherwise nothing changes (FEED-06: rewind restores only an available profile and never revives a removed connection). Not entitlement-gated in this phase.
 
 ## Likes You
 
 - `app.is_premium(acct)`: an `entitlement` row with `product = 'premium'`, `status = 'active'` and `valid_until` null or in the future.
-- Eligible incoming likes for `me`: candidates where the other account has a `pair_like` row and `me` has neither liked nor passed. This set is computed before any entitlement logic (LIKE-03, SUB-03).
-- `public.likes_you() -> {"outcome":"ok","premium":bool,"count":n,"cards":[…]}` for premium (full cards, ordered by `hashtextextended(pair_id::text, 0)`), or `{"outcome":"ok","premium":false,"count":n,"previews":[{"token":uuid,"age":int}]}` for free members. The preview carries no identity, no photo path and no per-person timer (LIKE-02). Age is shown because the mock's locked card shows it.
+- Eligible incoming likes for `me`: candidates where the other account has a `pair_like` row (a mutual like is a match, so `me` has not liked them). A pass does **not** remove a liker from this set: if it did, pass + count + rewind would name every liker to a free member (review finding, 2026-10-26). This set is computed before any entitlement logic (LIKE-03, SUB-03).
+- `public.likes_you() -> {"outcome":"ok","premium":bool,"count":n,"cards":[…]}` for premium (full cards, ordered by `hashtextextended(pair_id::text, 0)`), or `{"outcome":"ok","premium":false,"count":n,"previews":[{"token":uuid,"age":int}]}` for free members, ordered by token (random), never by anything the client can recompute from readable pair ids. The preview carries no identity, no photo path and no per-person timer (LIKE-02). It writes tokens, so it is a POST. Age is shown because the mock's locked card shows it.
 - `like_preview(token uuid pk, viewer, pair_id, created_at, expires_at = + 24 h)`, unique `(viewer, pair_id)`, closed to clients. `likes_you()` upserts a token per eligible like and refreshes `expires_at`. Phase 5c resolves a token to the blurred derivative of the liker's first photo, re-checking eligibility at that moment.
 
 ## Photo access
 
-`app.can_view_photos(viewer, owner)` is true when `viewer = owner`; when the pair is matched and open; when `app.candidate(viewer, pair)` holds (deck or Likes You card); or when the viewer is premium and `owner` has an eligible incoming like for `viewer`. Phase 5c attaches it to the Storage policy; this phase proves it in SQL.
+`app.can_view_photos(viewer, owner)` is true when `viewer = owner`; when the pair is matched and open; or when `app.candidate(viewer, pair)` holds (deck or Likes You card; every eligible liker is a candidate, so no separate premium clause). It is `security definer` and executable by `authenticated`, because a Storage policy runs as the caller and must read through RLS. Phase 5c attaches it to the Storage policy; this phase proves it in SQL.
 
 ## Retention
 
