@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,9 +26,19 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
   final _composer = TextEditingController();
   final _scroll = ScrollController();
   final _focus = FocusNode();
+  StreamSubscription<String>? _failures;
+
+  @override
+  void initState() {
+    super.initState();
+    _failures = ref.read(threadsProvider.notifier).failures.listen((message) {
+      if (mounted) showToast(context, message);
+    });
+  }
 
   @override
   void dispose() {
+    _failures?.cancel();
     _composer.dispose();
     _scroll.dispose();
     _focus.dispose();

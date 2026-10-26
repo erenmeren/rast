@@ -21,8 +21,9 @@ class FakeSafety implements SafetyRepository {
   Future<void> disconnect(String id) => _op('disconnect $id');
   @override
   Future<void> report(String id, String reason, {required bool alsoBlock}) => _op('report $id');
+  List<Person> hidden = [];
   @override
-  Future<List<Person>> blockedPeople() async => const [];
+  Future<List<Person>> hiddenPeople() async => hidden;
   @override
   Future<void> deleteAccount() => _op('delete');
   @override

@@ -22,6 +22,7 @@ void main() {
     final store = PreferencesStore(await SharedPreferences.getInstance());
     final session = SupabaseSessionRepository(client, MockSessionRepository(store));
     expect(session.load().verified, isTrue);
+    expect(session.load().phase, SessionPhase.onboarding, reason: 'a session with an empty store is a member mid-setup, never a stranger');
     await auth.signOut();
     expect(session.load(), same(Session.signedOut));
   }, skip: live ? false : 'live project; run with --dart-define=RAST_LIVE=true');

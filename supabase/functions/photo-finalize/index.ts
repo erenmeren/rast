@@ -23,12 +23,12 @@ Deno.serve(async (req: Request) => {
   } catch {
     return reply(400, { error: "bad_request" });
   }
-  if (typeof photoId !== "string") return reply(400, { error: "bad_request" });
+  if (typeof photoId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(photoId)) return reply(400, { error: "bad_request" });
 
   // The caller's own row only: RLS on photo hides everyone else's.
   const user = createClient(url, anonKey, { global: { headers: { Authorization: auth } } });
   const { data: photo, error } = await user.from("photo").select("id, account_id, slot, storage_path, state").eq("id", photoId).maybeSingle();
-  if (error) return reply(401, { error: "unauthenticated" });
+  if (error) return reply(error.code === "42501" || error.code === "PGRST301" ? 401 : 500, { error: error.code === "42501" || error.code === "PGRST301" ? "unauthenticated" : "lookup_failed" });
   if (!photo || photo.state === "removed") return reply(404, { error: "unknown_photo" });
 
   const admin = createClient(url, serviceKey);

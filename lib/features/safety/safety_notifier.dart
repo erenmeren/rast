@@ -18,9 +18,9 @@ class SafetyNotifier extends Notifier<SafetyState> {
   Future<void> _load() async {
     final repo = ref.read(safetyRepositoryProvider);
     final loaded = await repo.load();
-    final blocked = await repo.blockedPeople();
+    final hidden = await repo.hiddenPeople();
     if (!ref.mounted) return;
-    ref.read(peopleProvider.notifier).add(blocked);
+    ref.read(peopleProvider.notifier).add(hidden);
     state = _merge(state, loaded);
   }
 

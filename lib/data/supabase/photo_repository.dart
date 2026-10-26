@@ -28,12 +28,13 @@ class SupabasePhotoRepository implements PhotoRepository {
   Future<String> upload(int slot, String filePath) async {
     final me = _me;
     final bytes = await File(filePath).readAsBytes();
-    final mime = filePath.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+    final png = filePath.toLowerCase().endsWith('.png');
+    final mime = png ? 'image/png' : 'image/jpeg';
     // a stale attempt in this slot would block the live-slot index; clients
     // cannot delete rows, so it is retired instead
     await client.from('photo').update({'state': 'removed'}).eq('account_id', me).eq('slot', slot).eq('state', 'uploading');
     final id = newUuid();
-    final path = '$me/$id.jpg';
+    final path = '$me/$id.${png ? 'png' : 'jpg'}';
     await client.from('photo').insert({'id': id, 'account_id': me, 'slot': slot, 'storage_path': path});
     try {
       await client.storage.from('photos').uploadBinary(path, bytes, fileOptions: FileOptions(contentType: mime));

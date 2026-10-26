@@ -15,7 +15,7 @@ void main() {
     expect(state.reports.any((r) => r.personId == owner && r.reason == 'Scam or spam'), isTrue);
     expect(state.blocked, isEmpty);
     expect(state.disconnected, isEmpty);
-    expect(await safety.blockedPeople(), isEmpty);
+    expect(await safety.hiddenPeople(), isEmpty);
     await safety.unblock('00000000-0000-0000-0000-000000000009'); // a no-op must not throw
   }, skip: live ? false : 'live project; run with --dart-define=RAST_LIVE=true');
 }

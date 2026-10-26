@@ -41,14 +41,15 @@ class SupabaseSafetyRepository implements SafetyRepository {
   Future<void> report(String id, String reason, {required bool alsoBlock}) =>
       client.rpc('submit_report', params: {'target': id, 'reason_code': reason, 'client_op_id': newUuid(), 'also_block': alsoBlock});
 
-  /// Blocked people keep only an age: their photos are not viewable.
+  /// Blocked and removed people keep only an age: their photos are not viewable.
   @override
-  Future<List<Person>> blockedPeople() async {
-    final r = await client.rpc('blocked_accounts') as Map;
-    return [
-      for (final b in (r['blocked'] as List? ?? const []))
-        Person(id: b['account_id'] as String, age: b['age'] as int, gender: null, photo: ''),
+  Future<List<Person>> hiddenPeople() async {
+    final results = await Future.wait<dynamic>([client.rpc('blocked_accounts'), client.rpc('disconnected_accounts')]);
+    final rows = [
+      ...((results[0] as Map)['blocked'] as List? ?? const []),
+      ...((results[1] as Map)['disconnected'] as List? ?? const []),
     ];
+    return [for (final b in rows) Person(id: b['account_id'] as String, age: b['age'] as int, gender: null, photo: '')];
   }
 
   @override

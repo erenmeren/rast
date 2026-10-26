@@ -15,8 +15,9 @@ abstract class SafetyRepository {
   Future<void> unblock(String id);
   Future<void> disconnect(String id);
   Future<void> report(String id, String reason, {required bool alsoBlock});
-  /// Placeholder people for the blocked list (age only; photos are hidden).
-  Future<List<Person>> blockedPeople();
+  /// Placeholder people for the blocked and removed lists (age only; their
+  /// photos are not viewable).
+  Future<List<Person>> hiddenPeople();
   Future<void> deleteAccount();
   Future<void> clear();
 }

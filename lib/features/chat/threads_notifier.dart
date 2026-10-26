@@ -15,6 +15,11 @@ const int maxMessageLength = 1000;
 /// resume and after each send).
 class ThreadsNotifier extends Notifier<List<Thread>> {
   bool get _server => ref.read(backendKindProvider) == BackendKind.supabase;
+  final _failures = StreamController<String>.broadcast();
+
+  /// A message the server refused or never received; the thread is refreshed
+  /// so the optimistic copy disappears.
+  Stream<String> get failures => _failures.stream;
   Future<void> _ready = Future.value();
   Future<void> get ready => _ready;
 
@@ -81,12 +86,16 @@ class ThreadsNotifier extends Notifier<List<Thread>> {
     ];
     if (_server) {
       ref.read(chatRepositoryProvider).send(thread.personId, newUuid(), clipped).then((seq) {
-        if (seq == null && ref.mounted) refresh();
-      }, onError: (Object _) {
-        if (ref.mounted) refresh();
-      });
+        if (seq == null) _failed(threadId, 'This conversation is no longer available.');
+      }, onError: (Object _) => _failed(threadId, 'Your message did not reach the server. Check your connection and try again.'));
     }
     return true;
+  }
+
+  void _failed(String threadId, String message) {
+    if (!ref.mounted) return;
+    _failures.add(message);
+    refresh();
   }
 
   void markRead(String threadId) {

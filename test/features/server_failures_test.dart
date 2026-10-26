@@ -9,6 +9,7 @@ import 'package:rast/data/supabase/profile_repository.dart';
 import 'package:rast/features/auth/session_notifier.dart';
 import 'package:rast/features/chat/threads_notifier.dart';
 import 'package:rast/features/discovery/deck_notifier.dart';
+import 'package:rast/features/discovery/eligibility.dart';
 import 'package:rast/features/discovery/people_directory.dart';
 import 'package:rast/features/likes/likes_notifier.dart';
 import 'package:rast/features/safety/safety_notifier.dart';
@@ -101,6 +102,41 @@ void main() {
     await c.read(safetyProvider.notifier).block('b');
     expect(c.read(safetyProvider).blocked, {'b'});
     expect(safety.log, ['block b', 'block b']);
+  });
+
+  test('a refused or failed send is reported and undone', () async {
+    final (c, _, chat, _) = await server();
+    final failures = <String>[];
+    final sub = c.read(threadsProvider.notifier).failures.listen(failures.add);
+    chat.unavailable = true;
+    expect(c.read(threadsProvider.notifier).send('b', 'hi'), isTrue);
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    expect(failures, hasLength(1));
+    expect(c.read(threadsProvider).single.messages, isEmpty, reason: 'the refused message is gone after the refresh');
+    chat.unavailable = false;
+    chat.offline = true;
+    c.read(threadsProvider.notifier).send('b', 'again');
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    expect(failures, hasLength(2));
+    await sub.cancel();
+  });
+
+  test('blocked and removed people reach the directory as placeholders', () async {
+    final (c, _, _, safety) = await server();
+    safety.hidden = [const Person(id: 'h1', age: 40, gender: null, photo: '')];
+    safety.remote = const SafetyState(blocked: {'h1'});
+    await c.read(safetyProvider.notifier).refresh();
+    expect(c.read(peopleProvider.notifier).knows('h1'), isTrue);
+    expect(c.read(safetyProvider).blocked, {'h1'});
+  });
+
+  test('a server rewind of someone the directory forgot fetches the card', () async {
+    final (c, discovery, _, _) = await server();
+    await c.read(deckProvider.notifier).pass('a');
+    c.read(peopleProvider.notifier).forget('a');
+    expect(await c.read(deckProvider.notifier).rewind(), 'a');
+    expect(c.read(peopleProvider.notifier).knows('a'), isTrue);
+    expect(c.read(eligiblePeopleProvider).first.id, 'a');
   });
 
   test('birth dates survive hydrate in any time zone', () {

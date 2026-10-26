@@ -42,7 +42,11 @@ class SupabaseSessionRepository implements SessionRepository {
   @override
   Session load() {
     if (client.auth.currentSession == null) return Session.signedOut;
-    return inner.load().copyWith(verified: true);
+    final stored = inner.load();
+    // an empty store with a live session (reinstall, offline at start) is a
+    // member mid-setup, not a stranger; hydrate corrects it when online
+    final phase = stored.phase == SessionPhase.signedOut ? SessionPhase.onboarding : stored.phase;
+    return Session(phase: phase, verified: true);
   }
 
   @override

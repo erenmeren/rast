@@ -148,6 +148,11 @@ class DeckNotifier extends Notifier<DeckState> {
     if (_server) {
       final id = await _repo.rewind();
       if (id == null || !ref.mounted) return null;
+      if (!ref.read(peopleProvider.notifier).knows(id)) {
+        final card = await _repo.personCard(id);
+        if (!ref.mounted) return null;
+        if (card != null) ref.read(peopleProvider.notifier).add([card]);
+      }
       state = state.copyWith(
         order: [id, ...state.order.where((o) => o != id)],
         passed: {...state.passed}..remove(id),

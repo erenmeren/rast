@@ -17,6 +17,8 @@ class PeopleDirectory extends Notifier<Map<String, Person>> {
     state = {...state, for (final p in people) p.id: p};
   }
 
+  void forget(String id) => state = {...state}..remove(id);
+
   Person? byId(String? id) => id == null ? null : state[id];
   bool knows(String? id) => id != null && state.containsKey(id);
 }

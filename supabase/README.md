@@ -37,6 +37,7 @@ Link the project once (`supabase link --project-ref <ref>`) and run `supabase db
 | `0015_media.sql` | buckets `photos`, `previews`; `storage.objects` policies on `app.can_view_photos` / `app.photo_owner`; `photo_path_own_folder` check; `photo_ready_guard` trigger; `resolve_like_preview` |
 | `0016_photo_guard.sql` | `ready` is server-only on insert too; clients may update only `photo.state` and `photo.slot` |
 | `0017_connections.sql` | `connections()`, `person_card(target)`, `blocked_accounts()`; `pair_event` joins the realtime publication |
+| `0019_followups.sql` | `disconnected_accounts()`; one `discovery_session` per account (atomic replace), seed hidden from clients; a repeated pass counts as the most recent |
 | `0018_photo_replace.sql` | one `ready` and one `uploading` photo may share a slot while a replacement is in flight; finalize retires the old one |
 
 Thresholds live in the single `encounter_params` row and are provisional until Phase 0 replaces them: radius 20 m, skew 60 s, sample age 24 h, future 60 s, accuracy 50 m. Change them with an `update`, not a migration, until the field numbers are in. `app.release_due_encounters()` runs every minute under pg_cron (0011).
@@ -55,6 +56,7 @@ Design: `docs/superpowers/specs/2026-10-26-discovery-design.md`. All return `jso
 | `connections()` | `ok` + `connections` of `{pair_id, revision, card}` for open matches, newest first. |
 | `person_card(target)` | `ok` + `card` for a current candidate or open match; `unavailable` otherwise (strangers and blocked alike). |
 | `blocked_accounts()` | `ok` + `blocked` of `{account_id, age}`; photos of blocked people are not viewable, show a placeholder. |
+| `disconnected_accounts()` | `ok` + `disconnected` of `{account_id, age}` for removed connections, newest first. |
 
 A card is `{account_id, age, gender|null, custom_gender, photos}`; `gender` is null unless the member shows it. Photo bytes are not served yet (Phase 5c); `app.can_view_photos(viewer, owner)` is the rule the Storage policy will use.
 

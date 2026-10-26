@@ -69,7 +69,7 @@ class MockSafetyRepository implements SafetyRepository {
       });
 
   @override
-  Future<List<Person>> blockedPeople() async => const [];
+  Future<List<Person>> hiddenPeople() async => const [];
 
   @override
   Future<void> deleteAccount() async {}

@@ -9,6 +9,7 @@ class FakeChat implements ChatRepository {
   final log = <String>[];
   final _changes = StreamController<void>.broadcast();
   bool unavailable = false;
+  bool offline = false;
 
   List<Person> people = [];
   @override
@@ -17,6 +18,7 @@ class FakeChat implements ChatRepository {
   @override
   Future<int?> send(String targetId, String clientOpId, String body) async {
     log.add('send $targetId $body');
+    if (offline) throw Exception('offline');
     if (unavailable) return null;
     final seq = (threads.where((t) => t.id == targetId).firstOrNull?.messages.length ?? 0) + 1;
     threads = [
