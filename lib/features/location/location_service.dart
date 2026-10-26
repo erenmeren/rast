@@ -69,6 +69,12 @@ class LocationService extends Notifier<LocationStatus> {
   Future<void> _saveQueue() => _store.setString(queueKey, jsonEncode([for (final s in _queue) s.toJson()]));
 
   Future<void> _start(int interval) async {
+    // a stale "enabled" flag (reinstall, revoked permission) must not start a
+    // stream that fails at once
+    if (!await _repo.hasPermissions()) {
+      if (ref.mounted) state = state.copyWith(running: false, lastError: 'Location permission is missing. Tap Location access to allow it.');
+      return;
+    }
     final device = await _repo.deviceId();
     if (!ref.mounted) return;
     _sub = _repo.fixes(interval).listen((fix) => _onFix(device, fix), onError: (Object e) {

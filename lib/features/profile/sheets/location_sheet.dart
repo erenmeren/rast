@@ -22,7 +22,7 @@ Future<void> showLocationSheet(BuildContext context, WidgetRef ref) {
             Text('Location access helps you discover people whose paths cross yours.', style: rastStyle(size: 13, weight: 450, height: 1.65, color: sheetContext.colors.body)),
             const SizedBox(height: 8),
             const FeatureItem(icon: 'locate', title: 'Precise location', text: 'Helps assess encounters within approximately 20 metres.'),
-            const FeatureItem(icon: 'clock', title: 'Background location', text: "Helps capture encounters even while the app isn't open.", divider: false),
+            const FeatureItem(icon: 'clock', title: 'Background location', text: "Helps capture encounters even while the app isn't open. Android asks for this on a settings page: choose Allow all the time.", divider: false),
             const SizedBox(height: 4),
             const SettingTip(icon: 'lock', text: 'Other people never see your exact location on a map.'),
             const SizedBox(height: 20),

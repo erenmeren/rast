@@ -94,6 +94,17 @@ void main() {
     expect([for (final s in fake.uploads.single) s.seq], [1, 2, 3]);
   });
 
+  test('without the platform permissions the service does not start and says why', () async {
+    final fake = FakeLocation()..permitted = false;
+    final c = await testContainer(extra: [locationRepositoryProvider.overrideWithValue(fake)]);
+    makeActiveMember(c);
+    c.listen(locationProvider, (_, _) {});
+    await tick();
+    expect(c.read(locationProvider).running, isFalse);
+    expect(c.read(locationProvider).lastError, contains('Location access'));
+    expect(fake.streamsStarted, 0);
+  });
+
   test('a stream error stops the service and is shown', () async {
     final (c, fake) = await running();
     fake.fail(StateError('permission revoked'));
