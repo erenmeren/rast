@@ -91,7 +91,7 @@ class _PhonePageState extends ConsumerState<PhonePage> {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                 color: c.inputFill,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(Radii.card),
                 border: Border.all(color: c.inputBorder),
               ),
               child: DropdownButtonHideUnderline(

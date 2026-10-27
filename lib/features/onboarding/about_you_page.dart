@@ -162,7 +162,7 @@ class _DateField extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: c.inputFill,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(Radii.card),
         border: Border.all(color: c.inputBorder),
       ),
       child: Semantics(
@@ -177,7 +177,7 @@ class _DateField extends StatelessWidget {
           cursorColor: c.accent,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: rastStyle(size: 28, weight: 750, letterSpacing: -1, color: c.isDark ? const Color(0xFF94909C) : const Color(0xFFC4C4CC)),
+            hintStyle: rastStyle(size: 28, weight: 750, letterSpacing: -1, color: c.placeholder),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
             semanticCounterText: '',

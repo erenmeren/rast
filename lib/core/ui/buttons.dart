@@ -94,9 +94,9 @@ class SecondaryButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           minimumSize: const Size(double.infinity, 52),
           padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 14),
-          side: BorderSide(color: c.isDark ? const Color(0xFF44434C) : c.outline),
+          side: BorderSide(color: c.outline),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-          foregroundColor: c.isDark ? const Color(0xFFE1DCE1) : c.text,
+          foregroundColor: c.text,
           textStyle: rastStyle(size: 14, weight: 700),
         ),
         child: Text(label),
@@ -127,7 +127,7 @@ class TextLinkButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final fg = color ?? (c.isDark ? const Color(0xFFC6C0C8) : const Color(0xFF63636B));
+    final fg = color ?? c.body;
     final button = TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(
@@ -194,7 +194,7 @@ class IconCircleButton extends StatelessWidget {
                 width: size,
                 height: size,
                 child: Center(
-                  child: RastIcon(icon, size: iconSize, color: foreground ?? (c.isDark ? const Color(0xFFD1CCD3) : c.text)),
+                  child: RastIcon(icon, size: iconSize, color: foreground ?? c.text),
                 ),
               ),
             ),

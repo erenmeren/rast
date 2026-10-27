@@ -58,7 +58,7 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('YOUR CONNECTIONS', style: RastText.eyebrow(c, color: c.isDark ? c.body : const Color(0xFFAAAAB5))),
+                  Text('YOUR CONNECTIONS', style: RastText.eyebrow(c)),
                   RastIcon('mark', size: 17, color: c.accent),
                 ],
               ),
@@ -82,7 +82,7 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
                                 children: [
                                   Avatar(p.photo, size: 57, highlighted: true),
                                   const SizedBox(height: 8),
-                                  Text('${ageLabel(p.age)} years old', style: rastStyle(size: 12, weight: 600, color: c.isDark ? c.body : const Color(0xFF777783))),
+                                  Text('${ageLabel(p.age)} years old', style: rastStyle(size: 12, weight: 600, color: c.body)),
                                 ],
                               ),
                             ),
@@ -92,7 +92,7 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
                 ),
               ),
               const SizedBox(height: 18),
-              Text('MESSAGES', style: RastText.eyebrow(c, color: c.isDark ? c.body : const Color(0xFFAAAAB5))),
+              Text('MESSAGES', style: RastText.eyebrow(c)),
               if (threads.isEmpty)
                 const EmptyState(icon: 'chat', title: 'It starts with a hello.', text: 'Your conversations will appear here.')
               else
@@ -102,9 +102,9 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  RastIcon('lock', size: 12, color: c.isDark ? c.body : const Color(0xFF81818E)),
+                  RastIcon('lock', size: 12, color: c.body),
                   const SizedBox(width: 7),
-                  Text('A good conversation takes two.', style: rastStyle(size: 11, weight: 450, color: c.isDark ? c.body : const Color(0xFF81818E))),
+                  Text('A good conversation takes two.', style: rastStyle(size: 11, weight: 450, color: c.body)),
                 ],
               ),
             ],
@@ -128,7 +128,7 @@ class _Tab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final fg = active ? c.text : (c.isDark ? const Color(0xFFAFA5B5) : const Color(0xFF7B7B87));
+    final fg = active ? c.text : c.body;
     return Semantics(
       button: true,
       selected: active,
@@ -173,7 +173,7 @@ class _Row extends StatelessWidget {
         key: Key('thread-${thread.id}'),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 18),
+          padding: const EdgeInsets.symmetric(vertical: Space.l),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: c.outline))),
           child: Row(
             children: [
@@ -183,9 +183,9 @@ class _Row extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('${ageLabel(person.age)} · Crossed paths', style: rastStyle(size: 15, weight: 750, color: c.isDark ? c.label : const Color(0xFF4A4A56))),
+                    Text('${ageLabel(person.age)} · Crossed paths', style: rastStyle(size: 15, weight: 750, color: c.label)),
                     const SizedBox(height: 7),
-                    Text(last?.text ?? 'A new match. Say hello.', maxLines: 1, overflow: TextOverflow.ellipsis, style: rastStyle(size: 13, weight: 450, color: c.isDark ? c.body : const Color(0xFF7A7A87))),
+                    Text(last?.text ?? 'A new match. Say hello.', maxLines: 1, overflow: TextOverflow.ellipsis, style: rastStyle(size: 13, weight: 450, color: c.body)),
                   ],
                 ),
               ),
@@ -193,7 +193,7 @@ class _Row extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(last?.time ?? 'Now', style: rastStyle(size: 10, weight: 450, color: c.isDark ? c.body : const Color(0xFF898996))),
+                  Text(last?.time ?? 'Now', style: rastStyle(size: 10, weight: 450, color: c.body)),
                   if (thread.unread > 0) ...[
                     const SizedBox(height: 8),
                     Container(

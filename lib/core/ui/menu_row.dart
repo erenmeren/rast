@@ -26,14 +26,14 @@ class MenuRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final labelColor = danger ? (c.isDark ? c.error : c.accent) : (c.isDark ? c.label : const Color(0xFF545460));
+    final labelColor = danger ? (c.isDark ? c.error : c.accent) : (c.label);
     return Semantics(
       button: true,
       child: InkWell(
         onTap: onTap,
         child: Container(
           constraints: const BoxConstraints(minHeight: 48),
-          padding: const EdgeInsets.symmetric(vertical: 17),
+          padding: const EdgeInsets.symmetric(vertical: Space.l),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: c.outline))),
           child: Row(
             children: [
@@ -52,7 +52,7 @@ class MenuRow extends StatelessWidget {
                 ),
               ),
               trailing ??
-                  RastIcon('chevron', size: 12, color: c.isDark ? const Color(0xFF9B8A9E) : const Color(0xFFC0C0CA)),
+                  RastIcon('chevron', size: 12, color: c.placeholder),
             ],
           ),
         ),

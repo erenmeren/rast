@@ -15,12 +15,12 @@ class InfoBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final bg = c.isDark ? const Color(0xFF302621) : const Color(0xFFFFF3EE);
-    final body = c.isDark ? const Color(0xFFD7B4A5) : const Color(0xFF855949);
-    final lead = c.isDark ? const Color(0xFFF0C8B8) : const Color(0xFF855949);
+    final bg = c.accentContainer;
+    final body = c.onPlusSoft;
+    final lead = c.onPlusStrong;
     return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(13)),
+      padding: const EdgeInsets.all(Space.l),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(Radii.card)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -55,8 +55,8 @@ class SettingTip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final bg = c.isDark ? const Color(0xFF302621) : const Color(0xFFFFF3EE);
-    final fg = c.isDark ? const Color(0xFFD7B4A5) : const Color(0xFF966A56);
+    final bg = c.accentContainer;
+    final fg = c.onPlusSoft;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
@@ -88,7 +88,7 @@ class FeatureItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: Space.l),
       decoration: divider
           ? BoxDecoration(border: Border(bottom: BorderSide(color: c.outline)))
           : null,
@@ -104,9 +104,9 @@ class FeatureItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: rastStyle(size: 14, weight: 750, color: c.isDark ? c.label : const Color(0xFF52525D))),
+                Text(title, style: rastStyle(size: 14, weight: 750, color: c.label)),
                 const SizedBox(height: 5),
-                Text(text, style: rastStyle(size: 12, weight: 450, height: 1.65, color: c.isDark ? c.body : const Color(0xFF73737F))),
+                Text(text, style: rastStyle(size: 12, weight: 450, height: 1.65, color: c.body)),
               ],
             ),
           ),

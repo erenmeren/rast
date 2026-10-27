@@ -90,7 +90,7 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${person.age} · Crossed paths', style: rastStyle(size: 14, weight: 750, color: c.isDark ? c.label : const Color(0xFF454551))),
+                          Text('${person.age} · Crossed paths', style: rastStyle(size: 14, weight: 750, color: c.label)),
                           const SizedBox(height: 3),
                           Text('Your next hello.', style: rastStyle(size: 11, weight: 450, color: c.body)),
                         ],
@@ -106,7 +106,7 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
                 controller: _scroll,
                 padding: const EdgeInsets.fromLTRB(Space.l, Space.l, Space.l, Space.l),
                 children: [
-                  Center(child: Text('TODAY', style: rastStyle(size: 10, weight: 700, letterSpacing: 1.3, color: c.isDark ? c.body : const Color(0xFF8B8B96)))),
+                  Center(child: Text('TODAY', style: rastStyle(size: 10, weight: 700, letterSpacing: 1.3, color: c.body))),
                   const SizedBox(height: 14),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 2, 20, 24),
@@ -115,13 +115,13 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
                         Container(
                           width: 42,
                           height: 42,
-                          decoration: BoxDecoration(color: c.accentContainer, borderRadius: BorderRadius.circular(14)),
+                          decoration: BoxDecoration(color: c.accentContainer, borderRadius: BorderRadius.circular(Radii.card)),
                           child: Center(child: RastIcon('mark', size: 22, color: c.accent)),
                         ),
                         const SizedBox(height: 12),
                         Text('Small world. Good timing.', style: rastStyle(size: 20, weight: 800, letterSpacing: -0.6, color: c.text)),
                         const SizedBox(height: 7),
-                        Text('You liked each other.\nSee where a hello takes you.', textAlign: TextAlign.center, style: rastStyle(size: 12, weight: 450, height: 1.9, color: c.isDark ? c.body : const Color(0xFF777783))),
+                        Text('You liked each other.\nSee where a hello takes you.', textAlign: TextAlign.center, style: rastStyle(size: 12, weight: 450, height: 1.9, color: c.body)),
                       ],
                     ),
                   ),
@@ -142,11 +142,11 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 11),
                               decoration: BoxDecoration(
-                                color: c.isDark ? const Color(0xFF302320) : const Color(0xFFFFF6F2),
+                                color: c.accentContainer,
                                 borderRadius: BorderRadius.circular(22),
                                 border: Border.all(color: c.isDark ? const Color(0xFF865244) : const Color(0xFFFFDACE)),
                               ),
-                              child: Text('“Shall we start with a hello?”', style: rastStyle(size: 12, weight: 500, color: c.isDark ? const Color(0xFFF2B2A0) : const Color(0xFFDD735C))),
+                              child: Text('“Shall we start with a hello?”', style: rastStyle(size: 12, weight: 500, color: c.onAccentContainer)),
                             ),
                           ),
                         ),
@@ -178,7 +178,7 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
                         cursorColor: c.accent,
                         decoration: InputDecoration(
                           hintText: 'Say something good...',
-                          hintStyle: rastStyle(size: 16, weight: 450, color: c.isDark ? const Color(0xFF94909C) : const Color(0xFFB3B3BE)),
+                          hintStyle: rastStyle(size: 16, weight: 450, color: c.placeholder),
                           counterText: '',
                           filled: true,
                           fillColor: c.inputFill,
@@ -248,7 +248,7 @@ class MessageBubble extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(message.time, style: rastStyle(size: 10, weight: 450, height: 1, color: own ? const Color(0xFFFFCFC6) : (c.isDark ? const Color(0xFFB3A7BC) : const Color(0xFF797984)))),
+                Text(message.time, style: rastStyle(size: 10, weight: 450, height: 1, color: own ? const Color(0xFFFFCFC6) : c.body)),
                 if (own) ...[const SizedBox(width: 4), const RastIcon('check', size: 11, color: Color(0xFFFFCFC6))],
               ],
             ),

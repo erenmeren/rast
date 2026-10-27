@@ -58,12 +58,12 @@ class ProfilePage extends ConsumerWidget {
                           Text.rich(
                             TextSpan(
                               text: profile.age == null ? '—' : ageLabel(profile.age!),
-                              children: [TextSpan(text: '  years old', style: rastStyle(size: 13, weight: 500, letterSpacing: 0, color: c.isDark ? c.body : const Color(0xFF9999A5)))],
+                              children: [TextSpan(text: '  years old', style: rastStyle(size: 13, weight: 500, letterSpacing: 0, color: c.body))],
                             ),
                             style: rastStyle(size: 34, weight: 800, height: 1, letterSpacing: -1.3, color: c.text),
                           ),
                           const SizedBox(height: 6),
-                          Text(profile.genderDisplay ?? 'Good being you.', style: rastStyle(size: 12, weight: 450, color: c.isDark ? c.body : const Color(0xFF7B7B86))),
+                          Text(profile.genderDisplay ?? 'Good being you.', style: rastStyle(size: 12, weight: 450, color: c.body)),
                           const SizedBox(height: 10),
                           Pill(
                             label: active ? 'Open to encounters' : 'Visibility paused',
@@ -80,12 +80,12 @@ class ProfilePage extends ConsumerWidget {
               Semantics(
                 button: true,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(Radii.card),
                   onTap: () => context.push('/profile/plus'),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 17),
+                    padding: const EdgeInsets.all(Space.l),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(Radii.card),
                       gradient: LinearGradient(colors: [c.plusGradientStart, c.plusGradientEnd]),
                     ),
                     child: Row(
@@ -107,7 +107,7 @@ class ProfilePage extends ConsumerWidget {
                             ],
                           ),
                         ),
-                        RastIcon('arrow', size: 17, color: c.isDark ? const Color(0xFFEAB09B) : const Color(0xFFB46C4D)),
+                        RastIcon('arrow', size: 17, color: c.onPlusStrong),
                       ],
                     ),
                   ),
@@ -118,8 +118,8 @@ class ProfilePage extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text.rich(
-                    TextSpan(text: 'Your photos', children: [TextSpan(text: '  $n/4', style: rastStyle(size: 9, weight: 500, letterSpacing: 0, color: c.isDark ? c.body : const Color(0xFFB1B1BC)))]),
-                    style: rastStyle(size: 11, weight: 700, color: c.isDark ? c.label : const Color(0xFF696974)),
+                    TextSpan(text: 'Your photos', children: [TextSpan(text: '  $n/4', style: rastStyle(size: 9, weight: 500, letterSpacing: 0, color: c.body))]),
+                    style: rastStyle(size: 11, weight: 700, color: c.label),
                   ),
                   TextLinkButton(label: 'Edit', size: 11, color: c.accent, onPressed: () => context.push('/profile/photos')),
                 ],
@@ -135,12 +135,12 @@ class ProfilePage extends ConsumerWidget {
                           height: 92,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(11),
-                            color: profile.photos[i] == null ? (c.isDark ? const Color(0xFF242127) : const Color(0xFFF8F8FA)) : null,
-                            border: profile.photos[i] == null ? Border.all(color: c.isDark ? const Color(0xFF645361) : const Color(0xFFDDDDE6)) : null,
+                            color: profile.photos[i] == null ? c.raised : null,
+                            border: profile.photos[i] == null ? Border.all(color: c.placeholder) : null,
                           ),
                           clipBehavior: Clip.antiAlias,
                           child: profile.photos[i] == null
-                              ? Center(child: Text('+', style: rastStyle(size: 13, weight: 500, color: c.isDark ? const Color(0xFFC5B3C6) : const Color(0xFFAAAAB5))))
+                              ? Center(child: Text('+', style: rastStyle(size: 13, weight: 500, color: c.placeholder)))
                               : PhotoImage(profile.photos[i]!, alignment: const Alignment(0, -0.32)),
                         ),
                       ),
@@ -155,7 +155,7 @@ class ProfilePage extends ConsumerWidget {
               MenuRow(label: 'Notifications', detail: settings.notifications ? 'On' : 'Off', icon: 'bell', onTap: () => showNotificationsSheet(context, ref)),
               MenuRow(label: 'Safety & account', detail: 'Your boundaries matter', icon: 'shield', onTap: () => context.go('/profile/safety')),
               const SizedBox(height: 26),
-              Center(child: Text('rast · A LITTLE CLOSER', style: rastStyle(size: 8, weight: 500, letterSpacing: 1.2, color: c.isDark ? c.body : const Color(0xFFC0C0CA)))),
+              Center(child: Text('rast · A LITTLE CLOSER', style: rastStyle(size: 8, weight: 500, letterSpacing: 1.2, color: c.body))),
             ],
           ),
               ),

@@ -67,7 +67,7 @@ class RastTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: (style ?? RastText.input(c)).copyWith(
-          color: c.isDark ? const Color(0xFF94909C) : const Color(0xFFC4C4CC),
+          color: c.placeholder,
         ),
         counterText: '',
         filled: true,
@@ -76,15 +76,15 @@ class RastTextField extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         constraints: const BoxConstraints(minHeight: 54),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(Radii.card),
           borderSide: BorderSide(color: c.inputBorder),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(Radii.card),
           borderSide: BorderSide(color: c.accent, width: 1.5),
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(Radii.card),
           borderSide: BorderSide(color: c.inputBorder),
         ),
       ),
@@ -166,7 +166,7 @@ class OptionCheck extends StatelessWidget {
                 onChanged: (v) => onChanged(v ?? false),
                 activeColor: c.accent,
                 checkColor: c.onPrimary,
-                side: BorderSide(color: c.isDark ? const Color(0xFF6B6672) : const Color(0xFFB8B8C2)),
+                side: BorderSide(color: c.placeholder),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 visualDensity: VisualDensity.compact,
@@ -174,7 +174,7 @@ class OptionCheck extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(label, style: rastStyle(size: 12, weight: 450, height: 1.6, color: c.isDark ? c.body : const Color(0xFF73737E))),
+              child: Text(label, style: rastStyle(size: 12, weight: 450, height: 1.6, color: c.body)),
             ),
           ],
         ),

@@ -29,13 +29,13 @@ Future<void> showBlockedProfilesSheet(BuildContext context, WidgetRef ref) {
             for (final id in safety.blocked)
               if (ref.person(id) case final p?)
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: Space.l),
                   decoration: BoxDecoration(border: Border(bottom: BorderSide(color: c.outline))),
                   child: Row(
                     children: [
                       Avatar(p.photo, size: 54),
                       const SizedBox(width: 12),
-                      Expanded(child: Text('${p.age} years old', style: rastStyle(size: 15, weight: 750, color: c.isDark ? c.label : const Color(0xFF4A4A56)))),
+                      Expanded(child: Text('${p.age} years old', style: rastStyle(size: 15, weight: 750, color: c.label))),
                       TextLinkButton(
                         label: 'Unblock',
                         onPressed: () {
@@ -74,7 +74,7 @@ Future<void> showRemovedConnectionsSheet(BuildContext context, WidgetRef ref) {
             for (final id in safety.disconnected)
               if (ref.person(id) case final p?)
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: Space.l),
                   decoration: BoxDecoration(border: Border(bottom: BorderSide(color: c.outline))),
                   child: Row(
                     children: [
@@ -84,9 +84,9 @@ Future<void> showRemovedConnectionsSheet(BuildContext context, WidgetRef ref) {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('${ageLabel(p.age)} · Connection removed', style: rastStyle(size: 15, weight: 750, color: c.isDark ? c.label : const Color(0xFF4A4A56))),
+                            Text('${ageLabel(p.age)} · Connection removed', style: rastStyle(size: 15, weight: 750, color: c.label)),
                             const SizedBox(height: 6),
-                            Text(safety.hasReport(id) ? 'Report saved in this preview' : 'No future matching', style: rastStyle(size: 13, weight: 450, color: c.isDark ? c.body : const Color(0xFF7A7A87))),
+                            Text(safety.hasReport(id) ? 'Report saved in this preview' : 'No future matching', style: rastStyle(size: 13, weight: 450, color: c.body)),
                           ],
                         ),
                       ),

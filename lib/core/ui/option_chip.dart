@@ -15,9 +15,9 @@ class OptionChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final border = selected ? c.accent : (c.isDark ? const Color(0xFF45424C) : const Color(0xFFE7E7EC));
-    final bg = selected ? c.accentContainer : (c.isDark ? const Color(0xFF212228) : c.canvas);
-    final fg = selected ? c.onAccentContainer : (c.isDark ? const Color(0xFFC3BEC8) : const Color(0xFF64646F));
+    final border = selected ? c.accent : c.outline;
+    final bg = selected ? c.accentContainer : (c.isDark ? c.raised : c.canvas);
+    final fg = selected ? c.onAccentContainer : c.body;
     return Semantics(
       button: true,
       selected: selected,

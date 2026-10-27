@@ -23,7 +23,7 @@ class AgeRangeSlider extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Age range', style: rastStyle(size: 14, weight: 700, color: c.isDark ? c.label : const Color(0xFF50505B))),
+            Text('Age range', style: rastStyle(size: 14, weight: 700, color: c.label)),
             Text(
               '$lo–${ageLabel(hi)}',
               key: const Key('age-range-label'),
@@ -36,7 +36,7 @@ class AgeRangeSlider extends StatelessWidget {
           data: SliderThemeData(
             trackHeight: 4,
             activeTrackColor: c.accent,
-            inactiveTrackColor: c.isDark ? const Color(0xFF43404A) : const Color(0xFFEBEBEF),
+            inactiveTrackColor: c.outline,
             rangeThumbShape: _RingThumb(c),
             overlayColor: c.accent.withValues(alpha: 0.12),
             rangeTrackShape: const RoundedRectRangeSliderTrackShape(),
@@ -62,8 +62,8 @@ class AgeRangeSlider extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('18', style: rastStyle(size: 12, weight: 450, color: c.isDark ? c.body : const Color(0xFF7B7B87))),
-            Text('99+', style: rastStyle(size: 12, weight: 450, color: c.isDark ? c.body : const Color(0xFF7B7B87))),
+            Text('18', style: rastStyle(size: 12, weight: 450, color: c.body)),
+            Text('99+', style: rastStyle(size: 12, weight: 450, color: c.body)),
           ],
         ),
       ],
@@ -94,7 +94,7 @@ class _RingThumb extends RangeSliderThumbShape {
   }) {
     final canvas = context.canvas;
     canvas.drawCircle(center + const Offset(0, 2), 12.5, Paint()..color = const Color(0x26DC4C34)..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3));
-    canvas.drawCircle(center, 12.5, Paint()..color = c.isDark ? const Color(0xFF262329) : Colors.white);
+    canvas.drawCircle(center, 12.5, Paint()..color = c.isDark ? c.raised : Colors.white);
     canvas.drawCircle(
       center,
       11,

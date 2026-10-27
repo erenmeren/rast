@@ -214,9 +214,9 @@ class _ReportOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final border = selected ? c.accent : (c.isDark ? const Color(0xFF45404B) : c.outline);
-    final bg = selected ? (c.isDark ? const Color(0xFF382822) : const Color(0xFFFFF1EB)) : (c.isDark ? const Color(0xFF24242A) : Colors.transparent);
-    final fg = selected ? c.accent : (c.isDark ? const Color(0xFFC7C0CB) : const Color(0xFF6A6A78));
+    final border = selected ? c.accent : c.outline;
+    final bg = selected ? c.accentContainer : (c.isDark ? c.raised : Colors.transparent);
+    final fg = selected ? c.accent : c.body;
     return Semantics(
       button: true,
       selected: selected,

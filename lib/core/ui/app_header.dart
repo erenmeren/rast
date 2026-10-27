@@ -33,12 +33,12 @@ class AppHeader extends StatelessWidget {
               margin: const EdgeInsets.only(right: Space.s),
               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 6),
               decoration: BoxDecoration(
-                color: c.isDark ? c.accentContainer : const Color(0xFFFFEBE4),
+                color: c.accentContainer,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
                 'PLUS',
-                style: rastStyle(size: 8, weight: 800, letterSpacing: 1, color: c.isDark ? c.accent : const Color(0xFFD6533E)),
+                style: rastStyle(size: 8, weight: 800, letterSpacing: 1, color: c.onAccentContainer),
               ),
             ),
           IconCircleButton(

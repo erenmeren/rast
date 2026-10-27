@@ -33,6 +33,7 @@ class RastColors extends ThemeExtension<RastColors> {
     required this.error,
     required this.darkStage,
     required this.iconMuted,
+    required this.placeholder,
     required this.statusActiveBg,
     required this.statusActiveFg,
     required this.plusGradientStart,
@@ -72,6 +73,9 @@ class RastColors extends ThemeExtension<RastColors> {
   /// Welcome and Match backgrounds: dark in both appearances.
   final Color darkStage;
   final Color iconMuted;
+
+  /// Hint text, empty-slot labels and faint chevrons.
+  final Color placeholder;
   final Color statusActiveBg;
   final Color statusActiveFg;
   final Color plusGradientStart;
@@ -109,6 +113,7 @@ class RastColors extends ThemeExtension<RastColors> {
     error: Color(0xFFD7443D),
     darkStage: Color(0xFF202124),
     iconMuted: Color(0xFF9A9AA7),
+    placeholder: Color(0xFFB8B8C2),
     statusActiveBg: Color(0xFFECF8F0),
     statusActiveFg: Color(0xFF5FA57A),
     plusGradientStart: Color(0xFFFFE4D5),
@@ -147,6 +152,7 @@ class RastColors extends ThemeExtension<RastColors> {
     error: Color(0xFFFF9C91),
     darkStage: Color(0xFF151619),
     iconMuted: Color(0xFFAFA1B2),
+    placeholder: Color(0xFF94909C),
     statusActiveBg: Color(0xFF25372B),
     statusActiveFg: Color(0xFF9CD5AD),
     plusGradientStart: Color(0xFF3E2B23),
@@ -194,6 +200,7 @@ class RastColors extends ThemeExtension<RastColors> {
       error: l(error, other.error),
       darkStage: l(darkStage, other.darkStage),
       iconMuted: l(iconMuted, other.iconMuted),
+      placeholder: l(placeholder, other.placeholder),
       statusActiveBg: l(statusActiveBg, other.statusActiveBg),
       statusActiveFg: l(statusActiveFg, other.statusActiveFg),
       plusGradientStart: l(plusGradientStart, other.plusGradientStart),

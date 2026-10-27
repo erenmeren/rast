@@ -25,7 +25,7 @@ class SubHeader extends StatelessWidget {
       center: Text(
         title,
         textAlign: TextAlign.center,
-        style: rastStyle(size: 13, weight: 700, color: c.isDark ? c.label : const Color(0xFF595964)),
+        style: rastStyle(size: 13, weight: 700, color: c.label),
       ),
       trailing: step > 0
           ? HeaderInset(
@@ -42,7 +42,7 @@ class SubHeader extends StatelessWidget {
                           width: 16,
                           height: 3,
                           decoration: BoxDecoration(
-                            color: n <= step ? c.accent : (c.isDark ? const Color(0xFF3B3943) : const Color(0xFFEEEEF1)),
+                            color: n <= step ? c.accent : c.outline,
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),

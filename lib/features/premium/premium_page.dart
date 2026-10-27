@@ -99,15 +99,15 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                       Text(
                         'Example prices. Demo upgrade only — no charge.\nIn a live subscription, the selected plan would renew until cancelled.',
                         textAlign: TextAlign.center,
-                        style: rastStyle(size: 10, weight: 450, height: 1.6, color: c.isDark ? c.body : const Color(0xFF7B707D)),
+                        style: rastStyle(size: 10, weight: 450, height: 1.6, color: c.body),
                       ),
                       TextLinkButton(label: 'Restore purchases', size: 11, onPressed: () => showToast(context, 'This is a demo. There are no purchases to restore.')),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          RastIcon('shield', size: 10, color: c.isDark ? c.body : const Color(0xFF817581)),
+                          RastIcon('shield', size: 10, color: c.body),
                           const SizedBox(width: 5),
-                          Text('Your privacy delay always comes first.', style: rastStyle(size: 10, weight: 450, color: c.isDark ? c.body : const Color(0xFF817581))),
+                          Text('Your privacy delay always comes first.', style: rastStyle(size: 10, weight: 450, color: c.body)),
                         ],
                       ),
                     ],
@@ -131,9 +131,9 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: rastStyle(size: 14, weight: 750, color: c.isDark ? c.label : const Color(0xFF4C4651))),
+                  Text(title, style: rastStyle(size: 14, weight: 750, color: c.label)),
                   const SizedBox(height: 4),
-                  Text(text, style: rastStyle(size: 12, weight: 450, color: c.isDark ? c.body : const Color(0xFF7B7480))),
+                  Text(text, style: rastStyle(size: 12, weight: 450, color: c.body)),
                 ],
               ),
             ),
@@ -154,7 +154,7 @@ class _Art extends StatelessWidget {
             width: w,
             height: h,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(Radii.card),
               border: Border.all(color: c.isDark ? const Color(0xFF4A3834) : Colors.white, width: 3),
               boxShadow: const [BoxShadow(color: Color(0x209D5C3C), blurRadius: 15, offset: Offset(0, 5))],
             ),
@@ -211,8 +211,8 @@ class _Plan extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final border = selected ? c.accent : (c.isDark ? const Color(0xFF51424B) : const Color(0xFFE4E4EB));
-    final bg = selected ? (c.isDark ? const Color(0xFF382621) : const Color(0xFFFFF5EF)) : (c.isDark ? const Color(0xFF231F25) : Colors.white);
+    final border = selected ? c.accent : c.outline;
+    final bg = selected ? c.accentContainer : (c.isDark ? c.raised : c.canvas);
     return Semantics(
       button: true,
       selected: selected,
@@ -222,19 +222,19 @@ class _Plan extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             Container(
-              padding: const EdgeInsets.fromLTRB(11, 15, 11, 13),
-              decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(14), border: Border.all(color: border, width: 1.5)),
+              padding: const EdgeInsets.fromLTRB(Space.m, Space.l, Space.m, Space.l),
+              decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(Radii.card), border: Border.all(color: border, width: 1.5)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: rastStyle(size: 12, weight: 750, color: selected ? (c.isDark ? const Color(0xFFFFAD98) : const Color(0xFFDC6B50)) : (c.isDark ? c.body : const Color(0xFF6E6570)))),
+                  Text(name, style: rastStyle(size: 12, weight: 750, color: selected ? c.onAccentContainer : (c.body))),
                   const SizedBox(height: 6),
                   Text.rich(
-                    TextSpan(text: price, children: [TextSpan(text: ' / mo', style: rastStyle(size: 11, weight: 500, color: c.isDark ? c.body : const Color(0xFF7D7380)))]),
-                    style: rastStyle(size: 23, weight: 800, letterSpacing: -0.7, color: c.isDark ? c.label : const Color(0xFF3B3B45)),
+                    TextSpan(text: price, children: [TextSpan(text: ' / mo', style: rastStyle(size: 11, weight: 500, color: c.body))]),
+                    style: rastStyle(size: 23, weight: 800, letterSpacing: -0.7, color: c.label),
                   ),
                   const SizedBox(height: 7),
-                  Text(note, style: rastStyle(size: 10, weight: 450, color: c.isDark ? c.body : const Color(0xFF756C78))),
+                  Text(note, style: rastStyle(size: 10, weight: 450, color: c.body)),
                 ],
               ),
             ),
@@ -244,7 +244,7 @@ class _Plan extends StatelessWidget {
                 top: -9,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                  decoration: BoxDecoration(color: c.isDark ? c.primary : const Color(0xFFCA4331), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: c.primary, borderRadius: BorderRadius.circular(12)),
                   child: Text(save!, style: rastStyle(size: 9, weight: 800, letterSpacing: 0.5, color: Colors.white)),
                 ),
               ),

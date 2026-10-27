@@ -19,8 +19,8 @@ Future<void> showEncounterSummarySheet(BuildContext context) {
             height: 137,
             margin: const EdgeInsets.symmetric(vertical: 19),
             decoration: BoxDecoration(
-              color: c.isDark ? const Color(0xFF30251F) : const Color(0xFFFFF6F0),
-              borderRadius: BorderRadius.circular(15),
+              color: c.accentContainer,
+              borderRadius: BorderRadius.circular(Radii.card),
               border: Border.all(color: c.isDark ? const Color(0xFF79553F) : const Color(0xFFFFE4D6)),
             ),
             child: Stack(

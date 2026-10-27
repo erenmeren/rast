@@ -26,8 +26,8 @@ void showToast(BuildContext context, String message) {
             padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 14),
             decoration: BoxDecoration(
               color: c.toastBg,
-              borderRadius: BorderRadius.circular(14),
-              border: c.isDark ? Border.all(color: const Color(0xFF635662)) : null,
+              borderRadius: BorderRadius.circular(Radii.card),
+              border: c.isDark ? Border.all(color: c.outline) : null,
               boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 20, offset: Offset(0, 8))],
             ),
             child: Row(
@@ -35,7 +35,7 @@ void showToast(BuildContext context, String message) {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 2),
-                  child: RastIcon('check', size: 15, color: c.isDark ? c.accent : const Color(0xFFFF9176)),
+                  child: RastIcon('check', size: 15, color: c.accent),
                 ),
                 const SizedBox(width: 9),
                 Expanded(

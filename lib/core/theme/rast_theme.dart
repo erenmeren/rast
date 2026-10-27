@@ -24,6 +24,11 @@ abstract final class Space {
   static const double page = 24;
 }
 
+/// Corner radii. Cards, boxes and fields share one.
+abstract final class Radii {
+  static const double card = 14;
+}
+
 FontWeight _bucket(int weight) {
   if (weight < 350) return FontWeight.w300;
   if (weight < 450) return FontWeight.w400;
@@ -80,13 +85,13 @@ abstract final class RastText {
   static TextStyle eyebrow(RastColors c, {Color? color}) =>
       rastStyle(size: 10, weight: 750, letterSpacing: 1.3, color: color ?? c.menuDetail);
   static TextStyle kicker(RastColors c) =>
-      rastStyle(size: 10, weight: 800, letterSpacing: 1.7, color: c.isDark ? c.accent : const Color(0xFFC24533));
+      rastStyle(size: 10, weight: 800, letterSpacing: 1.7, color: c.isDark ? c.accent : c.primary);
   static TextStyle help(RastColors c) =>
-      rastStyle(size: 12, weight: 450, height: 1.8, color: c.isDark ? c.body : const Color(0xFF747480));
+      rastStyle(size: 12, weight: 450, height: 1.8, color: c.body);
   static TextStyle error(RastColors c) =>
       rastStyle(size: 13, weight: 500, height: 1.65, color: c.error);
   static TextStyle tiny(RastColors c) =>
-      rastStyle(size: 11, weight: 450, height: 1.8, color: c.isDark ? c.body : const Color(0xFF73737E));
+      rastStyle(size: 11, weight: 450, height: 1.8, color: c.body);
   static TextStyle sheetTitle(RastColors c) =>
       rastStyle(size: 26, weight: 800, height: 1.2, letterSpacing: -0.9, color: c.isDark ? c.label : const Color(0xFF35353F));
   static TextStyle pageSubtitle(RastColors c) =>

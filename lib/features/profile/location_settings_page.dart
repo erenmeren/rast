@@ -99,7 +99,7 @@ class LocationSettingsPage extends ConsumerWidget {
                               children: [
                                 RastIcon('locate', size: 16, color: c.accent),
                                 const SizedBox(width: 8),
-                                Expanded(child: Text('Location access', style: rastStyle(size: 14, weight: 750, color: c.isDark ? c.label : const Color(0xFF555562)))),
+                                Expanded(child: Text('Location access', style: rastStyle(size: 14, weight: 750, color: c.label))),
                                 Pill(label: s.locationEnabled ? 'Enabled' : 'Off', accent: s.locationEnabled),
                               ],
                             ),
@@ -121,7 +121,7 @@ class LocationSettingsPage extends ConsumerWidget {
     );
   }
 
-  static TextStyle _copy(RastColors c) => rastStyle(size: 12, weight: 450, height: 1.9, color: c.isDark ? c.body : const Color(0xFF757582));
+  static TextStyle _copy(RastColors c) => rastStyle(size: 12, weight: 450, height: 1.9, color: c.body);
 }
 
 class _Section extends StatelessWidget {
@@ -134,7 +134,7 @@ class _Section extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 22),
+      padding: const EdgeInsets.symmetric(vertical: Space.l),
       decoration: BoxDecoration(border: Border(top: BorderSide(color: c.outline))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,7 +143,7 @@ class _Section extends StatelessWidget {
             Row(
               children: [
                 if (icon != null) ...[RastIcon(icon!, size: 16, color: c.accent), const SizedBox(width: 8)],
-                Text(title!, style: rastStyle(size: 14, weight: 750, color: c.isDark ? c.label : const Color(0xFF555562))),
+                Text(title!, style: rastStyle(size: 14, weight: 750, color: c.label)),
               ],
             ),
             const SizedBox(height: 15),

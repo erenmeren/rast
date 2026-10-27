@@ -15,7 +15,7 @@ class RastSwitch extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     final on = c.isDark ? c.primary : c.accent;
-    final off = c.isDark ? const Color(0xFF514A56) : const Color(0xFFE3E3E9);
+    final off = c.outline;
     return Semantics(
       toggled: value,
       label: semanticLabel,
@@ -73,9 +73,9 @@ class ToggleRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: rastStyle(size: 14, weight: 750, color: c.isDark ? c.label : const Color(0xFF555561))),
+              Text(title, style: rastStyle(size: 14, weight: 750, color: c.label)),
               const SizedBox(height: 6),
-              Text(text, style: rastStyle(size: 12, weight: 450, height: 1.6, color: c.isDark ? c.body : const Color(0xFF797985))),
+              Text(text, style: rastStyle(size: 12, weight: 450, height: 1.6, color: c.body)),
             ],
           ),
         ),

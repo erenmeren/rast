@@ -166,10 +166,10 @@ class _DiscoverPageState extends ConsumerState<DiscoverPage> {
                               width: 30,
                               height: 30,
                               decoration: BoxDecoration(
-                                color: active ? c.statusActiveBg : (c.isDark ? const Color(0xFF2B2830) : const Color(0xFFF6F6F8)),
+                                color: active ? c.statusActiveBg : c.raised,
                                 shape: BoxShape.circle,
                               ),
-                              child: Center(child: RastIcon(active ? 'locate' : 'pause', size: 14, color: active ? c.statusActiveFg : (c.isDark ? const Color(0xFFA59CAA) : const Color(0xFFACACB7)))),
+                              child: Center(child: RastIcon(active ? 'locate' : 'pause', size: 14, color: active ? c.statusActiveFg : c.placeholder)),
                             ),
                           ),
                         ),
@@ -207,7 +207,7 @@ class _RoundAction extends StatelessWidget {
         opacity: enabled ? 1 : 0.4,
         child: Material(
           color: c.isDark ? c.raised : Colors.white,
-          shape: CircleBorder(side: BorderSide(color: c.isDark ? const Color(0xFF403D47) : (size > 40 ? const Color(0xFFE9E9EE) : const Color(0xFFF0F0F3)))),
+          shape: CircleBorder(side: BorderSide(color: c.outline)),
           elevation: size > 40 ? 1 : 0,
           shadowColor: const Color(0x0A181823),
           child: InkWell(
@@ -216,7 +216,7 @@ class _RoundAction extends StatelessWidget {
             child: SizedBox(
               width: size < 48 ? 48 : size,
               height: size < 48 ? 48 : size,
-              child: Center(child: RastIcon(icon, size: iconSize, color: size > 40 ? (c.isDark ? const Color(0xFFC9C1CD) : const Color(0xFF50515C)) : (c.isDark ? const Color(0xFFC9C1CD) : const Color(0xFFB8B8C2)))),
+              child: Center(child: RastIcon(icon, size: iconSize, color: size > 40 ? c.label : c.placeholder)),
             ),
           ),
         ),

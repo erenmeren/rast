@@ -72,7 +72,7 @@ class LikesPage extends ConsumerWidget {
                             if (unlocked)
                               Padding(
                                 padding: const EdgeInsets.only(top: 12),
-                                child: Text('Tap a profile to like them back or pass.', textAlign: TextAlign.center, style: rastStyle(size: 11, weight: 450, height: 1.7, color: c.isDark ? const Color(0xFFACA4B3) : const Color(0xFF797986))),
+                                child: Text('Tap a profile to like them back or pass.', textAlign: TextAlign.center, style: rastStyle(size: 11, weight: 450, height: 1.7, color: c.body)),
                               )
                             else
                               _Upsell(onTap: () => context.push('/likes/plus')),
@@ -249,11 +249,11 @@ class _Upsell extends StatelessWidget {
         const SizedBox(height: 9),
         Text('Curiosity looks\ngood on you.', textAlign: TextAlign.center, style: rastStyle(size: 27, weight: 800, height: 1.17, letterSpacing: -0.9, color: c.text)),
         const SizedBox(height: 9),
-        Text("See who's already interested.\nFind your next connection faster.", textAlign: TextAlign.center, style: rastStyle(size: 13, weight: 450, height: 1.8, color: c.isDark ? c.body : const Color(0xFF777784))),
+        Text("See who's already interested.\nFind your next connection faster.", textAlign: TextAlign.center, style: rastStyle(size: 13, weight: 450, height: 1.8, color: c.body)),
         const SizedBox(height: 17),
         PrimaryButton(label: 'See who likes you', onPressed: onTap),
         const SizedBox(height: 12),
-        Text('You can still match for free in Discover.', textAlign: TextAlign.center, style: rastStyle(size: 11, weight: 450, height: 1.7, color: c.isDark ? const Color(0xFFACA4B3) : const Color(0xFF797986))),
+        Text('You can still match for free in Discover.', textAlign: TextAlign.center, style: rastStyle(size: 11, weight: 450, height: 1.7, color: c.body)),
       ],
     );
   }

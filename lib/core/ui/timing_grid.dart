@@ -32,9 +32,9 @@ class TimingGrid<T> extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
-          color: c.isDark ? const Color(0xFF222329) : const Color(0xFFF4F4F7),
-          borderRadius: BorderRadius.circular(13),
-          border: c.isDark ? Border.all(color: const Color(0xFF303038)) : null,
+          color: c.raised,
+          borderRadius: BorderRadius.circular(Radii.card),
+          border: c.isDark ? Border.all(color: c.outline) : null,
         ),
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -77,7 +77,7 @@ class _Cell<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final fg = selected ? Colors.white : (c.isDark ? const Color(0xFFBBB4C1) : const Color(0xFF777783));
+    final fg = selected ? Colors.white : c.body;
     return Semantics(
       button: true,
       selected: selected,

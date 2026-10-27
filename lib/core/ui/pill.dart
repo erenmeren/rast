@@ -18,13 +18,13 @@ class Pill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final fg = accent ? (c.isDark ? c.accent : const Color(0xFFD95641)) : (c.isDark ? const Color(0xFFBAB6C0) : c.body);
+    final fg = accent ? c.onAccentContainer : c.body;
     final child = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
         color: accent ? c.accentContainer : Colors.transparent,
         borderRadius: BorderRadius.circular(30),
-        border: accent ? null : Border.all(color: c.isDark ? const Color(0xFF4B4851) : c.outline),
+        border: accent ? null : Border.all(color: c.outline),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

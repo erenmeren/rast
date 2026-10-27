@@ -20,7 +20,7 @@ Future<T?> showRastSheet<T>(
     barrierColor: c.isDark ? const Color(0xB807080C) : const Color(0x5523232F),
     shape: RoundedRectangleBorder(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(27)),
-      side: c.isDark ? const BorderSide(color: Color(0xFF3A3740)) : BorderSide.none,
+      side: c.isDark ? BorderSide(color: c.outline) : BorderSide.none,
     ),
     constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.93),
     builder: (sheetContext) => _SheetBody(title: title, child: Builder(builder: builder)),
@@ -51,7 +51,7 @@ class _SheetBody extends StatelessWidget {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
-                  color: c.isDark ? const Color(0xFF605A66) : const Color(0xFFE2E2E9),
+                  color: c.outline,
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -99,10 +99,10 @@ class PolicySection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (heading != null) ...[
-            Text(heading!, style: rastStyle(size: 14, weight: 750, color: c.isDark ? c.label : const Color(0xFF4E4E5B))),
+            Text(heading!, style: rastStyle(size: 14, weight: 750, color: c.label)),
             const SizedBox(height: 4),
           ],
-          Text(text, style: rastStyle(size: 13, weight: 450, height: 1.9, color: c.isDark ? c.body : const Color(0xFF70707C))),
+          Text(text, style: rastStyle(size: 13, weight: 450, height: 1.9, color: c.body)),
         ],
       ),
     );

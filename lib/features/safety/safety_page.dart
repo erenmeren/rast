@@ -33,16 +33,16 @@ class SafetyPage extends ConsumerWidget {
                   children: [
                     Container(
                       margin: const EdgeInsets.only(bottom: Space.xl),
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(color: c.isDark ? const Color(0xFF332622) : const Color(0xFFFFF2ED), borderRadius: BorderRadius.circular(15)),
+                      padding: const EdgeInsets.all(Space.l),
+                      decoration: BoxDecoration(color: c.accentContainer, borderRadius: BorderRadius.circular(Radii.card)),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           RastIcon('shield', size: 22, color: c.accent),
                           const SizedBox(height: 12),
-                          Text('Your boundaries matter.', style: rastStyle(size: 22, weight: 800, letterSpacing: -0.7, color: c.isDark ? const Color(0xFFFFC2AA) : const Color(0xFFA8624C))),
+                          Text('Your boundaries matter.', style: rastStyle(size: 22, weight: 800, letterSpacing: -0.7, color: c.onPlusStrong)),
                           const SizedBox(height: 9),
-                          Text("Remove a connection for good, block a profile, or report something that doesn't feel right.", style: rastStyle(size: 12, weight: 450, height: 1.75, color: c.isDark ? const Color(0xFFD9B2A3) : const Color(0xFFC19B8C))),
+                          Text("Remove a connection for good, block a profile, or report something that doesn't feel right.", style: rastStyle(size: 12, weight: 450, height: 1.75, color: c.onPlusSoft)),
                         ],
                       ),
                     ),

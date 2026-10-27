@@ -41,7 +41,7 @@ class _Slot extends StatelessWidget {
       button: true,
       label: '${filled ? 'Change' : 'Add'} photo ${index + 1}',
       child: Material(
-        color: c.isDark ? const Color(0xFF232429) : const Color(0xFFF5F5F8),
+        color: c.raised,
         borderRadius: BorderRadius.circular(17),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
@@ -58,7 +58,7 @@ class _Slot extends StatelessWidget {
                   ),
                 ),
               ] else
-                CustomPaint(painter: _DashedBorder(c.isDark ? const Color(0xFF57515D) : const Color(0xFFDCDCE4))),
+                CustomPaint(painter: _DashedBorder(c.placeholder)),
               if (!filled)
                 Center(
                   child: Column(
@@ -66,7 +66,7 @@ class _Slot extends StatelessWidget {
                     children: [
                       RastIcon('plus', size: 25, color: c.accent),
                       const SizedBox(height: 8),
-                      Text('Add photo', style: rastStyle(size: 11, weight: 500, color: c.isDark ? const Color(0xFFC0B8C6) : const Color(0xFFAAAAB6))),
+                      Text('Add photo', style: rastStyle(size: 11, weight: 500, color: c.placeholder)),
                     ],
                   ),
                 ),
@@ -75,7 +75,7 @@ class _Slot extends StatelessWidget {
                 left: 11,
                 child: Text(
                   '0${index + 1}',
-                  style: rastStyle(size: 10, weight: 650, color: filled ? Colors.white : (c.isDark ? const Color(0xFFAFA7B5) : const Color(0xFFB1B1BC))),
+                  style: rastStyle(size: 10, weight: 650, color: filled ? Colors.white : c.placeholder),
                 ),
               ),
               if (filled)
@@ -110,7 +110,7 @@ class _Slot extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                     decoration: BoxDecoration(color: c.isDark ? const Color(0xED262127) : Colors.white, borderRadius: BorderRadius.circular(20)),
-                    child: Text('MAIN PHOTO', style: rastStyle(size: 8, weight: 800, letterSpacing: 0.5, color: c.isDark ? const Color(0xFFFFAD9D) : c.accent)),
+                    child: Text('MAIN PHOTO', style: rastStyle(size: 8, weight: 800, letterSpacing: 0.5, color: c.accent)),
                   ),
                 ),
             ],

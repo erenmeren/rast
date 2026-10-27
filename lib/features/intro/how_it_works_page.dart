@@ -328,7 +328,7 @@ class _Chapter extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Text(label, maxLines: 2, style: rastStyle(size: 12, weight: active ? 800 : 650, height: 1.35, color: active ? p.chapterActive : p.chapterFg)),
+              Text(label, maxLines: 2, style: rastStyle(size: 11, weight: active ? 800 : 650, height: 1.35, letterSpacing: -0.2, color: active ? p.chapterActive : p.chapterFg)),
             ],
           ),
         ),
