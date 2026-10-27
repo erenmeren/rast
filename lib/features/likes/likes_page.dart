@@ -33,28 +33,27 @@ class LikesPage extends ConsumerWidget {
                 : 'Your next connection starts with a like.';
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 18, 24, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AppHeader(action: 'filters', premium: unlocked, onAction: () => showFiltersSheet(context, ref)),
-              Row(
-                children: [
-                  Semantics(header: true, child: Text('Likes You', style: RastText.sectionTitle(c))),
-                  if (people.isNotEmpty) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 27,
-                      height: 27,
-                      decoration: BoxDecoration(color: c.accentContainer, shape: BoxShape.circle),
-                      child: Center(child: Text('${people.length}', style: rastStyle(size: 12, weight: 800, color: c.accent))),
+        child: Column(
+          children: [
+            AppHeader(action: 'filters', premium: unlocked, onAction: () => showFiltersSheet(context, ref)),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Space.page),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    PageTitle(
+                      title: 'Likes You',
+                      subtitle: copy,
+                      badge: people.isEmpty
+                          ? null
+                          : Container(
+                              width: 27,
+                              height: 27,
+                              decoration: BoxDecoration(color: c.accentContainer, shape: BoxShape.circle),
+                              child: Center(child: Text('${people.length}', style: rastStyle(size: 12, weight: 800, color: c.accent))),
+                            ),
                     ),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 9),
-              Text(copy, style: rastStyle(size: 13, weight: 450, height: 1.7, color: c.body)),
               Expanded(
                 child: people.isEmpty
                     ? EmptyState(
@@ -65,11 +64,10 @@ class LikesPage extends ConsumerWidget {
                         onAction: () => context.go('/discover'),
                       )
                     : SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 22),
+                        padding: const EdgeInsets.only(bottom: Space.xxl),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const SizedBox(height: 23),
                             if (unlocked) _UnlockedGrid(people: people) else _LockedStack(people: people),
                             if (unlocked)
                               Padding(
@@ -82,8 +80,11 @@ class LikesPage extends ConsumerWidget {
                         ),
                       ),
               ),
-            ],
-          ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

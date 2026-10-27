@@ -37,7 +37,7 @@ class OnboardingScaffold extends StatelessWidget {
             SubHeader(title: headerTitle, step: step, onBack: onBack),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(25, 10, 25, 8),
+                padding: const EdgeInsets.fromLTRB(Space.page, 0, Space.page, Space.s),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -57,7 +57,7 @@ class OnboardingScaffold extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(25, 16, 25, 25),
+              padding: const EdgeInsets.fromLTRB(Space.page, Space.l, Space.page, Space.xxl),
               child: footer,
             ),
           ],

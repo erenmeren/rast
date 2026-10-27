@@ -34,15 +34,14 @@ class LocationSettingsPage extends ConsumerWidget {
             SubHeader(title: 'Location & visibility', onBack: () => context.canPop() ? context.pop() : context.go('/profile')),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 22),
+                padding: const EdgeInsets.fromLTRB(Space.page, 0, Space.page, Space.xxl),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 8),
-                    Semantics(header: true, child: Text('You set\nthe pace.', style: rastStyle(size: 40, weight: 800, height: 1.1, letterSpacing: -1.5, color: c.text))),
-                    const SizedBox(height: 12),
-                    Text('Your encounters. Your timing.', style: rastStyle(size: 14, weight: 450, color: c.isDark ? c.body : const Color(0xFF777783))),
-                    const SizedBox(height: 23),
+                    Semantics(header: true, child: Text('You set\nthe pace.', style: RastText.setupHeadline(c))),
+                    const SizedBox(height: Space.m),
+                    Text('Your encounters. Your timing.', style: RastText.pageSubtitle(c)),
+                    const SizedBox(height: Space.xxl),
                     _Section(
                       icon: 'locate',
                       title: 'Location update target',

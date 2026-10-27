@@ -31,15 +31,18 @@ class ProfilePage extends ConsumerWidget {
     final n = profile.photoCount;
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 18, 24, 22),
+        child: Column(
+          children: [
+            AppHeader(action: 'settings', premium: premium, onAction: () => context.go('/profile/location')),
+            Expanded(
+              child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(Space.page, 0, Space.page, Space.xxl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppHeader(action: 'settings', premium: premium, onAction: () => context.go('/profile/location')),
-              Semantics(header: true, child: Text('Your profile', style: RastText.sectionTitle(c))),
+              const PageTitle(title: 'Your profile'),
               Padding(
-                padding: const EdgeInsets.fromLTRB(4, 26, 4, 24),
+                padding: const EdgeInsets.fromLTRB(4, 0, 4, 24),
                 child: Row(
                   children: [
                     Container(
@@ -155,6 +158,9 @@ class ProfilePage extends ConsumerWidget {
               Center(child: Text('rast · A LITTLE CLOSER', style: rastStyle(size: 8, weight: 500, letterSpacing: 1.2, color: c.isDark ? c.body : const Color(0xFFC0C0CA)))),
             ],
           ),
+              ),
+            ),
+          ],
         ),
       ),
     );

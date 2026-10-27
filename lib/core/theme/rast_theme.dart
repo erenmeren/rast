@@ -19,6 +19,9 @@ abstract final class Space {
   static const double xl = 20;
   static const double xxl = 24;
   static const double xxxl = 32;
+
+  /// Horizontal page gutter. Every page, header and sheet aligns to it.
+  static const double page = 24;
 }
 
 FontWeight _bucket(int weight) {
@@ -86,6 +89,8 @@ abstract final class RastText {
       rastStyle(size: 11, weight: 450, height: 1.8, color: c.isDark ? c.body : const Color(0xFF73737E));
   static TextStyle sheetTitle(RastColors c) =>
       rastStyle(size: 26, weight: 800, height: 1.2, letterSpacing: -0.9, color: c.isDark ? c.label : const Color(0xFF35353F));
+  static TextStyle pageSubtitle(RastColors c) =>
+      rastStyle(size: 12, weight: 450, height: 1.6, color: c.body);
   static TextStyle emptyTitle(RastColors c) =>
       rastStyle(size: 27, weight: 800, height: 1.12, letterSpacing: -1, color: c.text);
 }

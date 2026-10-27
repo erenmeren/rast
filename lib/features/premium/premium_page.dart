@@ -41,24 +41,18 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
         child: SafeArea(
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(13, 6, 13, 0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconCircleButton(
-                    icon: 'back',
-                    semanticLabel: 'Back',
-                    size: 35,
-                    iconSize: 17,
-                    background: c.isDark ? const Color(0xAA3D2D2B) : const Color(0x80FFFFFF),
-                    foreground: c.isDark ? const Color(0xFFE5BFB2) : c.text,
-                    onPressed: () => context.canPop() ? context.pop() : context.go('/likes'),
-                  ),
+              HeaderBar(
+                leading: IconCircleButton(
+                  icon: 'back',
+                  semanticLabel: 'Back',
+                  background: c.isDark ? const Color(0xAA3D2D2B) : const Color(0x80FFFFFF),
+                  foreground: c.isDark ? const Color(0xFFE5BFB2) : c.text,
+                  onPressed: () => context.canPop() ? context.pop() : context.go('/likes'),
                 ),
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(25, 0, 25, 22),
+                  padding: const EdgeInsets.fromLTRB(Space.page, 0, Space.page, Space.xxl),
                   child: Column(
                     children: [
                       Row(
@@ -74,9 +68,9 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
                         ],
                       ),
                       const SizedBox(height: 15),
-                      Text('Less guessing.\nMore connecting.', textAlign: TextAlign.center, style: rastStyle(size: 33, weight: 800, height: 1.14, letterSpacing: -1.2, color: c.text)),
-                      const SizedBox(height: 9),
-                      Text("See who's already into you.", style: rastStyle(size: 14, weight: 450, color: c.isDark ? c.body : const Color(0xFF77717C))),
+                      Text('Less guessing.\nMore connecting.', textAlign: TextAlign.center, style: RastText.setupHeadline(c)),
+                      const SizedBox(height: Space.m),
+                      Text("See who's already into you.", style: RastText.pageSubtitle(c)),
                       const SizedBox(height: 22),
                       const _Art(),
                       const SizedBox(height: 7),

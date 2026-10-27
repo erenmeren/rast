@@ -27,12 +27,12 @@ class SafetyPage extends ConsumerWidget {
             SubHeader(title: 'Safety & account', onBack: () => context.canPop() ? context.pop() : context.go('/profile')),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 22),
+                padding: const EdgeInsets.fromLTRB(Space.page, 0, Space.page, Space.xxl),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      margin: const EdgeInsets.symmetric(vertical: 20),
+                      margin: const EdgeInsets.only(bottom: Space.xl),
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(color: c.isDark ? const Color(0xFF332622) : const Color(0xFFFFF2ED), borderRadius: BorderRadius.circular(15)),
                       child: Column(

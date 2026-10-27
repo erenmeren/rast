@@ -94,34 +94,35 @@ class HowItWorksPageState extends ConsumerState<HowItWorksPage> with SingleTicke
     final body = Scaffold(
       backgroundColor: p.paper,
       body: SafeArea(
-        child: AnimatedBuilder(
+        child: Column(
+          children: [
+            HeaderBar(
+              leading: HeaderInset(child: RastLogo(color: p.ink)),
+              trailing: HeaderInset(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), border: Border.all(color: p.controlBorder)),
+                  child: Row(
+                    children: [
+                      Container(width: 5, height: 5, decoration: BoxDecoration(color: p.chapterFill, shape: BoxShape.circle)),
+                      const SizedBox(width: 6),
+                      Text('Illustrative demo', style: rastStyle(size: 10, weight: 600, color: p.note)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: AnimatedBuilder(
           animation: c,
           builder: (context, _) {
             final stage = c.frame.stage;
             final step = howSteps[stage];
             return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(22, 18, 22, 24),
+              padding: const EdgeInsets.fromLTRB(Space.page, 0, Space.page, Space.xxl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      RastLogo(size: 31, color: p.ink),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), border: Border.all(color: p.controlBorder)),
-                        child: Row(
-                          children: [
-                            Container(width: 5, height: 5, decoration: BoxDecoration(color: p.chapterFill, shape: BoxShape.circle)),
-                            const SizedBox(width: 6),
-                            Text('Illustrative demo', style: rastStyle(size: 10, weight: 600, color: p.note)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
                   Text(required ? 'ONE QUICK INTRODUCTION' : 'SMALL WORLD. GOOD TIMING.', style: rastStyle(size: 10, weight: 750, letterSpacing: 1.6, color: p.note)),
                   const SizedBox(height: 9),
                   Semantics(
@@ -231,6 +232,9 @@ class HowItWorksPageState extends ConsumerState<HowItWorksPage> with SingleTicke
               ),
             );
           },
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -32,30 +32,28 @@ class MatchPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: c.darkStage,
       body: SafeArea(
-        child: LayoutBuilder(
+        child: Column(
+          children: [
+            HeaderBar(
+              leading: const HeaderInset(child: RastLogo(color: Colors.white)),
+              trailing: IconCircleButton(
+                icon: 'close',
+                semanticLabel: 'Keep exploring',
+                background: Colors.transparent,
+                border: c.isDark ? const Color(0xFF58505D) : const Color(0xFF45454B),
+                foreground: c.isDark ? const Color(0xFFE4DBE9) : const Color(0xFFDDDDDD),
+                onPressed: () => context.go('/discover'),
+              ),
+            ),
+            Expanded(
+              child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(25, 23, 25, 22),
+            padding: const EdgeInsets.fromLTRB(Space.page, 0, Space.page, Space.xxl),
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: (constraints.maxHeight - 45).clamp(0.0, double.infinity)),
+              constraints: BoxConstraints(minHeight: (constraints.maxHeight - Space.xxl).clamp(0.0, double.infinity)),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const RastLogo(size: 33, color: Colors.white),
-                      IconCircleButton(
-                        icon: 'close',
-                        semanticLabel: 'Keep exploring',
-                        size: 33,
-                        iconSize: 16,
-                        background: Colors.transparent,
-                        border: c.isDark ? const Color(0xFF58505D) : const Color(0xFF45454B),
-                        foreground: c.isDark ? const Color(0xFFE4DBE9) : const Color(0xFFDDDDDD),
-                        onPressed: () => context.go('/discover'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 6),
                   Text('THAT FEELING? MUTUAL.', style: rastStyle(size: 10, weight: 750, letterSpacing: 1.6, color: muted)),
                   const SizedBox(height: 16),
                   Semantics(
@@ -85,6 +83,9 @@ class MatchPage extends ConsumerWidget {
               ),
             ),
           ),
+              ),
+            ),
+          ],
         ),
       ),
     );

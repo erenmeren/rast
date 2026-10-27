@@ -162,6 +162,9 @@ class IconCircleButton extends StatelessWidget {
     this.border,
   });
 
+  /// Interactive area around the visible circle (handoff target).
+  static const double hitBox = 48;
+
   final String icon;
   final VoidCallback? onPressed;
   final String semanticLabel;
@@ -178,8 +181,8 @@ class IconCircleButton extends StatelessWidget {
       button: true,
       label: semanticLabel,
       child: SizedBox(
-        width: 48,
-        height: 48,
+        width: hitBox,
+        height: hitBox,
         child: Center(
           child: Material(
             color: background ?? c.raised,

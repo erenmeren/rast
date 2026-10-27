@@ -77,32 +77,34 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.fromLTRB(5, 8, 5, 15),
+            DecoratedBox(
               decoration: BoxDecoration(color: c.canvas, border: Border(bottom: BorderSide(color: c.outline))),
-              child: Row(
-                children: [
-                  IconCircleButton(icon: 'back', semanticLabel: 'Back to chats', size: 31, iconSize: 17, background: Colors.transparent, onPressed: () => context.canPop() ? context.pop() : context.go('/chats')),
-                  Avatar(person.photo, size: 38),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('${person.age} · Crossed paths', style: rastStyle(size: 14, weight: 750, color: c.isDark ? c.label : const Color(0xFF454551))),
-                        const SizedBox(height: 3),
-                        Text('Your next hello.', style: rastStyle(size: 11, weight: 450, color: c.isDark ? c.body : const Color(0xFF797984))),
-                      ],
+              child: HeaderBar(
+                leading: IconCircleButton(icon: 'back', semanticLabel: 'Back to chats', background: Colors.transparent, onPressed: () => context.canPop() ? context.pop() : context.go('/chats')),
+                center: Row(
+                  children: [
+                    Avatar(person.photo, size: 38),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${person.age} · Crossed paths', style: rastStyle(size: 14, weight: 750, color: c.isDark ? c.label : const Color(0xFF454551))),
+                          const SizedBox(height: 3),
+                          Text('Your next hello.', style: rastStyle(size: 11, weight: 450, color: c.body)),
+                        ],
+                      ),
                     ),
-                  ),
-                  IconCircleButton(icon: 'more', semanticLabel: 'Conversation options', size: 31, iconSize: 17, background: Colors.transparent, onPressed: () => showPersonMenu(context, ref, person.id, returnTo: '/chats')),
-                ],
+                  ],
+                ),
+                trailing: IconCircleButton(icon: 'more', semanticLabel: 'Conversation options', background: Colors.transparent, onPressed: () => showPersonMenu(context, ref, person.id, returnTo: '/chats')),
               ),
             ),
             Expanded(
               child: ListView(
                 controller: _scroll,
-                padding: const EdgeInsets.fromLTRB(19, 16, 19, 15),
+                padding: const EdgeInsets.fromLTRB(Space.l, Space.l, Space.l, Space.l),
                 children: [
                   Center(child: Text('TODAY', style: rastStyle(size: 10, weight: 700, letterSpacing: 1.3, color: c.isDark ? c.body : const Color(0xFF8B8B96)))),
                   const SizedBox(height: 14),
@@ -154,7 +156,7 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
               ),
             ),
             Container(
-              padding: EdgeInsets.fromLTRB(17, 12, 17, 12 + MediaQuery.viewInsetsOf(context).bottom * 0),
+              padding: const EdgeInsets.fromLTRB(Space.l, Space.m, Space.l, Space.m),
               decoration: BoxDecoration(color: c.canvas, border: Border(top: BorderSide(color: c.outline))),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,

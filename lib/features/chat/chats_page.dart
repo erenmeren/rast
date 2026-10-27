@@ -34,16 +34,16 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
     final threads = _unreadOnly ? all.where((t) => t.unread > 0).toList() : all;
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 18, 24, 22),
+        child: Column(
+          children: [
+            AppHeader(action: 'settings', premium: ref.watch(premiumProvider), onAction: () => context.go('/profile/location')),
+            Expanded(
+              child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(Space.page, 0, Space.page, Space.xxl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppHeader(action: 'settings', premium: ref.watch(premiumProvider), onAction: () => context.go('/profile/location')),
-              Semantics(header: true, child: Text('Chats', style: RastText.sectionTitle(c))),
-              const SizedBox(height: 9),
-              Text('Keep a good thing going.', style: rastStyle(size: 12, weight: 450, color: c.body)),
-              const SizedBox(height: 20),
+              const PageTitle(title: 'Chats', subtitle: 'Keep a good thing going.'),
               Container(
                 decoration: BoxDecoration(border: Border(bottom: BorderSide(color: c.outline))),
                 child: Row(
@@ -109,6 +109,9 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
               ),
             ],
           ),
+              ),
+            ),
+          ],
         ),
       ),
     );

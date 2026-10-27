@@ -75,11 +75,10 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                   ),
                 ),
                 SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(11, 9, 11, 0),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: IconCircleButton(
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: HeaderBar(
+                      leading: IconCircleButton(
                         icon: 'back',
                         semanticLabel: 'Back',
                         background: c.isDark ? const Color(0xDF222128) : const Color(0xDDFFFFFF),
@@ -90,13 +89,13 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                   ),
                 ),
                 Positioned(
-                  left: 23,
-                  bottom: 24,
+                  left: Space.page,
+                  bottom: Space.xxl,
                   child: Text(ageLabel(p.age), style: rastStyle(size: 47, weight: 800, height: 1, letterSpacing: -1.4, color: Colors.white)),
                 ),
                 Positioned(
-                  right: 20,
-                  bottom: 24,
+                  right: Space.page,
+                  bottom: Space.xxl,
                   child: Row(
                     children: [
                       _PhotoButton(icon: 'back', label: 'Previous photo', onTap: () => setState(() => _photo = (_photo + 3) % 4)),
@@ -112,7 +111,7 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
           ),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 21, 24, 24),
+              padding: const EdgeInsets.fromLTRB(Space.page, Space.xl, Space.page, Space.xxl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

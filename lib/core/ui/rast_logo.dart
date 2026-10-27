@@ -6,7 +6,10 @@ import 'rast_icon.dart';
 
 /// The "rast." wordmark with the double-circle mark.
 class RastLogo extends StatelessWidget {
-  const RastLogo({super.key, this.size = 33, this.color});
+  const RastLogo({super.key, this.size = headerSize, this.color});
+
+  /// Logo height in every page header.
+  static const double headerSize = 33;
 
   final double size;
   final Color? color;

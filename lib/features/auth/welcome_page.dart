@@ -26,23 +26,22 @@ class WelcomePage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: c.darkStage,
       body: SafeArea(
-        child: LayoutBuilder(
+        child: Column(
+          children: [
+            HeaderBar(
+              leading: const HeaderInset(child: RastLogo(color: Colors.white)),
+              trailing: HeaderInset(child: Text('A LITTLE CLOSER.', style: rastStyle(size: 9, weight: 750, letterSpacing: 1, color: c.isDark ? const Color(0xFFAAA0B0) : const Color(0xFF6F707A)))),
+            ),
+            Expanded(
+              child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(25, 25, 25, 23),
+            padding: const EdgeInsets.fromLTRB(Space.page, 0, Space.page, Space.xxl),
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: (constraints.maxHeight - 48).clamp(0.0, double.infinity)),
+              constraints: BoxConstraints(minHeight: (constraints.maxHeight - Space.xxl).clamp(0.0, double.infinity)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const RastLogo(size: 35, color: Colors.white),
-                      const SizedBox(width: 12),
-                      Flexible(child: Text('A LITTLE CLOSER.', overflow: TextOverflow.ellipsis, style: rastStyle(size: 9, weight: 750, letterSpacing: 1, color: c.isDark ? const Color(0xFFAAA0B0) : const Color(0xFF6F707A)))),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 6),
                   const _WelcomeVisual(),
                   const SizedBox(height: 26),
                   Semantics(
@@ -101,6 +100,9 @@ class WelcomePage extends ConsumerWidget {
               ),
             ),
           ),
+              ),
+            ),
+          ],
         ),
       ),
     );

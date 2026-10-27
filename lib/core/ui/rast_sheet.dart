@@ -5,7 +5,7 @@ import '../theme/rast_theme.dart';
 import 'buttons.dart';
 
 /// Modal bottom sheet with handle, title and close button. Top radius 27,
-/// side padding 23, scrollable and keyboard-aware.
+/// side padding on the page gutter, scrollable and keyboard-aware.
 Future<T?> showRastSheet<T>(
   BuildContext context, {
   required String title,
@@ -40,7 +40,7 @@ class _SheetBody extends StatelessWidget {
       duration: rastButtonDuration,
       padding: EdgeInsets.only(bottom: bottomInset),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(23, 12, 23, 28),
+        padding: const EdgeInsets.fromLTRB(Space.page, Space.m, Space.page, 28),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
