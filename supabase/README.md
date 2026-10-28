@@ -39,6 +39,7 @@ Link the project once (`supabase link --project-ref <ref>`) and run `supabase db
 | `0017_connections.sql` | `connections()`, `person_card(target)`, `blocked_accounts()`; `pair_event` joins the realtime publication |
 | `0019_followups.sql` | `disconnected_accounts()`; one `discovery_session` per account (atomic replace), seed hidden from clients; a repeated pass counts as the most recent |
 | `0018_photo_replace.sql` | one `ready` and one `uploading` photo may share a slot while a replacement is in flight; finalize retires the old one |
+| `0020_push.sql` | preferences notify flags, `device.push_token`, `push_outbox`, `app.notify` from `like_account`/`send_message`, `app.push_hook` + `pg_net` trigger to `push-send`, 7-day outbox purge |
 
 Thresholds live in the single `encounter_params` row and are provisional until Phase 0 replaces them: radius 20 m, skew 60 s, sample age 24 h, future 60 s, accuracy 50 m. Change them with an `update`, not a migration, until the field numbers are in. `app.release_due_encounters()` runs every minute under pg_cron (0011).
 
