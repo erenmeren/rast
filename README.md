@@ -116,10 +116,10 @@ Private. The bundled Plus Jakarta Sans font is licensed under the SIL Open Font 
 The app defaults to the mock. The production adapters are wired at the composition root when the build carries the flag:
 
 ```bash
-flutter run --dart-define=RAST_BACKEND=supabase
+flutter run --dart-define=RAST_BACKEND=supabase --dart-define-from-file=firebase.env.json
 ```
 
-Phone sign-in then sends a real SMS (Twilio Verify). Adapter tests against the live project use the test user and run only on demand:
+`firebase.env.json` holds the Firebase client values (`RAST_FCM_*`); with them empty the app runs without push. Phone sign-in then sends a real SMS (Twilio Verify). Adapter tests against the live project use the test user and run only on demand:
 
 ```bash
 flutter test test/live --concurrency=1 --dart-define=RAST_LIVE=true --timeout 120s
@@ -127,4 +127,6 @@ flutter test test/live --concurrency=1 --dart-define=RAST_LIVE=true --timeout 12
 
 Location sampling runs only under the Supabase backend, while the member is active with location on; it asks for precise location, "allow all the time" and notifications, keeps a foreground-service notification on Android and uploads batches to `submit_location_samples`.
 
-Backend contract: `supabase/README.md`. Designs: `docs/superpowers/specs/2026-10-26-flutter-adapters-design.md`, `docs/superpowers/specs/2026-10-26-location-upload-design.md`.
+Push notifications (new match, like, message; three switches in Profile › Notifications) go through FCM: the token sits on the device row, the RPCs write `push_outbox`, and the `push-send` function delivers.
+
+Backend contract: `supabase/README.md`. Designs: `docs/superpowers/specs/2026-10-26-flutter-adapters-design.md`, `docs/superpowers/specs/2026-10-26-location-upload-design.md`, `docs/superpowers/specs/2026-10-28-push-notifications-design.md`.

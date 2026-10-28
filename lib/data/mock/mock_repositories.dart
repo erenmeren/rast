@@ -330,3 +330,16 @@ class MockLocationRepository implements LocationRepository {
   @override
   Future<List<String>> upload(List<LocationSample> samples) async => [for (final s in samples) s.id];
 }
+
+class MockPushRepository implements PushRepository {
+  @override
+  Future<bool> requestPermission() async => true;
+  @override
+  Stream<String> tokens() => const Stream.empty();
+  @override
+  Future<void> register(String token) async {}
+  @override
+  Future<void> unregister() async {}
+  @override
+  Stream<PushTap> taps() => const Stream.empty();
+}

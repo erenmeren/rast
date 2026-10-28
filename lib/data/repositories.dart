@@ -213,3 +213,24 @@ abstract class ProfileRepository {
   Future<void> savePreferences(Preferences preferences);
   Future<void> clear();
 }
+
+/// A notification the member opened. `accountId` is the other member for a
+/// match or a message; a like carries none.
+class PushTap {
+  const PushTap({required this.kind, this.accountId});
+  final String kind;
+  final String? accountId;
+}
+
+/// Push registration and taps. Production: firebase_messaging, the token on
+/// this install's device row.
+abstract class PushRepository {
+  Future<bool> requestPermission();
+  /// The current token, then every refresh.
+  Stream<String> tokens();
+  Future<void> register(String token);
+  /// Clears the device row and the FCM token; called before sign-out.
+  Future<void> unregister();
+  /// Taps, including the one that launched the app.
+  Stream<PushTap> taps();
+}

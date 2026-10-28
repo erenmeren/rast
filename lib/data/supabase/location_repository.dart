@@ -9,6 +9,19 @@ import '../repositories.dart';
 
 const String deviceKey = 'rast.device.id';
 
+/// The device row of this install, created once and remembered in the store.
+/// Shared by location upload and push registration.
+Future<String> ensureDeviceId(SupabaseClient client, PreferencesStore store) async {
+  final stored = store.getString(deviceKey);
+  if (stored != null) return stored;
+  final me = client.auth.currentUser?.id;
+  if (me == null) throw const AuthException('not signed in');
+  final row = await client.from('device').insert({'account_id': me, 'platform': Platform.operatingSystem}).select('id').single();
+  final id = row['id'] as String;
+  await store.setString(deviceKey, id);
+  return id;
+}
+
 /// geolocator with a foreground service (as proven in the location lab),
 /// one device row per install, batches into submit_location_samples.
 class SupabaseLocationRepository implements LocationRepository {
@@ -70,16 +83,7 @@ class SupabaseLocationRepository implements LocationRepository {
   }
 
   @override
-  Future<String> deviceId() async {
-    final stored = store.getString(deviceKey);
-    if (stored != null) return stored;
-    final me = client.auth.currentUser?.id;
-    if (me == null) throw const AuthException('not signed in');
-    final row = await client.from('device').insert({'account_id': me, 'platform': Platform.operatingSystem}).select('id').single();
-    final id = row['id'] as String;
-    await store.setString(deviceKey, id);
-    return id;
-  }
+  Future<String> deviceId() => ensureDeviceId(client, store);
 
   @override
   Future<List<String>> upload(List<LocationSample> samples) async {

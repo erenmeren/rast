@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -10,9 +11,11 @@ import '../data/supabase/backend.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 import '../data/supabase/chat_repository.dart';
 import '../data/supabase/discovery_repository.dart';
+import '../data/supabase/firebase_config.dart';
 import '../data/supabase/location_repository.dart';
 import '../data/supabase/photo_repository.dart';
 import '../data/supabase/profile_repository.dart';
+import '../data/supabase/push_repository.dart';
 import '../data/supabase/safety_repository.dart';
 import '../core/models/models.dart';
 import '../features/auth/session_notifier.dart';
@@ -52,6 +55,7 @@ void _watchSession(ProviderContainer container) {
 Future<List<Override>> supabaseOverrides(PreferencesStore store) async {
   final backend = await Backend.init();
   final client = backend.client;
+  if (FirebaseConfig.present) await Firebase.initializeApp(options: FirebaseConfig.options);
   final sync = SupabaseSync(client, store);
   // A returning member's store may be empty (reinstall) or stale.
   if (client.auth.currentSession != null) {
@@ -76,5 +80,7 @@ Future<List<Override>> supabaseOverrides(PreferencesStore store) async {
     chatRepositoryProvider.overrideWithValue(SupabaseChatRepository(client, store)),
     safetyRepositoryProvider.overrideWithValue(SupabaseSafetyRepository(client)),
     locationRepositoryProvider.overrideWithValue(SupabaseLocationRepository(client, store)),
+    // without the Firebase values the mock push repository stays: no token, no push
+    if (FirebaseConfig.present) pushRepositoryProvider.overrideWithValue(SupabasePushRepository(client, store)),
   ];
 }
