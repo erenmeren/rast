@@ -6,6 +6,8 @@ import 'package:rast/data/repositories.dart';
 import 'package:rast/features/auth/session_notifier.dart';
 import 'package:rast/features/push/push_service.dart';
 
+import 'package:rast/core/storage/preferences_store.dart';
+
 import '../helpers/app.dart';
 import '../helpers/fake_push.dart';
 
@@ -54,8 +56,34 @@ void main() {
   });
 
   test('log out unregisters before the session ends', () async {
-    final (c, fake) = await running();
+    final fake = FakePush();
+    final auth = _LoggingAuth(fake.log);
+    final c = await testContainer(prefs: {deviceKey: 'dev-1'}, extra: [
+      pushRepositoryProvider.overrideWithValue(fake),
+      authRepositoryProvider.overrideWithValue(auth),
+    ]);
+    makeActiveMember(c);
     await c.read(sessionProvider.notifier).logOut();
-    expect(fake.unregistered, isTrue);
+    expect(fake.log, ['unregister', 'signOut']);
+    // the next account on this phone must get its own device row
+    expect(c.read(preferencesStoreProvider).getString(deviceKey), isNull);
   });
+
+  test('deleting the account forgets the device row too', () async {
+    final (c, _) = await running();
+    await c.read(preferencesStoreProvider).setString(deviceKey, 'dev-1');
+    await c.read(sessionProvider.notifier).deleteAccount();
+    expect(c.read(preferencesStoreProvider).getString(deviceKey), isNull);
+  });
+}
+
+class _LoggingAuth implements AuthRepository {
+  _LoggingAuth(this.log);
+  final List<String> log;
+  @override
+  Future<void> sendCode(String dial, String phone) async {}
+  @override
+  Future<bool> verify(String code) async => true;
+  @override
+  Future<void> signOut() async => log.add('signOut');
 }

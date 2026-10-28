@@ -7,8 +7,6 @@ import 'package:supabase_flutter/supabase_flutter.dart' hide Session;
 import '../../core/storage/preferences_store.dart';
 import '../repositories.dart';
 
-const String deviceKey = 'rast.device.id';
-
 /// The device row of this install, created once and remembered in the store.
 /// Shared by location upload and push registration.
 Future<String> ensureDeviceId(SupabaseClient client, PreferencesStore store) async {

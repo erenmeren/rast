@@ -176,6 +176,10 @@ class LocationSample {
       );
 }
 
+/// Store key of this install's device row id; forgotten on sign-out so the
+/// next account gets its own row.
+const String deviceKey = 'rast.device.id';
+
 /// Position sampling and intake. Production: geolocator with a foreground
 /// service, the device row of this install, submit_location_samples.
 abstract class LocationRepository {

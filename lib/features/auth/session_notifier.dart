@@ -5,6 +5,7 @@ import '../../core/models/models.dart';
 import '../../core/rules/rules.dart';
 import '../chat/threads_notifier.dart';
 import '../../core/storage/preferences_store.dart';
+import '../../data/repositories.dart';
 import '../discovery/deck_notifier.dart';
 import '../discovery/people_directory.dart';
 import '../likes/likes_notifier.dart';
@@ -114,6 +115,7 @@ class SessionNotifier extends Notifier<Session> {
     try {
       await ref.read(pushRepositoryProvider).unregister();
     } catch (_) {}
+    await ref.read(preferencesStoreProvider).remove(deviceKey);
     try {
       await ref.read(authRepositoryProvider).signOut();
     } catch (_) {}
@@ -123,6 +125,7 @@ class SessionNotifier extends Notifier<Session> {
 
   Future<void> deleteAccount() async {
     await ref.read(safetyRepositoryProvider).deleteAccount();
+    await ref.read(preferencesStoreProvider).remove(deviceKey);
     await ref.read(authRepositoryProvider).signOut();
     ref.read(introProvider.notifier).reset();
     await ref.read(safetyProvider.notifier).reset();

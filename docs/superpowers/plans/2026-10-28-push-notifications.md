@@ -25,7 +25,7 @@
 1. A like from a blocked or non-eligible person returns `unavailable` before `app.notify` is reached; no outbox row may appear (Task 1 test `test_unavailable_like_writes_nothing`).
 2. A member with two devices receives one notification per device and a dead token on one device must not stop the other (Task 2 helper `sendAll` continues on error; live check in Task 6).
 3. The owner's Nothing Phone still carries a token after log-out unless `unregister()` ran before `signOut()`; the Task 5 test `log out unregisters before the session ends` pins the order.
-4. `hydrate()` on a reinstall must not reset the three flags to true when the server says false (Task 3 test `hydrate reads the three flags`).
+4. `hydrate()` on a reinstall must not reset the three flags to true when the server says false (no test: `hydrate` needs a Supabase client the suite does not fake; reviewed by reading `profile_repository.dart`).
 5. A tap on a `liked` notification carries no `account_id`; the router must go to `/likes`, never to a person page (Task 5 test `a liked tap opens Likes You`).
 
 ---

@@ -14,7 +14,7 @@ The harness starts a throwaway container, applies `tests/auth_stub.sql` and `tes
 
 ## Applying to a Supabase project
 
-Link the project once (`supabase link --project-ref <ref>`) and run `supabase db push`; the CLI applies `migrations/*.sql` in order. Enable `pg_cron` in the dashboard first if you want the retention jobs scheduled; without it the schedule step is skipped and the purge functions can be called by hand.
+Link the project once (`supabase link --project-ref <ref>`) and run `supabase db push`; the CLI applies `migrations/*.sql` in order. Edge functions: `photo-finalize` and `like-preview` keep JWT verification on; `push-send` is deployed with `--no-verify-jwt` (`verify_jwt: false` through the MCP) because pg_net sends no `Authorization` header and the `x-push-secret` header is the auth. Redeploying it with the default turns every push into a gateway 401. Enable `pg_cron` in the dashboard first if you want the retention jobs scheduled; without it the schedule step is skipped and the purge functions can be called by hand.
 
 ## Layout
 

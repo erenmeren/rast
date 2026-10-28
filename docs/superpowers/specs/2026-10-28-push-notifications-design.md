@@ -50,6 +50,7 @@ Notification badges and in-app banners while the app is in the foreground (realt
 2. Service account JSON (Firebase console › Project settings › Service accounts) → edge function secret `FCM_SERVICE_ACCOUNT`.
 3. `PUSH_HOOK_SECRET` (random) → edge function secret and `insert into app.push_hook (url, secret) values ('https://<ref>.supabase.co/functions/v1/push-send', '<secret>')`.
 4. Enable `pg_net` in the dashboard if 0020 did not (it is available on hosted projects).
+5. Any redeploy of `push-send` keeps `verify_jwt` off (`supabase functions deploy push-send --no-verify-jwt`).
 
 ## Tests
 

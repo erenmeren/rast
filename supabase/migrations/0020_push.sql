@@ -59,13 +59,18 @@ declare
 begin
   select * into h from app.push_hook limit 1;
   if h.url is not null and exists (select 1 from pg_extension where extname = 'pg_net') then
-    -- dynamic so the function also compiles where the net schema is absent
-    execute format(
-      'select net.http_post(url := %L, body := %L::jsonb, headers := %L::jsonb)',
-      h.url,
-      jsonb_build_object('id', new.id)::text,
-      jsonb_build_object('Content-Type', 'application/json', 'x-push-secret', h.secret)::text
-    );
+    begin
+      -- dynamic so the function also compiles where the net schema is absent
+      execute format(
+        'select net.http_post(url := %L, body := %L::jsonb, headers := %L::jsonb, timeout_milliseconds := 10000)',
+        h.url,
+        jsonb_build_object('id', new.id)::text,
+        jsonb_build_object('Content-Type', 'application/json', 'x-push-secret', h.secret)::text
+      );
+    exception when others then
+      -- a push that cannot be queued (pg_net worker down) must not undo the like or message
+      raise warning 'push hook: %', sqlerrm;
+    end;
   end if;
   return new;
 end $$;

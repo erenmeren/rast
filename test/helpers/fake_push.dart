@@ -7,6 +7,8 @@ class FakePush implements PushRepository {
   int permissionRequests = 0;
   final registered = <String>[];
   bool unregistered = false;
+  /// Shared with other fakes to pin call order.
+  final log = <String>[];
   final tokenController = StreamController<String>.broadcast();
   final tapController = StreamController<PushTap>.broadcast();
 
@@ -21,7 +23,10 @@ class FakePush implements PushRepository {
   @override
   Future<void> register(String token) async => registered.add(token);
   @override
-  Future<void> unregister() async => unregistered = true;
+  Future<void> unregister() async {
+    unregistered = true;
+    log.add('unregister');
+  }
   @override
   Stream<PushTap> taps() => tapController.stream;
 }
