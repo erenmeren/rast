@@ -10,6 +10,7 @@ import '../features/profile/preferences_notifier.dart';
 import '../features/profile/profile_notifier.dart';
 import '../features/likes/likes_notifier.dart';
 import '../features/location/location_service.dart';
+import '../features/push/push_service.dart';
 import 'providers.dart';
 import 'router.dart';
 
@@ -55,6 +56,7 @@ class _RastAppState extends ConsumerState<RastApp> with WidgetsBindingObserver {
     final appearance = ref.watch(appearanceProvider);
     final router = ref.watch(routerProvider);
     ref.watch(locationProvider); // keeps the sampler alive for the app's lifetime
+    ref.watch(pushProvider);
     return MaterialApp.router(
       title: 'rast',
       debugShowCheckedModeBanner: false,

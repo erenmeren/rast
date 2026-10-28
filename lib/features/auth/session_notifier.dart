@@ -110,6 +110,10 @@ class SessionNotifier extends Notifier<Session> {
     ref.read(preferencesProvider.notifier).reset();
     await ref.read(sessionRepositoryProvider).clear();
     await ref.read(preferencesStoreProvider).removeWhere((k) => k.startsWith('rast.read.'));
+    // before sign-out: clearing the token needs the session
+    try {
+      await ref.read(pushRepositoryProvider).unregister();
+    } catch (_) {}
     try {
       await ref.read(authRepositoryProvider).signOut();
     } catch (_) {}
