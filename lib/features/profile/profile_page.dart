@@ -152,7 +152,7 @@ class ProfilePage extends ConsumerWidget {
               MenuRow(label: 'Location & visibility', detail: '${intervalLabel(settings.intervalSeconds)} · ${delayLabel(settings.delayHours)} reveal delay', icon: 'locate', onTap: () => context.go('/profile/location')),
               MenuRow(label: 'Appearance', detail: appearance == Appearance.system ? 'Match your device' : appearanceLabel(appearance), icon: 'moon', onTap: () => showAppearanceSheet(context, ref)),
               MenuRow(label: 'How it works', detail: 'See how a crossing becomes a connection', icon: 'route', onTap: () => context.go('/profile/how-it-works')),
-              MenuRow(label: 'Notifications', detail: settings.notifications ? 'On' : 'Off', icon: 'bell', onTap: () => showNotificationsSheet(context, ref)),
+              MenuRow(label: 'Notifications', detail: settings.anyNotify ? 'On' : 'Off', icon: 'bell', onTap: () => showNotificationsSheet(context, ref)),
               MenuRow(label: 'Safety & account', detail: 'Your boundaries matter', icon: 'shield', onTap: () => context.go('/profile/safety')),
               const SizedBox(height: 26),
               Center(child: Text('rast · A LITTLE CLOSER', style: rastStyle(size: 8, weight: 500, letterSpacing: 1.2, color: c.body))),

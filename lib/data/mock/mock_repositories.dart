@@ -227,7 +227,11 @@ class MockSettingsRepository implements SettingsRepository {
 
   static const intervalKey = 'rast.interval';
   static const delayKey = 'rast.delay';
-  static const notificationsKey = 'rast.notifications';
+  static const notifyKeys = {
+    NotifyKind.matches: 'rast.notify.matches',
+    NotifyKind.likes: 'rast.notify.likes',
+    NotifyKind.messages: 'rast.notify.messages',
+  };
   static const visibleKey = 'rast.visible';
   static const locationKey = 'rast.location';
 
@@ -238,7 +242,9 @@ class MockSettingsRepository implements SettingsRepository {
     return Settings(
       intervalSeconds: updateIntervalSeconds.contains(interval) ? interval! : defaultIntervalSeconds,
       delayHours: revealDelayHours.contains(delay) ? delay! : defaultDelayHours,
-      notifications: store.getBool(notificationsKey) ?? true,
+      notifyMatches: store.getBool(notifyKeys[NotifyKind.matches]!) ?? true,
+      notifyLikes: store.getBool(notifyKeys[NotifyKind.likes]!) ?? true,
+      notifyMessages: store.getBool(notifyKeys[NotifyKind.messages]!) ?? true,
       visible: store.getBool(visibleKey) ?? true,
       locationEnabled: store.getBool(locationKey) ?? false,
     );
@@ -253,11 +259,11 @@ class MockSettingsRepository implements SettingsRepository {
   @override
   Future<void> setLocation(bool value) => store.setBool(locationKey, value);
   @override
-  Future<void> setNotifications(bool value) => store.setBool(notificationsKey, value);
+  Future<void> setNotify(NotifyKind kind, bool value) => store.setBool(notifyKeys[kind]!, value);
 
   @override
   Future<void> clear() async {
-    for (final k in [intervalKey, delayKey, notificationsKey, visibleKey, locationKey]) {
+    for (final k in [intervalKey, delayKey, ...notifyKeys.values, visibleKey, locationKey]) {
       await store.remove(k);
     }
   }

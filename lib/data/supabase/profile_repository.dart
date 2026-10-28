@@ -58,12 +58,16 @@ class SupabaseProfileRepository implements ProfileRepository {
       'max_age': p.maxAge,
       'delay_hours': settings.delayHours,
       'interval_s': settings.intervalSeconds,
+      for (final k in NotifyKind.values) notifyColumn(k): settings.notify(k),
     }, onConflict: 'account_id');
   }
 
   @override
   Future<void> clear() => cache.clear();
 }
+
+/// The `preferences` column behind each notification switch.
+String notifyColumn(NotifyKind kind) => 'notify_${kind.name}';
 
 class SupabaseSettingsRepository implements SettingsRepository {
   SupabaseSettingsRepository(this.client, this.cache);
@@ -104,7 +108,10 @@ class SupabaseSettingsRepository implements SettingsRepository {
   @override
   Future<void> setLocation(bool value) => cache.setLocation(value);
   @override
-  Future<void> setNotifications(bool value) => cache.setNotifications(value);
+  Future<void> setNotify(NotifyKind kind, bool value) async {
+    await cache.setNotify(kind, value);
+    await _prefs({notifyColumn(kind): value});
+  }
   @override
   Future<void> clear() => cache.clear();
 }
@@ -213,6 +220,9 @@ class SupabaseSync implements BackendSync {
     if (prefs != null) {
       await settings.setDelay(prefs['delay_hours'] as int);
       await settings.setInterval(prefs['interval_s'] as int);
+      for (final k in NotifyKind.values) {
+        await settings.setNotify(k, prefs[notifyColumn(k)] as bool? ?? true);
+      }
     }
     if (profile != null) await settings.setVisible(profile['visible'] as bool);
     final introStatus = intro == null

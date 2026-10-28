@@ -33,9 +33,9 @@ class SettingsNotifier extends Notifier<Settings> {
     _repo.setLocation(value);
   }
 
-  void setNotifications(bool value) {
-    state = state.copyWith(notifications: value);
-    _repo.setNotifications(value);
+  void setNotify(NotifyKind kind, bool value) {
+    state = state.withNotify(kind, value);
+    _repo.setNotify(kind, value);
   }
 
   Future<void> reset() async {

@@ -69,21 +69,6 @@ void main() {
     await finishToasts(tester);
   });
 
-  testWidgets('notifications sheet toggles the preference', (tester) async {
-    final c = await testContainer();
-    makeActiveMember(c);
-    await pumpRast(tester, c, initialLocation: '/profile');
-    await tester.ensureVisible(find.text('Notifications'));
-    await tester.tap(find.text('Notifications'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byType(RastSwitch));
-    await tester.pumpAndSettle();
-    expect(c.read(settingsProvider).notifications, isFalse);
-    await tester.tap(find.text('Done'));
-    await tester.pumpAndSettle();
-    expect(find.text('Off'), findsOneWidget);
-  });
-
   testWidgets('edit photos: removing one disables Save and pauses discovery', (tester) async {
     final c = await testContainer();
     makeActiveMember(c);

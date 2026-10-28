@@ -188,15 +188,15 @@ abstract class LocationRepository {
   Future<List<String>> upload(List<LocationSample> samples);
 }
 
-/// Reveal delay, sampling interval and visibility live on the server;
-/// notifications and the location flag stay on the device.
+/// Reveal delay, sampling interval, visibility and the three notification
+/// switches live on the server; the location flag stays on the device.
 abstract class SettingsRepository {
   Settings load();
   Future<void> setDelay(int hours);
   Future<void> setInterval(int seconds);
   Future<void> setVisible(bool value);
   Future<void> setLocation(bool value);
-  Future<void> setNotifications(bool value);
+  Future<void> setNotify(NotifyKind kind, bool value);
   Future<void> clear();
 }
 
